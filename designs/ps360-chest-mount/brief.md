@@ -35,6 +35,7 @@ re-measure.
 | insta360-chest-strap-the-part-sits-on-th | Product photo of the chest strap | None (shows how the part sits on the chest plate) |
 | side-profile-clevis-arm-curves-from-the- | Side profile of the clevis arm and disc | Calliper scale too blurred to read. Arm shape and plate/hub split scaled from the 30.7 mm disc in frame, ±2 mm |
 | side-profile-jaws-from-the-disc-back-fac | Side profile, jaws from the disc's back face to the far tip of the pivot lobe | **Back face to lobe tip ≈ 28.7 mm** (beam scale, ±0.5). Pivot position and lobe radius scaled from this photo, ±1 mm |
+| clean-side-profile-of-the-arm-and-pivot- | Clean side profile of the arm, no scale | Outer edge fits one circle (2 px residual): R ≈ 22.8 mm, centre ≈ 15.9 mm from the pivot toward the axis and level with it (scaled by the 13.9 mm lobe, ±1) |
 | inside-jaws-in-the-pivot-hole-of-a-survi | Inside jaws in the pivot hole of a surviving prong | Pivot hole Ø ≈ 5.1 mm (beam scale, mm and inch agree). Pivot position not measurable from this view |
 | side-profile-jaws-across-the-pivot-lobe- | Jaws across the pivot lobe through the hole centre, perpendicular to the disc axis | Lobe width ≈ 13.9 mm (beam scale; mm reads 13.7, inch reads 14.1). Hole sits midway between the jaws, so lobe R ≈ 6.95 |
 | inside-jaws-in-the-gap-between-the-two-s | Inside jaws in the gap between the two surviving prongs | Prong gap ≈ 3.4 mm (beam scale; mm reads 3.3, inch 3.5). The jaw tips touch both inner faces near the top of the prongs |
@@ -58,8 +59,8 @@ re-measure.
 | Gap between prongs (2 gaps) | 3.4 mm; 3 × 3.4 + 2 × 3.4 = 17.0 against the 16.5 root reading, within the ±0.5 tolerance of each | calliper beam scale, ±0.5 |
 | Pivot hole Ø | 5.1 mm (GoPro-standard M5 thumbscrew clearance is ≈ 5.2) | calliper beam scale, ±0.5 |
 | Arm profile | leaves the disc rim, curves outward past the rim, then down to the pivot lobe, with a large inside fillet to the front hub (see schematic side view) | side-profile photo |
-| Arm outer edge: where the curve leaves the rim | 2 mm from the back face (the chest-plate side); above that the rim is straight | Darren |
-| Arm outer edge shape | one circular arc centred on the hub/disc axis, running from that rim point tangent into the pivot lobe. Fitting it to the measured points gives R ≈ 22.4 with its centre ≈ 18.2 mm from the back face | Darren (circle on the hub centre); radius and centre derived |
+| Arm outer edge shape | one circular arc centred on the disc/hub axis, level with the pivot, tangent to the lobe's outer side: R = 15 + 6.95 = 21.95 | Darren (circle on the hub centre) + fit to the clean profile photo (R ≈ 22.8, centre within 0.3 mm of pivot level, ±1) |
+| Where that arc leaves the rim | ≈ 6.1 mm from the back face (follows from the arc); Darren gave 2 mm, which this arc cannot also meet | open, see question 6 |
 | Overall depth: disc back face to the far tip of the pivot lobe | 28.7 mm | calliper beam scale, ±0.5 |
 | Prong lobe outer radius | 6.95 mm (13.9 mm across) | calliper beam scale, ±0.25 on the radius |
 | Pivot centre from the back face | 21.75 mm (28.7 − 6.95) | derived from two calliper readings, ±0.6 |
@@ -114,8 +115,9 @@ Each becomes a `PARAMS` entry so a print can settle it.
 4. Front hub: diameter and height with the calliper (photo gives Ø≈15.5 × 2.2).
 5. Clevis: prong thickness and gap both read 3.4 but sum 0.5 over the root width; a display
    reading on one prong, one gap and the root would settle which is off.
-6. Confirm the outer arc's centre: on the hub's axis, but ≈ 18.2 mm from the back face
-   rather than at the hub itself (an arc centred at the hub cannot reach the lobe).
+6. Outer arc vs. the 2 mm rim start: with the centre on the axis level with the pivot
+   (what the clean profile shows) the arc meets the rim ≈ 6.1 mm from the back face.
+   Keeping 2 mm instead moves the centre to ≈ 18.2 mm from the back (R 22.4).
 7. The camera arm's 2-prong end: its gap and prong thickness, so the replacement's
    gaps are sized to the arm rather than to the worn original.
 8. A photo of the chest plate with the part removed, and of the connector screw (head Ø
