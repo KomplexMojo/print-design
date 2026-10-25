@@ -118,7 +118,7 @@ Each becomes a `PARAMS` entry so a print can settle it.
    rather than at the hub itself (an arc centred at the hub cannot reach the lobe).
 7. The camera arm's 2-prong end: its gap and prong thickness, so the replacement's
    gaps are sized to the arm rather than to the worn original.
-7. A photo of the chest plate with the part removed, and of the connector screw (head Ø
+8. A photo of the chest plate with the part removed, and of the connector screw (head Ø
    and thread), so the mating side is known rather than inferred from the broken part.
 
 ## Revision history
