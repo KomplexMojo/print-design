@@ -130,3 +130,12 @@
   size_px:
   - 1800
   - 2400
+- file: photos/ref/20261025-side-profile-jaws-across-the-pivot-lobe-.jpg
+  kind: ref
+  caption: Side profile, jaws across the pivot lobe at the hole, radial direction
+    (beam scale ~13.9 mm; display off)
+  date: '2026-10-25'
+  original: fee23726-IMG_5452.jpeg
+  size_px:
+  - 1800
+  - 2400
