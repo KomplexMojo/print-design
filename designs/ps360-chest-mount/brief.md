@@ -37,6 +37,7 @@ re-measure.
 | side-profile-jaws-from-the-disc-back-fac | Side profile, jaws from the disc's back face to the far tip of the pivot lobe | **Back face to lobe tip ≈ 28.7 mm** (beam scale, ±0.5). Pivot position and lobe radius scaled from this photo, ±1 mm |
 | inside-jaws-in-the-pivot-hole-of-a-survi | Inside jaws in the pivot hole of a surviving prong | Pivot hole Ø ≈ 5.1 mm (beam scale, mm and inch agree). Pivot position not measurable from this view |
 | side-profile-jaws-across-the-pivot-lobe- | Jaws across the pivot lobe through the hole centre, perpendicular to the disc axis | Lobe width ≈ 13.9 mm (beam scale; mm reads 13.7, inch reads 14.1). Hole sits midway between the jaws, so lobe R ≈ 6.95 |
+| inside-jaws-in-the-gap-between-the-two-s | Inside jaws in the gap between the two surviving prongs | Prong gap ≈ 3.4 mm (beam scale; mm reads 3.3, inch 3.5). The jaw tips touch both inner faces near the top of the prongs |
 
 ## Requirements
 
@@ -54,7 +55,7 @@ re-measure.
 | Width across the 3-prong root | 16.5 mm (measured across the broken prong's stub) | calliper beam scale, ±0.5 |
 | Clevis: **3 prongs** (one missing), pivot axis parallel to the disc face | count | Darren |
 | Prong thickness (each of the 3) | 3.4 mm | calliper beam scale on a surviving prong, ±0.5 |
-| Gap between prongs (2 gaps) | ≈ 3.0 mm; 3 × 3.4 + 2 × 3.0 = 16.2 fits the 16.5 root | scaled from a photo, estimate |
+| Gap between prongs (2 gaps) | 3.4 mm; 3 × 3.4 + 2 × 3.4 = 17.0 against the 16.5 root reading, within the ±0.5 tolerance of each | calliper beam scale, ±0.5 |
 | Pivot hole Ø | 5.1 mm (GoPro-standard M5 thumbscrew clearance is ≈ 5.2) | calliper beam scale, ±0.5 |
 | Arm profile | leaves the disc rim, curves outward past the rim, then down to the pivot lobe, with a large inside fillet to the front hub (see schematic side view) | side-profile photo |
 | Overall depth: disc back face to the far tip of the pivot lobe | 28.7 mm | calliper beam scale, ±0.5 |
@@ -109,8 +110,9 @@ Each becomes a `PARAMS` entry so a print can settle it.
    angle relative to the clevis.
 3. Outer rim step on the back: width and height.
 4. Front hub: diameter and height with the calliper (photo gives Ø≈15.5 × 2.2).
-5. Clevis: gap between the two surviving prongs (calliper on it), and
-   the pivot centre's distance from the disc axis (still photo-scaled, ±1 mm).
+5. Clevis: the pivot centre's distance from the disc axis (still photo-scaled, ±1 mm).
+   Prong thickness and gap both read 3.4 but sum 0.5 over the root width; a display
+   reading on one prong, one gap and the root would settle which is off.
 6. The camera arm's 2-prong end: its gap and prong thickness, so the replacement's
    gaps are sized to the arm rather than to the worn original.
 7. A photo of the chest plate with the part removed, and of the connector screw (head Ø

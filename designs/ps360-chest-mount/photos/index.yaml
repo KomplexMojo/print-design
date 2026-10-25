@@ -139,3 +139,12 @@
   size_px:
   - 1800
   - 2400
+- file: photos/ref/20261025-inside-jaws-in-the-gap-between-the-two-s.jpg
+  kind: ref
+  caption: Inside jaws in the gap between the two surviving prongs (beam scale ~3.4
+    mm; display off)
+  date: '2026-10-25'
+  original: 9fab9700-IMG_5454.jpeg
+  size_px:
+  - 1800
+  - 2400
