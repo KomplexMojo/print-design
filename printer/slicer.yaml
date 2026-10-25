@@ -19,6 +19,10 @@ variants:
     overrides: {wall_loops: "4", sparse_infill_density: "40%"}
   petg:
     filament: "Bambu PETG Basic @BBL H2S"
+  petg-strong:
+    filament: "Bambu PETG Basic @BBL H2S"
+    process: "0.20mm Standard @BBL H2S"
+    overrides: {wall_loops: "4", sparse_infill_density: "40%"}
 
 # Extra directories to search for preset JSON files (user presets live in
 # BambuStudio/user/<id>/{machine,process,filament}).
