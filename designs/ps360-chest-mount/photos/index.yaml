@@ -112,3 +112,12 @@
   size_px:
   - 1800
   - 2400
+- file: photos/ref/20261025-side-profile-jaws-from-the-disc-back-fac.jpg
+  kind: ref
+  caption: Side profile, jaws from the disc back face to the far tip of the pivot
+    lobe (beam scale ~28.7 mm; display off)
+  date: '2026-10-25'
+  original: 5121b622-IMG_5449.jpeg
+  size_px:
+  - 1800
+  - 2400
