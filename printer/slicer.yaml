@@ -1,0 +1,25 @@
+# Bambu Studio CLI settings for `printloop slice` and `printloop profiles`.
+# Slicing runs on Darren's machine, where Bambu Studio and the H2S presets live.
+# Leave a value empty to use the auto-detected default for your OS.
+
+bambu_studio: ""        # path to the Bambu Studio executable
+
+# Preset names exactly as Bambu Studio shows them. System presets and your own
+# user presets both work; `printloop profiles` flattens them into full configs.
+presets:
+  machine: "Bambu Lab H2S 0.4 nozzle"
+  process: "0.20mm Standard @BBL H2S"
+  filament: "Bambu PLA Basic @BBL H2S"
+
+# Named process/filament combos a brief can ask for with `slice_profile:`.
+# Each entry overrides the presets above. Run `printloop profiles` after editing.
+variants:
+  strong:
+    process: "0.20mm Standard @BBL H2S"
+    overrides: {wall_loops: "4", sparse_infill_density: "40%"}
+  petg:
+    filament: "Bambu PETG Basic @BBL H2S"
+
+# Extra directories to search for preset JSON files (user presets live in
+# BambuStudio/user/<id>/{machine,process,filament}).
+extra_profile_dirs: []

@@ -1,0 +1,9 @@
+# Build outputs are regenerated from part.py; the log records the commit for each print.
+# The check report and slice summaries stay tracked so any session can read them.
+designs/*/out/*
+!designs/*/out/report.md
+!designs/*/out/*.slice.json
+__pycache__/
+*.egg-info/
+.venv/
+.DS_Store

@@ -1,0 +1,37 @@
+# Bambu Lab H2S: machine limits and design rules used by `printloop check`.
+# The `fits` and `rules` values are meant to be tuned from real prints:
+# when a print log shows a fit was too tight or loose, update them here
+# (and note the change in the log) so every later design benefits.
+
+printer:
+  name: Bambu Lab H2S
+  build_volume_mm: [340, 320, 340]   # X, Y, Z (from the 0.4 nozzle system profile)
+  bed_margin_mm: 5                   # keep parts this far from the bed edge
+  nozzle_mm: 0.4
+  layer_mm: 0.20                     # 0.20mm Standard @BBL H2S
+
+material:
+  default: PLA
+  density_g_cm3:
+    PLA: 1.24
+    PETG: 1.27
+    ABS: 1.04
+    ASA: 1.07
+    TPU: 1.21
+    PA-CF: 1.15
+
+# Clearance per side between mating parts, in mm. Calibrate with designs/fit-gauge.
+fits:
+  press: 0.10      # interference-ish, needs force or a mallet
+  snug: 0.15       # holds by friction, removable by hand
+  slide: 0.25      # moves freely without wobble
+  loose: 0.40      # drops in
+  hole_shrink_mm: 0.10  # small vertical holes print this much undersize (diameter)
+
+rules:
+  min_wall_mm: 0.8            # 2 perimeters at 0.4 nozzle
+  warn_wall_mm: 1.2           # 3 perimeters; thinner walls are fragile
+  max_overhang_deg: 45        # from vertical; steeper needs support or a chamfer
+  max_overhang_area_pct: 5    # warn when unsupported overhang exceeds this share of surface
+  min_bed_contact_mm2: 25     # warn below this first-layer contact area
+  max_height_to_base: 4       # warn when height exceeds this multiple of the base width (tippy)
