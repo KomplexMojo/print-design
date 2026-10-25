@@ -1,6 +1,6 @@
 ---
 name: print-design
-description: Model a 3D-printable part in build123d from its brief and get it through the H2S printability checks. Use when designing or changing a part.py under designs/ in the print-designs repo.
+description: Model a 3D-printable part in build123d from its brief and get it through the H2S printability checks. Use when designing or changing a part.py under designs/ in the print-design repo.
 ---
 
 # Design: parametric build123d model plus printability checks

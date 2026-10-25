@@ -1,6 +1,6 @@
 ---
 name: print-ideate
-description: Turn an idea for a 3D-printed part into a design brief in the print-designs repo. Use when Darren describes something new to print or asks to start a design.
+description: Turn an idea for a 3D-printed part into a design brief in the print-design repo. Use when Darren describes something new to print or asks to start a design.
 ---
 
 # Ideate: capture requirements for a printed part

@@ -1,4 +1,4 @@
-# print-designs
+# print-design
 
 Design 3D-printed parts with Claude and build123d, print them on a Bambu Lab H2S,
 and feed what comes off the bed back into the next revision.
@@ -23,8 +23,8 @@ and feed what comes off the bed back into the next revision.
 1. Install [uv](https://github.com/astral-sh/uv) and Python 3.11+.
 2. Clone this repo and install the CLI:
    ```
-   git clone https://github.com/KomplexMojo/print-designs.git
-   cd print-designs
+   git clone https://github.com/KomplexMojo/print-design.git
+   cd print-design
    uv venv && source .venv/bin/activate      # Windows: .venv\Scripts\activate
    uv pip install -e .
    ```

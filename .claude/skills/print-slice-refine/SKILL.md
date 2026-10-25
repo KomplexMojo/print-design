@@ -1,6 +1,6 @@
 ---
 name: print-slice-refine
-description: Slice a print-designs part for the Bambu H2S, hand it off to print, log how it came out, and turn the result into the next revision. Use after a design passes its checks, or when Darren reports a print result.
+description: Slice a print-design part for the Bambu H2S, hand it off to print, log how it came out, and turn the result into the next revision. Use after a design passes its checks, or when Darren reports a print result.
 ---
 
 # Slice, print, log, refine

@@ -1,4 +1,4 @@
-# print-designs
+# print-design
 
 Parametric 3D-printed parts for a Bambu Lab H2S, designed with build123d and
 run through one loop: **ideate → design → slice → print → refine**.
