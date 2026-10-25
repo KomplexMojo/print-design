@@ -33,6 +33,7 @@ re-measure.
 | back-face-close-up-outer-rim-lip-1-mm-ke | Back face close-up | None (shows the rim lip, recess step and notch steps) |
 | back-face-outer-rim-keyed-recess-with-tw | Back face: outer rim step, keyed recess, two notches 180° apart | None (no scale) |
 | insta360-chest-strap-the-part-sits-on-th | Product photo of the chest strap | None (shows how the part sits on the chest plate) |
+| side-profile-clevis-arm-curves-from-the- | Side profile of the clevis arm and disc | Calliper scale too blurred to read. Arm shape, pivot position, lobe radius, plate and hub split scaled from the 30.7 mm disc in frame, ±2 mm |
 
 ## Requirements
 
@@ -46,13 +47,15 @@ re-measure.
 | Recess keys: two notches at 180° | width, depth unknown | photo, count only |
 | Angle of the notches relative to the clevis | unknown | |
 | Outer rim step on the back face | width, height unknown | photo, shape only |
-| Front counterbore around the hole (screw head seat) | Ø, depth unknown; may not exist | photo, faint |
+| Disc plate thickness / raised front hub | plate ≈ 3.6 mm + hub Ø ≈ 15.5 × ≈ 2.2 mm (sums to the 5.8 total) | scaled from side-profile photo, ±2 |
 | Width across the 3-prong root | 16.5 mm (measured across the broken prong's stub) | calliper beam scale, ±0.5 |
 | Clevis: **3 prongs** (one missing), pivot axis parallel to the disc face | count | Darren |
 | Prong thickness (each of the 3) | 3.4 mm | calliper beam scale on a surviving prong, ±0.5 |
 | Gap between prongs (2 gaps) | ≈ 3.0 mm; 3 × 3.4 + 2 × 3.0 = 16.2 fits the 16.5 root | scaled from a photo, estimate |
-| Pivot hole Ø | unknown (≈5.2 mm for an M5 thumbscrew if GoPro-standard) | |
-| Prong outer radius, pivot height above the front face, pivot offset from disc centre | unknown | |
+| Pivot hole Ø | ≈ 5.4 mm (GoPro-standard is ≈ 5.2 for the M5 thumbscrew) | scaled from side-profile photo, ±2 |
+| Arm profile | leaves the disc rim, curves outward past the rim, then down to the pivot lobe, with a large inside fillet to the front hub (see schematic side view) | side-profile photo |
+| Pivot position | ≈ 15.7 mm from the disc axis (about at the rim), ≈ 21.5 mm in front of the plate's front face | scaled from side-profile photo, ±2 |
+| Prong lobe outer radius | ≈ 8 mm | scaled from side-profile photo, ±2 |
 | Front index mark (small slot on the rim opposite the clevis) | cosmetic, size not needed | photo |
 
 ## Mating parts and fits
@@ -100,10 +103,10 @@ Each becomes a `PARAMS` entry so a print can settle it.
 2. Recess depth to ±0.1 (Darren estimates 1 mm), notch width and depth, and the notch
    angle relative to the clevis.
 3. Outer rim step on the back: width and height.
-4. Is there a counterbore on the front for the screw head? Diameter and depth.
-5. Clevis: gap between the two surviving prongs (calliper on it), pivot hole Ø, prong
-   outer radius, pivot height above the front face, and pivot distance from the disc
-   centre.
+4. Front hub: diameter and height with the calliper (photo gives Ø≈15.5 × 2.2).
+5. Clevis: gap between the two surviving prongs (calliper on it), pivot hole Ø, and
+   with the calliper display on: pivot height from the front face and pivot distance
+   from the disc edge (the side-profile values are ±2 mm).
 6. The camera arm's 2-prong end: its gap and prong thickness, so the replacement's
    gaps are sized to the arm rather than to the worn original.
 7. A photo of the chest plate with the part removed, and of the connector screw (head Ø
