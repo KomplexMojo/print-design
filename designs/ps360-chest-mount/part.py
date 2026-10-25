@@ -32,11 +32,13 @@ PARAMS = {
     "hub_h": 2.2,                 # plate_t + hub_h = 5.8 overall
     "connector_screw_d": 11.0,    # assumed: original hole 11.8 is this plus a loose fit
     # Back face, against the chest plate
-    "chest_boss_d": 22.4,         # boss that seats in the keyed recess (brief: the recess reading)
-    "recess_depth": 1.0,
-    "notch_tab_w": 3.0,           # guess: width of the chest plate's key tabs
-    "notch_depth": 1.0,           # guess: radial depth of each notch beyond the recess wall
-    "notch_angle": 0.0,           # degrees from the clevis direction; unknown, schematic shows 0
+    "key_ring_d": 22.4,           # keyed ring standing 1 mm proud of the back face, into the chest plate
+    "key_ring_h": 1.0,            # Darren: the ring sits 1 mm below the back face
+    "key_tab_w": 3.0,             # guess: width of the chest plate's slots for the two tabs
+    "key_tab_len": 1.0,           # guess: how far each tab sticks out past the ring
+    "key_tab_angle": 0.0,         # degrees from the clevis direction; photo shows a tab toward the clevis
+    "sink_d": 15.0,               # sunken surface inside the ring, around the screw hole (photo scale, ±1)
+    "sink_depth": 1.5,            # guess: how far that surface sits below the ring's face
     "rim_step_w": 1.0,            # guess: relief step around the back outer edge
     "rim_step_h": 0.5,            # guess; 0 removes it
     # Clevis (3 prongs, pivot axis parallel to the disc face)
@@ -101,8 +103,8 @@ def build_design_frame(p: dict) -> Part:
     rim_r = p["disc_od"] / 2
     width = clevis_width(p)
     gap = gap_width(p)
-    recess_d = fits.hole(p["chest_boss_d"], "slide")
-    notch_w = fits.hole(p["notch_tab_w"], "slide")
+    ring_d = fits.shaft(p["key_ring_d"], "slide")
+    tab_w = fits.shaft(p["key_tab_w"], "slide")
     pivot = (0, p["pivot_from_axis"], p["pivot_from_back"])
 
     with BuildPart() as part:
@@ -135,22 +137,26 @@ def build_design_frame(p: dict) -> Part:
                     Box(pivot_d / 2, pivot_d / 2, width + 2, mode=Mode.SUBTRACT,
                         align=(Align.CENTER, Align.CENTER, Align.CENTER))
 
-        # Centre hole for the connector screw
-        Cylinder(fits.hole(p["connector_screw_d"], "loose") / 2, 20, mode=Mode.SUBTRACT)
 
-        # Back face: keyed recess with two notches 180° apart, and the outer rim step
-        Cylinder(recess_d / 2, p["recess_depth"], mode=Mode.SUBTRACT,
-                 align=(Align.CENTER, Align.CENTER, Align.MIN))
-        for a in (p["notch_angle"], p["notch_angle"] + 180):
-            with Locations(Location((0, 0, 0), (0, 0, a))):
-                with Locations((0, recess_d / 2 + p["notch_depth"] / 2 - 0.5, 0)):
-                    Box(notch_w, p["notch_depth"] + 1, p["recess_depth"], mode=Mode.SUBTRACT,
-                        align=(Align.CENTER, Align.CENTER, Align.MIN))
+        # Back face: keyed ring with two tabs 180° apart, standing proud into the chest plate
+        with Locations((0, 0, -p["key_ring_h"])):
+            Cylinder(ring_d / 2, p["key_ring_h"], align=(Align.CENTER, Align.CENTER, Align.MIN))
+            for a in (p["key_tab_angle"], p["key_tab_angle"] + 180):
+                with Locations(Location((0, 0, 0), (0, 0, a))):
+                    with Locations((0, ring_d / 2 + p["key_tab_len"] / 2 - 0.5, 0)):
+                        Box(tab_w, p["key_tab_len"] + 1, p["key_ring_h"],
+                            align=(Align.CENTER, Align.CENTER, Align.MIN))
+            # Sunken surface inside the ring
+            Cylinder(p["sink_d"] / 2, p["sink_depth"], mode=Mode.SUBTRACT,
+                     align=(Align.CENTER, Align.CENTER, Align.MIN))
         if p["rim_step_h"] > 0:
             with BuildSketch():
                 Circle(rim_r + 5)
                 Circle(rim_r - p["rim_step_w"], mode=Mode.SUBTRACT)
             extrude(amount=p["rim_step_h"], mode=Mode.SUBTRACT)
+
+        # Centre hole for the connector screw
+        Cylinder(fits.hole(p["connector_screw_d"], "loose") / 2, 20, mode=Mode.SUBTRACT)
 
         # Front index mark on the rim opposite the clevis
         with Locations((0, -(rim_r - 1 - p["index_mark_len"] / 2), p["plate_t"])):
@@ -161,8 +167,8 @@ def build_design_frame(p: dict) -> Part:
             with Locations((-rim_r, 0, 0)):
                 Box(2 * p["bed_flat"], 40, 40, mode=Mode.SUBTRACT)
         else:
-            chamfer(part.edges().filter_by(GeomType.CIRCLE).group_by(Axis.Z)[0]
-                    .filter_by(lambda e: e.radius > rim_r - p["rim_step_w"] - 0.1), p["foot_chamfer"])
+            # The ring is what touches the bed; chamfer its outer edge and the screw hole's
+            chamfer(part.edges().group_by(Axis.Z)[0], p["foot_chamfer"])
     return part.part
 
 

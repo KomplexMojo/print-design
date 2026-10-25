@@ -32,6 +32,7 @@ re-measure.
 | back-face-jaws-in-the-keyed-recess-beam- | Jaws in the keyed recess; clevis edge-on showing a prong gap | Keyed recess Ø ≈ 22.5 mm (agrees with 22.4); prong gap ≈ 3.0 mm scaled from pixels, no jaws on it |
 | back-face-close-up-outer-rim-lip-1-mm-ke | Back face close-up | None (shows the rim lip, recess step and notch steps) |
 | back-face-outer-rim-keyed-recess-with-tw | Back face: outer rim step, keyed recess, two notches 180° apart | None (no scale) |
+| IMG_5447 (Darren, 2026-10-25) | Back face at an angle: rim lip, keyed ring with two tabs, sunken centre | Ring stands about 1 mm proud (Darren). Sunken surface Ø ≈ 15 scaled from the disc, ±1. Supersedes the "recess" and "notch" readings above |
 | insta360-chest-strap-the-part-sits-on-th | Product photo of the chest strap | None (shows how the part sits on the chest plate) |
 | side-profile-clevis-arm-curves-from-the- | Side profile of the clevis arm and disc | Calliper scale too blurred to read. Arm shape and plate/hub split scaled from the 30.7 mm disc in frame, ±2 mm |
 | side-profile-jaws-from-the-disc-back-fac | Side profile, jaws from the disc's back face to the far tip of the pivot lobe | **Back face to lobe tip ≈ 28.7 mm** (beam scale, ±0.5). Pivot position and lobe radius scaled from this photo, ±1 mm |
@@ -47,10 +48,11 @@ re-measure.
 | Disc outside diameter | 30.7 mm | calliper beam scale, ±0.5 |
 | Disc overall thickness | 5.8 mm | calliper beam scale, ±0.5 |
 | Centre hole for the connector screw | Ø 11.8 mm | calliper beam scale, ±0.5 |
-| Back keyed recess (engages chest plate) | Ø 22.4 mm | calliper beam scale, ±0.5 |
-| Recess depth | ≈ 1.0 mm | Darren, rough |
-| Recess keys: two notches at 180° | width, depth unknown | photo, count only |
-| Angle of the notches relative to the clevis | unknown | |
+| Back keyed ring (engages chest plate) | Ø 22.4 mm, standing about 1 mm proud of the back face (not a recess) | calliper beam scale, ±0.5; direction from Darren and photo IMG_5447, 2026-10-25 |
+| Sunken surface inside the ring, around the screw hole | Ø ≈ 15, depth unknown | photo IMG_5447 scaled from the 30.7 disc, ±1; Darren |
+| Ring height below the back face | ≈ 1.0 mm | Darren, rough |
+| Ring keys: two tabs at 180°, one toward the clevis | width, length unknown | photo IMG_5447, shape only |
+| Angle of the tabs relative to the clevis | ≈ 0° (one tab faces the clevis) | photo IMG_5447 |
 | Outer rim step on the back face | width, height unknown | photo, shape only |
 | Disc plate thickness / raised front hub | plate ≈ 3.6 mm + hub Ø ≈ 15.5 × ≈ 2.2 mm (sums to the 5.8 total) | scaled from side-profile photo, ±2 |
 | Width across the 3-prong root | 16.5 mm (measured across the broken prong's stub) | calliper beam scale, ±0.5 |
@@ -61,15 +63,15 @@ re-measure.
 | Arm profile | leaves the disc rim, curves outward past the rim, then down to the pivot lobe, with a large inside fillet to the front hub (see schematic side view) | side-profile photo |
 | Arm outer edge shape | one circular arc centred on the disc/hub axis, level with the pivot, tangent to the lobe's outer side: R = 15 + 6.95 = 21.95 | Darren (circle on the hub centre) + fit to the clean profile photo (R ≈ 22.8, centre within 0.3 mm of pivot level, ±1) |
 | Where that arc leaves the rim | ≈ 6.1 mm from the back face (follows from the arc) | derived; Darren chose this fit over the earlier 2 mm |
-| Overall depth: disc back face to the far tip of the pivot lobe | 28.7 mm | calliper beam scale, ±0.5 |
+| Overall depth: disc back face (around the ring) to the far tip of the pivot lobe | 28.7 mm | calliper beam scale, ±0.5 |
 | Prong lobe outer radius | 6.95 mm (13.9 mm across) | calliper beam scale, ±0.25 on the radius |
 | Pivot centre from the back face | 21.75 mm (28.7 − 6.95) | derived from two calliper readings, ±0.6 |
 | Pivot centre from the disc axis | 15 mm (just inside the rim) | Darren, measured |
 | Front index mark (small slot on the rim opposite the clevis) | cosmetic, size not needed | photo |
 
 ## Mating parts and fits
-- **Chest plate keyed boss → back recess:** slide (`fits.hole(22.4, "slide")`), so it
-  seats by hand and the notches index it without rocking.
+- **Back keyed ring → chest plate recess:** slide (`fits.shaft(22.4, "slide")`), so it
+  seats by hand and the tabs index it without rocking.
 - **Connector screw → centre hole:** loose clearance (`fits.hole(d, "loose")`); the
   screw clamps the disc, it does not locate it.
 - **Camera arm (2-prong) → clevis (3-prong):** the arm's two prongs drop into the two
@@ -88,12 +90,12 @@ rain, and a hot car. Clamp load from the connector screw compresses the disc.
 - **Orientation (proposed):** print on its side, with the clevis plane flat on the bed,
   so layers run along the prongs and through their roots rather than across them.
   Printing disc-face-down would put layer lines exactly where the original prong snapped.
-  The trade-off is that the disc and the keyed recess are then vertical, which costs
-  roundness on the recess; check it in the first print and switch if the recess fit
+  The trade-off is that the disc and the keyed ring are then vertical, which costs
+  roundness on the ring; check it in the first print and switch if the ring fit
   suffers. Decide once the clevis geometry is known.
 
 ## Acceptance criteria
-- [ ] Back recess seats onto the chest plate by hand, both notches engage, and the disc
+- [ ] Back ring seats into the chest plate by hand, both tabs engage, and the disc
       does not rock.
 - [ ] The connector screw passes through freely and clamps the disc so it does not turn
       under a firm hand twist.
@@ -107,10 +109,10 @@ rain, and a hot car. Clamp load from the connector screw compresses the disc.
 ## Open questions
 Each becomes a `PARAMS` entry so a print can settle it.
 
-1. Re-measure with the calliper display on: disc OD, thickness, centre hole, recess Ø
+1. Re-measure with the calliper display on: disc OD, thickness, centre hole, ring Ø
    (the photo values are ±0.5 mm).
-2. Recess depth to ±0.1 (Darren estimates 1 mm), notch width and depth, and the notch
-   angle relative to the clevis.
+2. Ring height to ±0.1 (Darren estimates 1 mm), its inner Ø, the sunken surface's depth,
+   and tab width and length.
 3. Outer rim step on the back: width and height.
 4. Front hub: diameter and height with the calliper (photo gives Ø≈15.5 × 2.2).
 5. Clevis: prong thickness and gap both read 3.4 but sum 0.5 over the root width; a display
@@ -124,9 +126,16 @@ Each becomes a `PARAMS` entry so a print can settle it.
 How `part.py` turns the requirements above into geometry, and what was assumed where
 the brief has no number. Every value below is a `PARAMS` entry.
 
-- **Fits.** Recess `fits.hole(22.4, "slide")` = 23.0 as specified above. That is 0.6 over
-  the original's 22.4 reading, because the brief treats 22.4 as the boss; if the disc rocks,
-  measure the chest plate's boss and set `chest_boss_d`. Centre hole
+- **Back face (from Darren's photo IMG_5447).** The keyed ring stands 1 mm proud of the
+  back face, into the chest plate, rather than being cut 1 mm into it as the first draft had
+  it. The ring is `fits.shaft(22.4, "slide")` = 21.9 across, with two tabs
+  `fits.shaft(3.0, "slide")` = 2.5 wide sticking 1.0 past it, one toward the clevis. Inside the
+  ring, a Ø15 surface around the screw hole is sunk 1.5 below the ring's face, which is 0.5 into
+  the back face. That depth is a guess, so measure it. The 5.8 thickness and the 21.75 pivot
+  are still measured from the back face around the ring, so the part is 6.8 thick at the ring
+  and 29.7 to the lobe tip. If the 28.7 reading was taken from the ring instead, set
+  `pivot_from_back` to 20.75.
+- **Fits.** Centre hole
   `fits.hole(11.0, "loose")` = 11.9, assuming an 11.0 connector screw so the hole matches
   the original 11.8. Pivot hole `fits.hole(5.0, "slide")` = 5.6 for an M5 thumbscrew.
 - **Clevis.** Prongs 3.4. Gaps 3.4 = `arm_prong_t` 2.9 (assumed, open question 6) plus a
@@ -137,28 +146,27 @@ the brief has no number. Every value below is a `PARAMS` entry.
   follows the R21.95 arc centred on the disc axis to the lobe. Inner edge goes from the
   lobe's inner side to a waist at 11.5 from the axis, 10.8 from the back (scaled from the
   side photo, ±2), then to the plate at the hub edge with a 2.5 inside fillet.
-- **Guesses for unknowns.** Notches 3.6 wide (a 3.0 tab plus slide), 1.0 deep past the
-  recess wall, full recess depth, in line with the clevis (`notch_angle` 0 as the
-  schematic draws them). Outer rim step 1.0 wide × 0.5 high, cut as a relief, so a wrong
+- **Guesses for unknowns.** Tab size and sunken-surface depth above. Outer rim step 1.0 wide × 0.5 high, cut as a relief, so a wrong
   guess cannot stop the disc seating. Index mark: 0.8 × 4 × 0.4 slot on the front face
   opposite the clevis.
 - **Orientation.** `orientation: side` (the default) prints with the clevis plane on the
   bed, as proposed above, so layers run along the prongs. It adds a 0.6 mm flat on the disc
   rim at 90° to the clevis as a bed face, which makes the disc 30.1 across that one
   direction (measure the OD across the flat's perpendicular). `--set orientation=flat`
-  prints back face down instead, with a teardrop pivot hole and a 0.4 elephant's-foot
-  chamfer; use it if the side print's recess comes out too far from round.
+  prints ring down instead, with a teardrop pivot hole and a 0.4 elephant's-foot chamfer on
+  the ring; use it if the side print's ring comes out too far from round.
 
 ### Accepted check warnings
 - **Side (default): bed contact and overhangs.** The disc stands on its rim with 26 mm² on
   the bed at 5.9× height-to-base, and the outer prong's underside sits about 6 mm above
   the bed (16.9 % overhang area). Slice with tree supports and a brim. Strength across the
   prong roots is worth the support scars, since that is where the original broke.
-- **Flat: overhangs.** Only the ceilings of the recess and rim step on the bed face
-  (z 0.5 to 1.0), a short bridge the H2S handles without supports.
+- **Flat: overhangs.** The back face around the ring, 1 mm above the bed, overhangs 4 mm
+  all round, and the sunken surface is a short bridge (z 1.0 to 1.5). Use supports on the
+  bed face, or accept a rougher back face.
 
 ## Revision history
 | Rev | Change | Why |
 |---|---|---|
 | 0 | Schematic and requirements from photos | Start of redesign; nothing printed yet |
-| 1 | First model: disc, keyed recess, 3-prong clevis with root fillets, printed on its side in PETG (strong) | Build out the brief; nothing printed yet |
+| 1 | First model: disc, raised keyed back ring with a sunken centre, 3-prong clevis with root fillets, printed on its side in PETG (strong) | Build out the brief; nothing printed yet |
