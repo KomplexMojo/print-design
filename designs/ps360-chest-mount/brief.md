@@ -58,6 +58,7 @@ re-measure.
 | Gap between prongs (2 gaps) | 3.4 mm; 3 × 3.4 + 2 × 3.4 = 17.0 against the 16.5 root reading, within the ±0.5 tolerance of each | calliper beam scale, ±0.5 |
 | Pivot hole Ø | 5.1 mm (GoPro-standard M5 thumbscrew clearance is ≈ 5.2) | calliper beam scale, ±0.5 |
 | Arm profile | leaves the disc rim, curves outward past the rim, then down to the pivot lobe, with a large inside fillet to the front hub (see schematic side view) | side-profile photo |
+| Arm outer edge: straight run before the curve | 2 mm, flush with the disc rim, measured from the plate's front face | Darren |
 | Overall depth: disc back face to the far tip of the pivot lobe | 28.7 mm | calliper beam scale, ±0.5 |
 | Prong lobe outer radius | 6.95 mm (13.9 mm across) | calliper beam scale, ±0.25 on the radius |
 | Pivot centre from the back face | 21.75 mm (28.7 − 6.95) | derived from two calliper readings, ±0.6 |
