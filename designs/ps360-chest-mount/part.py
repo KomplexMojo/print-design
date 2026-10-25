@@ -13,6 +13,8 @@ on +Y, pivot axis along X), then turned into the print orientation chosen by
           across the prong roots.
 """
 
+import math
+
 from build123d import *
 
 from printloop import fits
@@ -27,9 +29,9 @@ SLICE_PROFILE = "petg-strong"
 PARAMS = {
     # Disc
     "disc_od": 30.7,
-    "plate_t": 3.6,               # disc plate, back face to the front face around the hub
-    "hub_d": 15.5,                # raised front hub (photo scale, ±2)
-    "hub_h": 2.2,                 # plate_t + hub_h = 5.8 overall
+    # The front face is one sloped plane, thinnest opposite the clevis (Darren's photo)
+    "front_t_far": 3.6,           # guess: thickness at the rim opposite the clevis
+    "front_t_clevis": 5.8,        # thickness at the rim under the clevis (the 5.8 calliper reading)
     "connector_screw_d": 11.0,    # assumed: original hole 11.8 is this plus a loose fit
     # Back face, against the chest plate
     "key_ring_d": 22.4,           # keyed ring standing 1 mm proud of the back face, into the chest plate
@@ -50,10 +52,12 @@ PARAMS = {
     "thumbscrew_d": 5.0,          # M5 thumbscrew shank
     "arm_lobe_r": 6.95,           # assumed: the camera arm's lobe matches ours
     "prong_root_fillet": 1.2,     # the original snapped at a sharp prong root
-    "waist_from_back": 10.8,      # narrowest point of the arm (photo scale, ±2)
-    "waist_inner_from_axis": 11.5,
-    "waist_fillet": 6.0,
-    "arm_root_fillet": 2.5,       # inside fillet where the arm meets the plate
+    # Arm side profile, traced from Darren's side photo (scaled by the pivot hole, ±1)
+    "outer_foot_from_axis": 13.8,  # outer edge leaves the front face here, just inside the rim
+    "outer_foot_angle": 60.0,      # degrees from the front face where the outer curve starts
+    "waist_from_back": 10.5,       # inner edge runs straight up the arm here
+    "waist_inner_from_axis": 12.2,
+    "inner_foot_from_axis": 7.5,   # inner edge sweeps onto the front face here
     # Cosmetic and print setup
     "index_mark_w": 0.8,
     "index_mark_len": 4.0,
@@ -72,31 +76,53 @@ def gap_width(p: dict) -> float:
     return p["arm_prong_t"] + 2 * fits.clearance("slide")
 
 
+def front_z(p: dict, y: float) -> float:
+    """Height of the sloped front face at radial position y (+Y toward the clevis)."""
+    r = p["disc_od"] / 2
+    return p["front_t_far"] + (p["front_t_clevis"] - p["front_t_far"]) * (y + r) / (2 * r)
+
+
 def arm_profile(p: dict) -> Sketch:
-    """Side profile of the arm in the design YZ plane, as a sketch on Plane.YZ (local x = Y, y = Z)."""
-    rim_r = p["disc_od"] / 2
+    """Side profile of the arm in the design YZ plane, as a sketch on Plane.YZ (local x = Y, y = Z).
+
+    The bottom closes at z=0; build_design_frame trims everything below the front face.
+    """
     py, pz = p["pivot_from_axis"], p["pivot_from_back"]
-    # Outer edge: one arc centred on the disc axis, level with the pivot, tangent to the lobe.
-    outer_r = py + p["lobe_r"]
-    leave_z = pz - (outer_r**2 - rim_r**2) ** 0.5  # where the arc leaves the rim (≈ 6.1)
-    lobe_in = py - p["lobe_r"]
+    foot_out = (p["outer_foot_from_axis"], front_z(p, p["outer_foot_from_axis"]))
+    lobe_out = (py + p["lobe_r"], pz)
+    lobe_in = (py - p["lobe_r"], pz)
     waist = (p["waist_inner_from_axis"], p["waist_from_back"])
-    root = (p["hub_d"] / 2, p["plate_t"])
+    foot_in = (p["inner_foot_from_axis"], front_z(p, p["inner_foot_from_axis"]))
+    a = math.radians(p["outer_foot_angle"])
     with BuildSketch(Plane.YZ) as sk:
         with BuildLine():
-            Line((root[0], 0), (rim_r, 0))
-            Line((rim_r, 0), (rim_r, leave_z))
-            RadiusArc((rim_r, leave_z), (outer_r, pz), -outer_r)
+            Line((foot_in[0], 0), (foot_out[0], 0))
+            Line((foot_out[0], 0), foot_out)
+            # Outer edge: one smooth curve from the plate to the lobe's outer side
+            Spline(foot_out, lobe_out, tangents=[(math.cos(a), math.sin(a)), (0, 1)])
             CenterArc((py, pz), p["lobe_r"], 0, 180)
-            Line((lobe_in, pz), waist)
-            Line(waist, root)
-            Line(root, (root[0], 0))
+            # Inner edge: down from the lobe, straight past the waist, sweeping onto the face
+            Spline(lobe_in, waist, foot_in, tangents=[(0, -1), (-1, 0)])
+            Line(foot_in, (foot_in[0], 0))
         make_face()
-        verts = sk.vertices()
-        fillet(verts.filter_by_position(Axis.X, waist[0] - 0.01, waist[0] + 0.01), p["waist_fillet"])
-        fillet(sk.vertices().filter_by_position(Axis.Y, root[1] - 0.01, root[1] + 0.01)
-               .filter_by_position(Axis.X, root[0] - 0.01, root[0] + 0.01), p["arm_root_fillet"])
     return sk.sketch
+
+
+def front_halfspace(p: dict, above: bool) -> Part:
+    """A big block on one side of the sloped front-face plane."""
+    r = p["disc_od"] / 2
+    tilt = math.degrees(math.atan2(p["front_t_clevis"] - p["front_t_far"], 2 * r))
+    block = Box(200, 200, 100, align=(Align.CENTER, Align.CENTER, Align.MIN if above else Align.MAX),
+                mode=Mode.PRIVATE)
+    return block.rotate(Axis.X, tilt).moved(Location((0, 0, front_z(p, 0))))
+
+
+def above_front(p: dict) -> Part:
+    return front_halfspace(p, above=True)
+
+
+def below_front(p: dict) -> Part:
+    return front_halfspace(p, above=False)
 
 
 def build_design_frame(p: dict) -> Part:
@@ -108,23 +134,25 @@ def build_design_frame(p: dict) -> Part:
     pivot = (0, p["pivot_from_axis"], p["pivot_from_back"])
 
     with BuildPart() as part:
-        # Disc plate and front hub
-        Cylinder(rim_r, p["plate_t"], align=(Align.CENTER, Align.CENTER, Align.MIN))
-        with Locations((0, 0, p["plate_t"])):
-            Cylinder(p["hub_d"] / 2, p["hub_h"], align=(Align.CENTER, Align.CENTER, Align.MIN))
+        # Disc with its sloped front face
+        Cylinder(rim_r, p["front_t_clevis"] + 1, align=(Align.CENTER, Align.CENTER, Align.MIN))
+        add(above_front(p), mode=Mode.SUBTRACT)
 
-        # Clevis arm: the side profile extruded across all three prongs
-        add(extrude(arm_profile(p), amount=width / 2, both=True))
+        # Clevis arm: the side profile extruded across all three prongs, standing on the front face
+        arm = extrude(arm_profile(p), amount=width / 2, both=True)
+        add(arm - below_front(p))
 
-        # Gaps for the camera arm's two prongs. The cutter is a puck around the pivot whose
-        # rims are rounded, which leaves a fillet at every prong root instead of a sharp corner.
-        slot_r = p["arm_lobe_r"] + fits.clearance("loose") + p["prong_root_fillet"]
+        # Gaps for the camera arm's two prongs, cut down to a flat floor clear of the arm's lobe.
+        # The cutter's bottom edges are rounded, which leaves a fillet at every prong root
+        # instead of the sharp corner the original snapped at. A flat floor across the whole
+        # neck avoids the thin webs a round-bottomed gap leaves where it grazes the arm's edges.
+        floor_z = p["pivot_from_back"] - p["arm_lobe_r"] - fits.clearance("loose") - p["prong_root_fillet"]
         for sx in (-1, 1):
             x = sx * (p["prong_t"] + gap) / 2
             with BuildPart(mode=Mode.PRIVATE) as cutter:
-                with Locations(Location(pivot[:0] + (x,) + pivot[1:], (0, 90, 0))):
-                    Cylinder(slot_r, gap)
-                fillet(cutter.edges().filter_by(GeomType.CIRCLE), p["prong_root_fillet"] - 0.01)
+                with Locations((x, p["pivot_from_axis"], floor_z)):
+                    Box(gap, 60, 40, align=(Align.CENTER, Align.CENTER, Align.MIN))
+                fillet(cutter.edges().filter_by(Axis.Y).group_by(Axis.Z)[0], p["prong_root_fillet"] - 0.01)
             add(cutter.part, mode=Mode.SUBTRACT)
 
         # Pivot hole for the thumbscrew, through all three prongs
@@ -159,7 +187,8 @@ def build_design_frame(p: dict) -> Part:
         Cylinder(fits.hole(p["connector_screw_d"], "loose") / 2, 20, mode=Mode.SUBTRACT)
 
         # Front index mark on the rim opposite the clevis
-        with Locations((0, -(rim_r - 1 - p["index_mark_len"] / 2), p["plate_t"])):
+        mark_y = -(rim_r - 1 - p["index_mark_len"] / 2)
+        with Locations((0, mark_y, front_z(p, mark_y))):
             Box(p["index_mark_w"], p["index_mark_len"], 2 * p["index_mark_depth"], mode=Mode.SUBTRACT)
 
         if p["orientation"] == "side":

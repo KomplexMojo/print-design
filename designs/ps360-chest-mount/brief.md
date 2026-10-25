@@ -54,15 +54,15 @@ re-measure.
 | Ring keys: two tabs at 180°, one toward the clevis | width, length unknown | photo IMG_5447, shape only |
 | Angle of the tabs relative to the clevis | ≈ 0° (one tab faces the clevis) | photo IMG_5447 |
 | Outer rim step on the back face | width, height unknown | photo, shape only |
-| Disc plate thickness / raised front hub | plate ≈ 3.6 mm + hub Ø ≈ 15.5 × ≈ 2.2 mm (sums to the 5.8 total) | scaled from side-profile photo, ±2 |
+| Front face | one sloped plane, no hub: 5.8 thick at the rim under the clevis, about 3.6 opposite it | Darren, STL vs photo, 2026-10-25; the 3.6 is a guess |
 | Width across the 3-prong root | 16.5 mm (measured across the broken prong's stub) | calliper beam scale, ±0.5 |
 | Clevis: **3 prongs** (one missing), pivot axis parallel to the disc face | count | Darren |
 | Prong thickness (each of the 3) | 3.4 mm | calliper beam scale on a surviving prong, ±0.5 |
 | Gap between prongs (2 gaps) | 3.4 mm; 3 × 3.4 + 2 × 3.4 = 17.0 against the 16.5 root reading, within the ±0.5 tolerance of each | calliper beam scale, ±0.5 |
 | Pivot hole Ø | 5.1 mm (GoPro-standard M5 thumbscrew clearance is ≈ 5.2) | calliper beam scale, ±0.5 |
-| Arm profile | leaves the disc rim, curves outward past the rim, then down to the pivot lobe, with a large inside fillet to the front hub (see schematic side view) | side-profile photo |
-| Arm outer edge shape | one circular arc centred on the disc/hub axis, level with the pivot, tangent to the lobe's outer side: R = 15 + 6.95 = 21.95 | Darren (circle on the hub centre) + fit to the clean profile photo (R ≈ 22.8, centre within 0.3 mm of pivot level, ±1) |
-| Where that arc leaves the rim | ≈ 6.1 mm from the back face (follows from the arc) | derived; Darren chose this fit over the earlier 2 mm |
+| Arm profile | rises from the front face just inside the rim and curves out to the pivot lobe; the inner edge narrows to a neck under the lobe, then sweeps onto the front face | Darren, STL vs photo, 2026-10-25 |
+| Arm outer edge shape | one smooth curve from the front face (13.8 from the axis, leaving at about 60°) to the lobe's outer side | traced from the side photo, scaled by the pivot hole, ±1 |
+| Where the curve starts | on the front face, not partway up the rim (the first draft started it 6.1 up the rim) | Darren |
 | Overall depth: disc back face (around the ring) to the far tip of the pivot lobe | 28.7 mm | calliper beam scale, ±0.5 |
 | Prong lobe outer radius | 6.95 mm (13.9 mm across) | calliper beam scale, ±0.25 on the radius |
 | Pivot centre from the back face | 21.75 mm (28.7 − 6.95) | derived from two calliper readings, ±0.6 |
@@ -114,7 +114,7 @@ Each becomes a `PARAMS` entry so a print can settle it.
 2. Ring height to ±0.1 (Darren estimates 1 mm), its inner Ø, the sunken surface's depth,
    and tab width and length.
 3. Outer rim step on the back: width and height.
-4. Front hub: diameter and height with the calliper (photo gives Ø≈15.5 × 2.2).
+4. Front face: thickness at the rim opposite the clevis (3.6 is a guess).
 5. Clevis: prong thickness and gap both read 3.4 but sum 0.5 over the root width; a display
    reading on one prong, one gap and the root would settle which is off.
 6. The camera arm's 2-prong end: its gap and prong thickness, so the replacement's
@@ -139,13 +139,18 @@ the brief has no number. Every value below is a `PARAMS` entry.
   `fits.hole(11.0, "loose")` = 11.9, assuming an 11.0 connector screw so the hole matches
   the original 11.8. Pivot hole `fits.hole(5.0, "slide")` = 5.6 for an M5 thumbscrew.
 - **Clevis.** Prongs 3.4. Gaps 3.4 = `arm_prong_t` 2.9 (assumed, open question 6) plus a
-  slide fit, so the width across the prongs is 17.0. The gaps are cut by a puck around the
-  pivot (radius 8.55 = arm lobe 6.95 + loose 0.4 + root fillet 1.2) with rounded rims, which
-  leaves a 1.2 mm fillet at every prong root.
-- **Arm profile.** Outer edge runs straight up the rim to 6.1 from the back face, then
-  follows the R21.95 arc centred on the disc axis to the lobe. Inner edge goes from the
-  lobe's inner side to a waist at 11.5 from the axis, 10.8 from the back (scaled from the
-  side photo, ±2), then to the plate at the hub edge with a 2.5 inside fillet.
+  slide fit, so the width across the prongs is 17.0. The gaps are cut to a flat floor 8.55
+  below the pivot (arm lobe 6.95 + loose 0.4 + root fillet 1.2), across the whole neck, with a
+  1.2 mm fillet at every prong root. A round-bottomed gap left thin webs where it grazed the
+  narrower neck.
+- **Front face and arm (from Darren's STL vs photo comparison).** The front face is one
+  plane sloping from 5.8 thick under the clevis to 3.6 opposite it. There is no hub. The arm
+  stands on that face. Its outer edge is a spline that leaves the face 13.8 from the axis at
+  60° and meets the lobe's outer side vertically. Its inner edge runs down from the lobe's
+  inner side through a neck at 12.2 from the axis and 10.5 from the back, then sweeps onto
+  the face at 7.5 from the axis. All of this is traced from the side photo, scaled by the
+  pivot hole, ±1. The lobe (R6.95) and prongs (3.4) were checked against the photo and are
+  unchanged.
 - **Guesses for unknowns.** Tab size and sunken-surface depth above. Outer rim step 1.0 wide × 0.5 high, cut as a relief, so a wrong
   guess cannot stop the disc seating. Index mark: 0.8 × 4 × 0.4 slot on the front face
   opposite the clevis.
@@ -157,9 +162,9 @@ the brief has no number. Every value below is a `PARAMS` entry.
   the ring; use it if the side print's ring comes out too far from round.
 
 ### Accepted check warnings
-- **Side (default): bed contact and overhangs.** The disc stands on its rim with 26 mm² on
-  the bed at 5.9× height-to-base, and the outer prong's underside sits about 6 mm above
-  the bed (16.9 % overhang area). Slice with tree supports and a brim. Strength across the
+- **Side (default): bed contact and overhangs.** The disc stands on its rim with 36 mm² on
+  the bed at 5.0× height-to-base, and the outer prong's underside sits about 6 mm above
+  the bed (16.8 % overhang area). Slice with tree supports and a brim. Strength across the
   prong roots is worth the support scars, since that is where the original broke.
 - **Flat: overhangs.** The back face around the ring, 1 mm above the bed, overhangs 4 mm
   all round, and the sunken surface is a short bridge (z 1.0 to 1.5). Use supports on the
@@ -169,4 +174,4 @@ the brief has no number. Every value below is a `PARAMS` entry.
 | Rev | Change | Why |
 |---|---|---|
 | 0 | Schematic and requirements from photos | Start of redesign; nothing printed yet |
-| 1 | First model: disc, raised keyed back ring with a sunken centre, 3-prong clevis with root fillets, printed on its side in PETG (strong) | Build out the brief; nothing printed yet |
+| 1 | First model: disc with a sloped front face, raised keyed back ring with a sunken centre, photo-traced arm, 3-prong clevis with root fillets, printed on its side in PETG (strong) | Build out the brief; nothing printed yet |
