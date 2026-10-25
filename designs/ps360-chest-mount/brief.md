@@ -60,7 +60,7 @@ re-measure.
 | Pivot hole Ø | 5.1 mm (GoPro-standard M5 thumbscrew clearance is ≈ 5.2) | calliper beam scale, ±0.5 |
 | Arm profile | leaves the disc rim, curves outward past the rim, then down to the pivot lobe, with a large inside fillet to the front hub (see schematic side view) | side-profile photo |
 | Arm outer edge shape | one circular arc centred on the disc/hub axis, level with the pivot, tangent to the lobe's outer side: R = 15 + 6.95 = 21.95 | Darren (circle on the hub centre) + fit to the clean profile photo (R ≈ 22.8, centre within 0.3 mm of pivot level, ±1) |
-| Where that arc leaves the rim | ≈ 6.1 mm from the back face (follows from the arc); Darren gave 2 mm, which this arc cannot also meet | open, see question 6 |
+| Where that arc leaves the rim | ≈ 6.1 mm from the back face (follows from the arc) | derived; Darren chose this fit over the earlier 2 mm |
 | Overall depth: disc back face to the far tip of the pivot lobe | 28.7 mm | calliper beam scale, ±0.5 |
 | Prong lobe outer radius | 6.95 mm (13.9 mm across) | calliper beam scale, ±0.25 on the radius |
 | Pivot centre from the back face | 21.75 mm (28.7 − 6.95) | derived from two calliper readings, ±0.6 |
@@ -115,12 +115,9 @@ Each becomes a `PARAMS` entry so a print can settle it.
 4. Front hub: diameter and height with the calliper (photo gives Ø≈15.5 × 2.2).
 5. Clevis: prong thickness and gap both read 3.4 but sum 0.5 over the root width; a display
    reading on one prong, one gap and the root would settle which is off.
-6. Outer arc vs. the 2 mm rim start: with the centre on the axis level with the pivot
-   (what the clean profile shows) the arc meets the rim ≈ 6.1 mm from the back face.
-   Keeping 2 mm instead moves the centre to ≈ 18.2 mm from the back (R 22.4).
-7. The camera arm's 2-prong end: its gap and prong thickness, so the replacement's
+6. The camera arm's 2-prong end: its gap and prong thickness, so the replacement's
    gaps are sized to the arm rather than to the worn original.
-8. A photo of the chest plate with the part removed, and of the connector screw (head Ø
+7. A photo of the chest plate with the part removed, and of the connector screw (head Ø
    and thread), so the mating side is known rather than inferred from the broken part.
 
 ## Revision history
