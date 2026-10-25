@@ -3,6 +3,14 @@
 ## Purpose
 What the part does, where it goes, and what problem it solves.
 
+## Reference photos
+Photos Darren supplied, added with `printloop photo {{name}} FILE --caption "..."`
+(stored in photos/ref/, listed in photos/index.yaml). Note what each one shows and
+which dimensions came from it. A ruler or calipers in frame makes a photo measurable.
+
+| Photo | Shows | Dimensions taken from it |
+|---|---|---|
+
 ## Requirements
 Functional dimensions and constraints. Give each a source (measured, datasheet, guess).
 

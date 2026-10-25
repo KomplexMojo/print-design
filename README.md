@@ -12,7 +12,7 @@ and feed what comes off the bed back into the next revision.
 
 | Stage | What happens | Where it runs | Command |
 |---|---|---|---|
-| Ideate | Turn an idea into `brief.md`: purpose, measured dimensions, fits, loads, acceptance criteria | anywhere | `printloop new <name>` |
+| Ideate | Turn an idea and your photos into `brief.md`: purpose, measured dimensions, fits, loads, acceptance criteria | anywhere | `printloop new <name>`, `printloop photo <name> IMG` |
 | Design | Write `part.py` in build123d, build, read the printability report and preview | anywhere (cloud or local) | `printloop build <name>` |
 | Slice | Slice the STLs with your H2S presets; get print time and grams | your machine | `printloop slice <name>` |
 | Print | Open the sliced file in Bambu Studio and press **Print plate** | your machine | `printloop print <name>` |
@@ -54,6 +54,18 @@ printloop log fit-gauge --result success \
 
 The refine step copies those into `printer/h2s.yaml`, and every design that sizes
 holes with `printloop.fits` picks them up on its next build.
+
+## Photos
+
+Send photos in the project chat or drop them in the repo with
+`printloop photo <name> IMG... --caption "..."` (`--kind print` for photos of a finished print).
+They are stored under `designs/<name>/photos/{ref,print}/` as JPEGs at most 2400 px wide,
+upright, with EXIF metadata (including GPS location) removed, and captioned in
+`photos/index.yaml`. iPhone HEIC files work. Put a ruler or calipers in the shot when a
+dimension matters.
+
+That keeps a typical photo around 300 to 800 KB, so plain git handles hundreds of them.
+If the repo ever approaches 1 GB, move photos to Git LFS (`git lfs track "*.jpg"`).
 
 ## Fusion 360 fallback
 

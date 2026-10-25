@@ -1,6 +1,7 @@
 """printloop: ideate -> design -> slice -> print -> refine for the Bambu H2S.
 
   printloop new NAME            start a design from the template
+  printloop photo NAME FILE...  add reference (ideate) or result (print) photos
   printloop build NAME          run part.py, export STEP/STL, check printability, render preview
   printloop slice NAME          slice with the Bambu Studio CLI (run on the machine with Bambu Studio)
   printloop print NAME          open the sliced file in Bambu Studio to send to the H2S
@@ -30,6 +31,14 @@ def cmd_new(args):
         if path.is_file():
             path.write_text(path.read_text().replace("{{name}}", args.name))
     print(f"Created {target.relative_to(config.ROOT)}: fill in brief.md, then part.py")
+
+
+def cmd_photo(args):
+    from pathlib import Path
+    from .photos import add_photo
+    for source in args.files:
+        entry = add_photo(args.name, Path(source), args.kind, args.caption or "", args.revision)
+        print(f"designs/{args.name}/{entry['file']}  {entry['size_px'][0]}x{entry['size_px'][1]}  {entry['caption']}")
 
 
 def cmd_build(args):
@@ -108,6 +117,15 @@ def main(argv=None):
     p = sub.add_parser("new", help="start a design from the template")
     p.add_argument("name")
     p.set_defaults(func=cmd_new)
+
+    p = sub.add_parser("photo", help="add photos to a design")
+    p.add_argument("name")
+    p.add_argument("files", nargs="+")
+    p.add_argument("--kind", choices=["ref", "print"], default="ref",
+                   help="ref: reference shots for ideation (default); print: how a print came out")
+    p.add_argument("--caption", help="what the photo shows, e.g. 'shelf bracket, side view with ruler'")
+    p.add_argument("--revision", type=int, help="for print photos; defaults to the current REVISION")
+    p.set_defaults(func=cmd_photo)
 
     p = sub.add_parser("build", help="export, check and preview a design")
     p.add_argument("name")

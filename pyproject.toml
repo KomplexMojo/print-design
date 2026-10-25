@@ -10,6 +10,8 @@ dependencies = [
     "numpy",
     "matplotlib",
     "pyyaml",
+    "pillow",
+    "pillow-heif",
 ]
 
 [project.scripts]

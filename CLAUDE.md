@@ -6,6 +6,7 @@ run through one loop: **ideate → design → slice → print → refine**.
 ## Layout
 - `designs/<name>/brief.md`: requirements and acceptance criteria. Source of truth for intent.
 - `designs/<name>/part.py`: build123d model. Defines `REVISION`, `MATERIAL`, `SLICE_PROFILE`, `PARAMS`, and `build(p)`.
+- `designs/<name>/photos/`: `ref/` photos Darren supplies while ideating, `print/` photos of results, captions in `index.yaml`. Always add them with `printloop photo` (resizes, strips GPS/EXIF).
 - `designs/<name>/log.yaml`: one entry per print (result, measurements, issues, next changes).
 - `designs/<name>/out/`: generated STEP, STL, preview PNG, check report, sliced `.gcode.3mf`. Only `report.md` and `*.slice.json` are tracked.
 - `printer/h2s.yaml`: build volume, fit clearances, design rules. Fit values are calibrated from `designs/fit-gauge`.
@@ -26,6 +27,7 @@ run through one loop: **ideate → design → slice → print → refine**.
 ```
 pip install -e .                 # once per environment
 printloop new <name>             # copy designs/_template
+printloop photo <name> FILE... [--kind ref|print] --caption "..."
 printloop build <name> [--set key=value]
 printloop slice <name> [--profile strong]   # Darren's machine only
 printloop print <name>           # opens the sliced file in Bambu Studio

@@ -1,0 +1,8 @@
+# Photos and exports are binary; never diff or normalize line endings.
+*.jpg binary
+*.jpeg binary
+*.png binary
+*.heic binary
+*.3mf binary
+*.stl binary
+*.step binary

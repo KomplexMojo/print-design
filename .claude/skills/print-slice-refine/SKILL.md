@@ -28,10 +28,12 @@ When Darren reports back, record it even if Darren only gives a sentence:
 printloop log <name> --result success|partial|fail \
   --measure <feature>=<expected>:<measured> \
   --issue "<what went wrong>" --next "<change for next revision>" \
-  --photo designs/<name>/photos/<file> --notes "..."
+  --photo designs/<name>/photos/print/<file> --notes "..."
 ```
 Ask for the measurement behind any fit or size complaint ("too tight": which feature, by how much?).
-Save photos Darren sends under `designs/<name>/photos/`. Commit `<name> r<N>: print log`.
+Add photos of the print first with `printloop photo <name> <file> --kind print --caption "..."`,
+then pass the stored path to `--photo`. Look at each one for defects Darren didn't mention
+(stringing, layer shift, warped corners, sagging overhangs) and ask about them. Commit `<name> r<N>: print log`.
 
 ## Refine
 Read the whole `log.yaml` and the brief, then sort each issue into one of four fixes:
