@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1240" height="740" viewBox="0 0 1240 740" font-family="Helvetica, Arial, sans-serif">
 <rect width="1240" height="740" fill="white"/>
-<text x="24" y="34" fill="#1b1b1b" font-size="18" text-anchor="start" font-weight="bold">ps360-chest-mount: schematic of the broken part (r0, from photos)</text>
+<text x="24" y="34" fill="#1b1b1b" font-size="18" text-anchor="start" font-weight="bold">ps360-chest-mount: schematic of the original part (r0, from photos)</text>
 <text x="24" y="56" fill="#555" font-size="12" text-anchor="start" font-weight="normal">All values are read off the calliper beam scale (digital display was off), about ±0.5 mm. Red ? = unknown, needs a measurement.</text>
 <text x="200" y="110" fill="#1b1b1b" font-size="14" text-anchor="middle" font-weight="bold">FRONT (camera side)</text>
 <circle cx="200" cy="400" r="107.45" fill="#eceff1" stroke="#1b1b1b" stroke-width="2"/>
@@ -11,11 +11,12 @@
 <rect x="198.8" y="479.45" width="2.4" height="18.2" fill="#1b1b1b"/>
 <text x="210" y="501.45" fill="#555" font-size="11" text-anchor="start" font-weight="normal">index mark</text>
 <rect x="142.25" y="278.55" width="115.5" height="35" fill="#cfd8dc" stroke="#1b1b1b" stroke-width="2"/>
-<rect x="165.0" y="215.55" width="23.8" height="63" rx="11.9" fill="#b0bec5" stroke="#1b1b1b" stroke-width="2"/>
-<rect x="211.2" y="215.55" width="23.8" height="63" rx="11.9" fill="#b0bec5" stroke="#1b1b1b" stroke-width="2"/>
-<path d="M142.25 278.55 l-15.400000000000002 10.5 l5.6000000000000005 14 l9.799999999999999 10.5 z" fill="none" stroke="#c62828" stroke-width="1.6" stroke-dasharray="3 2"/>
-<text x="124.75" y="270.55" fill="#c62828" font-size="11" text-anchor="end" font-weight="normal">broken stub: original</text>
-<text x="124.75" y="284.55" fill="#c62828" font-size="11" text-anchor="end" font-weight="normal">shape unknown</text>
+<rect x="143.3" y="215.55" width="23.8" height="63" rx="11.9" fill="#ffebee" stroke="#c62828" stroke-width="1.8" stroke-dasharray="4 2"/>
+<rect x="188.10000000000002" y="215.55" width="23.8" height="63" rx="11.9" fill="#b0bec5" stroke="#1b1b1b" stroke-width="2"/>
+<rect x="232.9" y="215.55" width="23.8" height="63" rx="11.9" fill="#b0bec5" stroke="#1b1b1b" stroke-width="2"/>
+<text x="135.3" y="236.55" fill="#c62828" font-size="11" text-anchor="end" font-weight="bold">missing prong</text>
+<text x="135.3" y="250.55" fill="#c62828" font-size="11" text-anchor="end" font-weight="normal">(snapped off;</text>
+<text x="135.3" y="264.55" fill="#c62828" font-size="11" text-anchor="end" font-weight="normal">the reason to reprint)</text>
 <line x1="92.55" y1="541.45" x2="307.45" y2="541.45" stroke="#1565c0" stroke-width="1"/>
 <line x1="92.55" y1="536.45" x2="92.55" y2="546.45" stroke="#1565c0" stroke-width="1"/>
 <line x1="307.45" y1="536.45" x2="307.45" y2="546.45" stroke="#1565c0" stroke-width="1"/>
@@ -27,12 +28,15 @@
 <line x1="142.25" y1="329.55" x2="257.75" y2="329.55" stroke="#1565c0" stroke-width="1"/>
 <line x1="142.25" y1="324.55" x2="142.25" y2="334.55" stroke="#1565c0" stroke-width="1"/>
 <line x1="257.75" y1="324.55" x2="257.75" y2="334.55" stroke="#1565c0" stroke-width="1"/>
-<text x="200.0" y="323.55" fill="#1565c0" font-size="12" text-anchor="middle" font-weight="normal">16.5 neck (incl. stub)</text>
-<line x1="165.0" y1="203.55" x2="188.8" y2="203.55" stroke="#1565c0" stroke-width="1"/>
-<line x1="165.0" y1="198.55" x2="165.0" y2="208.55" stroke="#1565c0" stroke-width="1"/>
-<line x1="188.8" y1="198.55" x2="188.8" y2="208.55" stroke="#1565c0" stroke-width="1"/>
-<text x="176.9" y="197.55" fill="#1565c0" font-size="12" text-anchor="middle" font-weight="normal">3.4</text>
-<text x="230" y="207.55" fill="#c62828" font-size="12" text-anchor="start" font-weight="normal">gap ?</text>
+<text x="200.0" y="323.55" fill="#1565c0" font-size="12" text-anchor="middle" font-weight="normal">16.5 across 3-prong root</text>
+<line x1="188.10000000000002" y1="203.55" x2="211.90000000000003" y2="203.55" stroke="#1565c0" stroke-width="1"/>
+<line x1="188.10000000000002" y1="198.55" x2="188.10000000000002" y2="208.55" stroke="#1565c0" stroke-width="1"/>
+<line x1="211.90000000000003" y1="198.55" x2="211.90000000000003" y2="208.55" stroke="#1565c0" stroke-width="1"/>
+<text x="200.00000000000003" y="197.55" fill="#1565c0" font-size="12" text-anchor="middle" font-weight="normal">3.4</text>
+<line x1="211.90000000000003" y1="181.55" x2="232.9" y2="181.55" stroke="#c62828" stroke-width="1"/>
+<line x1="211.90000000000003" y1="176.55" x2="211.90000000000003" y2="186.55" stroke="#c62828" stroke-width="1"/>
+<line x1="232.9" y1="176.55" x2="232.9" y2="186.55" stroke="#c62828" stroke-width="1"/>
+<text x="222.40000000000003" y="175.55" fill="#c62828" font-size="12" text-anchor="middle" font-weight="normal">≈3.0?</text>
 <text x="200" y="477.3" fill="#c62828" font-size="11" text-anchor="middle" font-weight="normal">front counterbore Ø? depth ?</text>
 <text x="670" y="110" fill="#1b1b1b" font-size="14" text-anchor="middle" font-weight="bold">SIDE (section through clevis)</text>
 <rect x="560" y="292.55" width="40.6" height="214.9" fill="#eceff1" stroke="#1b1b1b" stroke-width="2"/>
@@ -53,7 +57,7 @@
 <line x1="560" y1="536.45" x2="560" y2="546.45" stroke="#1565c0" stroke-width="1"/>
 <line x1="600.6" y1="536.45" x2="600.6" y2="546.45" stroke="#1565c0" stroke-width="1"/>
 <text x="580.3" y="535.45" fill="#1565c0" font-size="12" text-anchor="middle" font-weight="normal">5.8 thick</text>
-<text x="619.1" y="496.4" fill="#c62828" font-size="11" text-anchor="start" font-weight="normal">recess depth ?</text>
+<text x="619.1" y="496.4" fill="#1565c0" font-size="11" text-anchor="start" font-weight="normal">recess depth ≈1.0 (Darren)</text>
 <text x="548" y="567.45" fill="#555" font-size="11" text-anchor="middle" font-weight="normal">camera / front</text>
 <text x="612.6" y="567.45" fill="#555" font-size="11" text-anchor="start" font-weight="normal">chest plate / back</text>
 <text x="1000" y="110" fill="#1b1b1b" font-size="14" text-anchor="middle" font-weight="bold">BACK (chest plate side)</text>
@@ -76,5 +80,5 @@
 <text x="62" y="694" fill="#1b1b1b" font-size="12" text-anchor="start" font-weight="normal">read from calliper beam scale (±0.5 mm)</text>
 <line x1="380" y1="690" x2="410" y2="690" stroke="#c62828" stroke-width="1.6" stroke-dasharray="4 2"/>
 <text x="418" y="694" fill="#1b1b1b" font-size="12" text-anchor="start" font-weight="normal">unknown: measure before modelling</text>
-<text x="24" y="718" fill="#555" font-size="12" text-anchor="start" font-weight="normal">Not to scale where a value is unknown. Clevis is a 2-prong hinge whose pivot axis lies parallel to the disc face; the camera arm's 3-prong end and thumbscrew go through it.</text>
+<text x="24" y="718" fill="#555" font-size="12" text-anchor="start" font-weight="normal">Not to scale where a value is unknown. Clevis is a 3-prong hinge (one prong missing) whose pivot axis lies parallel to the disc face; the camera arm's 2-prong end slots over it.</text>
 </svg>

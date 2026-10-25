@@ -76,3 +76,30 @@
   size_px:
   - 679
   - 729
+- file: photos/ref/20261025-back-face-knife-jaws-straddling-a-featur.jpg
+  kind: ref
+  caption: Back face, knife jaws straddling a feature behind the centre hole; feature
+    unclear (beam scale ~4.4 mm)
+  date: '2026-10-25'
+  original: 17b0b621-IMG_5444.jpeg
+  size_px:
+  - 1800
+  - 2400
+- file: photos/ref/20261025-back-face-jaws-in-the-keyed-recess-beam-.jpg
+  kind: ref
+  caption: Back face, jaws in the keyed recess (beam scale ~22.5 mm); clevis seen
+    edge-on with the prong gap
+  date: '2026-10-25'
+  original: ede92a1b-IMG_5446.jpeg
+  size_px:
+  - 1800
+  - 2400
+- file: photos/ref/20261025-back-face-close-up-outer-rim-lip-1-mm-ke.jpg
+  kind: ref
+  caption: 'Back face close-up: outer rim lip, ~1 mm keyed recess with notch steps,
+    clevis root'
+  date: '2026-10-25'
+  original: b9192d0d-IMG_5447.jpeg
+  size_px:
+  - 1800
+  - 2400
