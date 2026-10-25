@@ -61,7 +61,7 @@ re-measure.
 | Overall depth: disc back face to the far tip of the pivot lobe | 28.7 mm | calliper beam scale, ±0.5 |
 | Prong lobe outer radius | 6.95 mm (13.9 mm across) | calliper beam scale, ±0.25 on the radius |
 | Pivot centre from the back face | 21.75 mm (28.7 − 6.95) | derived from two calliper readings, ±0.6 |
-| Pivot centre from the disc axis | ≈ 15 mm (just inside the rim) | scaled from the side-profile photo, ±1 |
+| Pivot centre from the disc axis | 15 mm (just inside the rim) | Darren, measured |
 | Front index mark (small slot on the rim opposite the clevis) | cosmetic, size not needed | photo |
 
 ## Mating parts and fits
@@ -110,8 +110,7 @@ Each becomes a `PARAMS` entry so a print can settle it.
    angle relative to the clevis.
 3. Outer rim step on the back: width and height.
 4. Front hub: diameter and height with the calliper (photo gives Ø≈15.5 × 2.2).
-5. Clevis: the pivot centre's distance from the disc axis (still photo-scaled, ±1 mm).
-   Prong thickness and gap both read 3.4 but sum 0.5 over the root width; a display
+5. Clevis: prong thickness and gap both read 3.4 but sum 0.5 over the root width; a display
    reading on one prong, one gap and the root would settle which is off.
 6. The camera arm's 2-prong end: its gap and prong thickness, so the replacement's
    gaps are sized to the arm rather than to the worn original.
