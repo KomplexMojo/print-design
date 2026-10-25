@@ -41,7 +41,7 @@
 <text x="600" y="110" fill="#1b1b1b" font-size="14" text-anchor="middle" font-weight="bold">SIDE (profile, pivot axis into page)</text>
 <text x="600" y="128" fill="#555" font-size="11" text-anchor="middle" font-weight="normal">traced from the side-profile photo</text>
 <path d="M532.55 177.1 C507 196 486 231 486 280 L486.0 326.9 A49.0 49.0 0 0 0 584.0 326.9 C584.0 294 563 266 561.6 241.5 C560.9 220.5 570 207.2 585.75 205.8 L585.75 200.2 L532.55 200.2 Z" fill="#b0bec5" stroke="#1b1b1b" stroke-width="2"/>
-<circle cx="535.0" cy="326.9" r="17.5" fill="white" stroke="#1b1b1b" stroke-width="2"/>
+<circle cx="535.0" cy="326.9" r="17.849999999999998" fill="white" stroke="#1b1b1b" stroke-width="2"/>
 <rect x="532.55" y="175" width="214.9" height="25.2" fill="#eceff1" stroke="#1b1b1b" stroke-width="2"/>
 <rect x="585.75" y="200.2" width="108.5" height="15.400000000000002" fill="#eceff1" stroke="#1b1b1b" stroke-width="2"/>
 <rect x="561.6" y="175" width="156.79999999999998" height="7.0" fill="white" stroke="#1565c0" stroke-width="1.4" stroke-dasharray="4 2"/>
@@ -82,8 +82,8 @@
 <line x1="411.0" y1="375.9" x2="421.0" y2="375.9" stroke="#1565c0" stroke-width="1"/>
 <text x="408.0" y="279.45" fill="#1565c0" font-size="12" text-anchor="end" font-weight="normal">28.7</text>
 <text x="416.0" y="393.9" fill="#1565c0" font-size="11" text-anchor="middle" font-weight="normal">back face to lobe tip</text>
-<text x="549.0" y="320.9" fill="#e65100" font-size="12" text-anchor="start" font-weight="normal">Ø≈5?</text>
-<text x="549.0" y="335.9" fill="#e65100" font-size="11" text-anchor="start" font-weight="normal">pivot</text>
+<text x="549.0" y="320.9" fill="#1565c0" font-size="12" text-anchor="start" font-weight="normal">Ø5.1</text>
+<text x="549.0" y="335.9" fill="#1565c0" font-size="11" text-anchor="start" font-weight="normal">pivot</text>
 <text x="468.0" y="379.9" fill="#e65100" font-size="12" text-anchor="end" font-weight="normal">lobe R≈7</text>
 <text x="571.6" y="266" fill="#555" font-size="11" text-anchor="start" font-weight="normal">arm curves out</text>
 <text x="571.6" y="280" fill="#555" font-size="11" text-anchor="start" font-weight="normal">past the rim, then</text>

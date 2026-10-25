@@ -35,6 +35,7 @@ re-measure.
 | insta360-chest-strap-the-part-sits-on-th | Product photo of the chest strap | None (shows how the part sits on the chest plate) |
 | side-profile-clevis-arm-curves-from-the- | Side profile of the clevis arm and disc | Calliper scale too blurred to read. Arm shape and plate/hub split scaled from the 30.7 mm disc in frame, ±2 mm |
 | side-profile-jaws-from-the-disc-back-fac | Side profile, jaws from the disc's back face to the far tip of the pivot lobe | **Back face to lobe tip ≈ 28.7 mm** (beam scale, ±0.5). Pivot position and lobe radius scaled from this photo, ±1 mm |
+| inside-jaws-in-the-pivot-hole-of-a-survi | Inside jaws in the pivot hole of a surviving prong | Pivot hole Ø ≈ 5.1 mm (beam scale, mm and inch agree). Pivot position not measurable from this view |
 
 ## Requirements
 
@@ -53,7 +54,7 @@ re-measure.
 | Clevis: **3 prongs** (one missing), pivot axis parallel to the disc face | count | Darren |
 | Prong thickness (each of the 3) | 3.4 mm | calliper beam scale on a surviving prong, ±0.5 |
 | Gap between prongs (2 gaps) | ≈ 3.0 mm; 3 × 3.4 + 2 × 3.0 = 16.2 fits the 16.5 root | scaled from a photo, estimate |
-| Pivot hole Ø | ≈ 4–5.5 mm across two photos; GoPro-standard is ≈ 5.2 for the M5 thumbscrew | unknown, needs a calliper |
+| Pivot hole Ø | 5.1 mm (GoPro-standard M5 thumbscrew clearance is ≈ 5.2) | calliper beam scale, ±0.5 |
 | Arm profile | leaves the disc rim, curves outward past the rim, then down to the pivot lobe, with a large inside fillet to the front hub (see schematic side view) | side-profile photo |
 | Overall depth: disc back face to the far tip of the pivot lobe | 28.7 mm | calliper beam scale, ±0.5 |
 | Pivot position | ≈ 21.7 mm from the back face (≈ 18.1 in front of the plate's front face), ≈ 15 mm from the disc axis (just inside the rim) | scaled from the 28.7 mm photo, ±1 |
@@ -106,7 +107,7 @@ Each becomes a `PARAMS` entry so a print can settle it.
    angle relative to the clevis.
 3. Outer rim step on the back: width and height.
 4. Front hub: diameter and height with the calliper (photo gives Ø≈15.5 × 2.2).
-5. Clevis: gap between the two surviving prongs (calliper on it), pivot hole Ø, and
+5. Clevis: gap between the two surviving prongs (calliper on it), and
    with the calliper display on: pivot centre from the back face and from the disc
    edge, and lobe radius (only the 28.7 mm overall depth is a calliper reading).
 6. The camera arm's 2-prong end: its gap and prong thickness, so the replacement's
