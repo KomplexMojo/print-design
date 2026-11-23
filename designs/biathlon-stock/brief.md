@@ -27,7 +27,7 @@ Three parts, all printed on their side (Example 2 in the materials research):
 
 | Part | Holds | Approx. length | On the plate |
 |---|---|---|---|
-| Rear stock | butt plate mount, comb / cheek piece | ~220 mm | flat on its side |
+| Rear stock | butt plate, printed butt hook, comb / cheek piece (one piece, no adjusters) | ~220 mm | flat on its side |
 | Main body | wrist, pistol grip, trigger guard, action inlet, mag well | ~380 mm | diagonal on its side (≤ ~440 mm) |
 | Forestock | hand-stop rail, standing raiser, spare-mag holders, IBU marking faces | ~380 mm | diagonal on its side |
 
@@ -52,11 +52,11 @@ cross-dowels, disc-spring washers and a sealed joint line. Tool-only, no quick r
 ### Fit (from the athlete; defaults are estimates until measured)
 | Parameter | Default | Source |
 |---|---|---|
-| `lop_prone` | 330 | estimate, from B3/B11 |
-| `lop_standing` | 345 | estimate, from B11 |
+| `lop` (single value for prone and standing) | 335 | estimate, from B2/B3/B11; check against current butt setting |
 | `comb_height_above_bore` | per sights | B14, B19 |
 | `comb_cast` | 0–10 | B15, B16 |
 | `buttplate_length` / `curve_radius` / `cant_deg` / `drop` | 120 / 60 / 0 / 70 | estimate, B12/B13 |
+| `hook_length` / `hook_drop` / `hook_radius` (printed butt hook, under the armpit) | 90 / 60 / 25 | estimate, B13/B17; check against current hook |
 | `grip_angle_deg` | 85 | estimate |
 | `grip_circumference` / `grip_length` | 140 / 95 | estimate, B8/B9, B4/B5 |
 | `trigger_reach` | 70 | estimate, B6 |
@@ -88,7 +88,7 @@ position (marking surface), and infill/ballast (weight).
 - Cross-dowels and pillars: press (0.10) into printed bores, bonded.
 - Magazine in well and spare holders: slide (0.25), with a positive retention catch.
 - Hand stop on rail: slide (0.25), clamped by screw.
-- Butt plate / TPU pad and cheek riser: bolted with heat-set inserts.
+- Butt plate and butt hook: printed as part of the rear stock, no adjustment hardware. TPU pad bolted on with heat-set inserts.
 
 ## Loads and environment
 - Recoil (.22 LR) is negligible. Real loads: prone sling tension through the hand stop,
@@ -125,8 +125,10 @@ position (marking surface), and infill/ballast (weight).
 ## Open questions
 Each will be a `PARAMS` entry so a print can settle it.
 1. Which action and sights? Everything in "Fixed by hardware" depends on it.
-2. Who is the athlete, and can they supply B1–B20 plus side photos?
-3. One butt for both positions, or separate prone/standing butts (IBU: no swap after control)?
+2. The athlete is Darren. Need B1–B20 plus side photos in prone and standing.
+3. ~~One butt or two?~~ Decided 2026-11-23: one fixed butt for both positions, all
+   dimensions derived from Darren's measurements, with a printed hook. Darren's current
+   adjustable modular butt settings are the best check for the derived values.
 4. Hand stop, harness and spare-mag holders: reuse existing hardware or print?
 5. Target total weight and balance point.
 6. Is TC / national federation approval for a printed stock being pursued (deadline 1 May)?
