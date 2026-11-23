@@ -99,3 +99,17 @@ def test_rejects_other_schema():
             sp.load_fit(tmp)
     finally:
         bad.unlink()
+
+
+def test_part_params_feed_part_py():
+    """build123d gets the same numbers as Fusion, in part.py's own shapes."""
+    keys = set(re.findall(r'^    "(\w+)":', PART_PY, re.M))
+    res = run(SAMPLE)
+    out = sp.part_params(res, keys)
+    rows = res.by_name()
+    assert set(out) <= keys
+    assert out["handedness"] == "left" and out["bolt_side"] == "right"
+    assert out["lop"] == rows["lop"].value == 335
+    assert out["front_tongue"] == (30, 28, 30, -34)
+    assert out["mag_holder_count"] == 4 and isinstance(out["mag_holder_count"], int)
+    assert set(out) == keys, f"part.py keys the loader does not supply: {keys - set(out)}"

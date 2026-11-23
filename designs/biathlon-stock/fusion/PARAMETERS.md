@@ -100,6 +100,8 @@ One parameter per numeric value in the JSON. S and T (sides) are not parameters;
 | `harness_rail_hole_1` |  | mm | `270 mm` | 270 | fixed |  | trigger to rear rail insert (placeholder until AH and the rail are measured) |
 | `harness_rail_hole_2` |  | mm | `350 mm` | 350 | fixed |  | trigger to front rail insert |
 | `harness_rail_y` |  | mm | `-30 mm` | -30 | fixed |  | bore to insert centre line |
+| `insert_hole_d` |  | mm | `6.4 mm` | 6.4 | fixed |  | M5 heat-set insert hole, per insert maker |
+| `insert_depth` |  | mm | `10 mm` | 10 | fixed |  |  |
 
 ## 4. Current-rifle reference
 
@@ -116,6 +118,7 @@ One parameter per numeric value in the JSON. S and T (sides) are not parameters;
 | `forend_depth` |  | mm | `55 mm` | 55 | fixed | MC 3.1.6.4 a | bore to forend bottom |
 | `forend_tip` |  | mm | `440 mm` | 440 | fixed |  | trigger to front of the stock |
 | `edge_chamfer` |  | mm | `3 mm` | 3 | fixed |  |  |
+| `foot_chamfer` |  | mm | `0.4 mm` | 0.4 | fixed |  | elephant's-foot chamfer on bed edges |
 
 ## 6. Hardware (placeholders until measured)
 
@@ -129,6 +132,13 @@ One parameter per numeric value in the JSON. S and T (sides) are not parameters;
 | `barrel_d` | `barrel_d` | mm | `r_barrel_d_action` | 22 | measured |  | barrel at the action Sources: rifle.barrel_diameter_action_mm. |
 | `barrel_float` |  | mm | `2 mm` | 2 | fixed |  | free-float clearance |
 | `guard_bottom` |  | mm | `90 mm` | 90 | fixed | MC 3.1.6.4 a | bore to bottom of the trigger guard |
+| `trigger_slot_x0` |  | mm | `-8 mm` | -8 | fixed |  |  |
+| `trigger_slot_x1` |  | mm | `28 mm` | 28 | fixed |  |  |
+| `trigger_slot_width` |  | mm | `12 mm` | 12 | fixed |  |  |
+| `finger_hole_x0` |  | mm | `-42 mm` | -42 | fixed |  |  |
+| `finger_hole_x1` |  | mm | `38 mm` | 38 | fixed |  |  |
+| `finger_hole_y0` |  | mm | `-82 mm` | -82 | fixed |  |  |
+| `finger_hole_y1` |  | mm | `-45 mm` | -45 | fixed |  |  |
 | `mag_well_x0` |  | mm | `50 mm` | 50 | fixed |  |  |
 | `mag_well_x1` |  | mm | `100 mm` | 100 | fixed |  |  |
 | `mag_well_width` |  | mm | `22 mm` | 22 | fixed |  |  |
@@ -148,6 +158,7 @@ One parameter per numeric value in the JSON. S and T (sides) are not parameters;
 | `mag_holder_wall` |  | mm | `4 mm` | 4 | fixed |  |  |
 | `mag_holder_top` |  | mm | `-4 mm` | -4 | fixed |  | bore to top of the holder |
 | `mag_holder_floor` |  | mm | `4 mm` | 4 | fixed |  |  |
+| `mag_finger_notch` |  | mm | `18 mm` | 18 | fixed |  | thumb notch width in the outer wall |
 | `mag_holder_end` |  | mm | `mag_holder_start + mag_holder_count * (spare_mag_t + 2 * fit_snug) + (mag_holder_count + 1) * mag_holder_wall` | 305.2 | derived |  | derived |
 | `mag_holder_bottom` |  | mm | `-mag_holder_top + spare_mag_h + fit_snug + mag_holder_floor` | 58.15 | derived | MC 3.1.6.4 a | derived: bore to holder bottom |
 

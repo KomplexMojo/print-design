@@ -14,22 +14,24 @@ become `m_*` parameters and the CAD parameters become **Fusion expressions** of 
 model without re-running anything. Build **one design file** with a skeleton component and three
 body components that all read the same design-wide User Parameters. Handle handedness with **signed
 lateral offsets** (`face_side = ±1`) instead of a mirror feature. Enforce IBU limits with
-**`chk_*` margin parameters plus a geometric check script**, and flag rather than clamp. From r2 on, **Fusion
-becomes the geometry source** and `stock_params.py` becomes the single parameter source.
-`part.py` stays frozen at r1 as a reference, which is the same route ammo-tray took.
+**`chk_*` margin parameters plus a geometric check script**. Limits are **flagged, never clamped**, in both
+models (Darren, 2026-11-23). **The build123d model and the Fusion model run in parallel**, and neither
+replaces the other (Darren, 2026-11-23). Both read the same parameters: `stock_params.py` resolves the
+fit JSON once, then hands Fusion its expressions and hands `part.py` the evaluated numbers.
 
 ```
 biathlon-fit-pwa  ──export──▶  fit-<name>-<date>.json  (schema biathlon-stock-fit 1.x)
                                          │
-                         stock_params.py │ validate, map, evaluate, pre-check IBU
+                         stock_params.py │ validate, map, evaluate, pre-check IBU (flag only)
                                          ▼
-                 ordered rows: name · unit · expression · comment
-                                         │
-     fusion_load_params.py  (Scripts dialog, or MCP fusion_mcp_execute "script")
-                                         ▼
-     Fusion User Parameters ─▶ skeleton sketches ─▶ rear_stock · main_body · forestock
-                                         │
-                       check script (geometry)  ─▶  STEP / 3MF per component ─▶ slice
+                 ordered rows: name · unit · expression · value · comment
+                    │                                              │
+  fusion_load_params.py (Scripts dialog or MCP)        part_params() / params_from_fit()
+                    ▼                                              ▼
+  Fusion User Parameters (expressions)              part.py PARAMS overrides (numbers)
+  skeleton ─▶ rear_stock · main_body · forestock    build(p) ─▶ rear · main · fore
+  check script (geometry)                           ibu_checks(p) + printloop report
+                    └──────────── compared by the parity check (§7) ───────────┘
 ```
 
 ## 1. Loading the parameters: options compared
@@ -142,7 +144,9 @@ reads the same set.
   `out/` (next step, not in this PR).
 
 ## 6. IBU enforcement
-Three layers. None of them clamps silently, because the project rule is to flag.
+Decided 2026-11-23: **flag only, never clamp**, in both models. A broken limit is reported and
+the geometry is still built as specified, so the cause stays visible and is fixed at its source.
+Fusion has three layers:
 1. **Pre-flight in the loader.** `stock_params.py` evaluates every `chk_*` before anything is
    written to Fusion and prints the broken ones. The CLI exits 1 when any are broken.
 2. **Live margins in Fusion.** The `chk_*` parameters recompute on every edit and are visible in Change
@@ -156,17 +160,53 @@ Three layers. None of them clamps silently, because the project rule is to flag.
    - each part's bounding box fits the plate with 5 mm margins
    - assembled mass, including the action and barrel components, ≥ 3.5 kg (i)
 
+In build123d, `part.py`'s `ibu_checks(p)` and the loader's `chk_*` pre-flight print the same
+flags, and `build()` keeps building. Neither model may add `min()` or `max()` caps on a limited parameter.
+
 Parameters that can break a rule are tagged in the `IBU` column of PARAMETERS.md.
 
-## 7. Coexistence with build123d
-| Option | Pros | Cons |
-|---|---|---|
-| **Fusion replaces part.py from r2** (recommended) | One geometry model. Darren works in Fusion. `stock_params.py` is the single parameter source for Fusion, the fit app mapping and the checks. | printloop's automatic checks don't run on Fusion bodies, so the geometric check script covers them (ammo-tray precedent). |
-| Keep both, each reading `stock_params.py` | Keeps the printloop checks and CI | Two geometry models to keep equal, which will drift |
-| build123d stays primary and Fusion only gets STEP | No new work | Not parametric in Fusion, so it fails the goal |
+## 7. build123d and Fusion in parallel
+Decided 2026-11-23: both models are kept, and neither replaces the other.
 
-In every option `stock_params.py` stays importable from `part.py`. The test
-`test_defaults_match_part_py` keeps the registry estimates equal to r1's PARAMS until part.py is retired.
+**One parameter source.** `stock_params.py` is the only place where a fit-JSON field becomes a
+parameter, a formula or a default. Each model consumes it differently:
+| | Fusion | build123d (`part.py`) |
+|---|---|---|
+| Entry point | `fusion_load_params.py` | `params_from_fit(path, PARAMS)` → overrides |
+| Form | Expressions (`lop = m_AA`), live in Fusion | Evaluated numbers, with tuples rebuilt in part.py's shapes (`front_tongue = (30, 28, 30, -34)`) |
+| Handedness | `face_side`, `bolt_dir` = ±1 | `"handedness"`, `"bolt_side"` = `"left"` / `"right"` |
+| Fits | `fit_*` parameters from `printer/h2s.yaml` | `printloop.fits` (same file) |
+| IBU | `chk_*`, plus the geometric check script | `ibu_checks(p)`, plus the printloop report |
+
+**Wiring part.py** (next step, a few lines in part.py, not in this PR, because part.py belongs to PR 3):
+```python
+import os, sys
+sys.path.insert(0, str(Path(__file__).parent / "fusion"))
+from stock_params import params_from_fit
+fit = os.environ.get("FIT_JSON")
+P = {**PARAMS, **(params_from_fit(fit, PARAMS) if fit else {})}
+```
+Then `FIT_JSON=… printloop build biathlon-stock`. `printloop build --set` keeps working for one-off tweaks.
+
+**Keeping the two in step:**
+- *Defaults.* `test_defaults_match_part_py` fails if a registry estimate differs from part.py PARAMS.
+  A change to a default is made in both places in the same commit, or part.py reads its defaults
+  from the registry.
+- *Coverage.* `test_part_params_feed_part_py` fails if part.py has a PARAMS key that the loader does
+  not supply. A new part.py parameter therefore needs a registry row (and so a Fusion parameter).
+- *Geometry parity.* Both models use the same frame. The rule they share is that the trigger blade is the
+  origin, the bore is the X axis, and +Z is the shooter's right. A parity script (next step) builds both from
+  the same fit JSON and compares each part's bounding box, volume and key points: the lowest point below
+  the bore, the comb top, the split faces and the hole centres. It flags differences over 0.5 mm. Fusion's
+  STEP export is read into build123d for the comparison.
+- *Roles.* build123d stays the scripted, CI-checkable model that runs the printloop printability report.
+  Fusion is the interactive model for shaping (grip and cheek surfaces, fillets) and visual review.
+  Shape work done in Fusion that changes a dimension goes back into the registry as a parameter, never
+  as a hand-typed number.
+
+**Cost of the choice.** Every geometric feature is modelled twice. Expect drift on free-form
+surfaces such as grip, cheek and butt curves, where Fusion will run ahead of build123d. The
+parity check tolerates that only for parts that are fit-tested in Fusion first, and the brief says which.
 
 ## 8. Gaps found between the fit app and part.py
 - `comb_height_above_bore` (from AB) is not a part.py parameter, because part.py derives the comb from
@@ -175,13 +215,14 @@ In every option `stock_params.py` stays importable from `part.py`. The test
   section should be driven by it.
 - `harness_front_position` and `harness_rear_position` (AH, AI) are not used by part.py, which has rail-insert placeholders
   and no rear connector. They are loaded and will drive the connectors once the clip is known.
-- The fit app's `document.cad_target.parameter_table` says `part.py PARAMS`. If Fusion is chosen, it
-  should point at `fusion/stock_params.py`.
+- The fit app's `document.cad_target.parameter_table` says `part.py PARAMS`. It should point at
+  `designs/biathlon-stock/fusion/stock_params.py`, since that now feeds both models.
 - With the sample record, `chk_holder_hand` is −0.2 mm. This is the same spare-mag-holder and prone-hand overlap that r1 already flagged.
 
 ## 9. Verified so far
-- `stock_params.py` against `samples/fit-sample.json`: 153 parameters, all expressions evaluate, and
-  values match the fit app. Tests: `uv run --with pytest --no-project python -m pytest designs/biathlon-stock/fusion -q` (9 pass).
+- `stock_params.py` against `samples/fit-sample.json`: 164 parameters, all expressions evaluate,
+  values match the fit app, and `part_params()` supplies all 71 part.py PARAMS keys.
+  Tests: `uv run --with pytest --no-project python -m pytest designs/biathlon-stock/fusion -q` (10 pass).
 - The sample is generated with the fit app's own `buildExport` from its test fixture. The values are
   typical-range midpoints, not Darren's.
 - **Not yet run inside Fusion.** The Fusion MCP was unavailable during this work (Fusion closed).
@@ -191,7 +232,7 @@ In every option `stock_params.py` stays importable from `part.py`. The test
 ## Files
 | File | Purpose |
 |---|---|
-| `stock_params.py` | Registry and resolver (stdlib only). CLI preview, `--csv` for ParameterIO |
+| `stock_params.py` | Registry and resolver (stdlib only), the parameter source for both models. CLI preview, `--csv` for ParameterIO, `params_from_fit()` for part.py |
 | `fusion_load_params.py` | Fusion script: create or update User Parameters from a fit record |
 | `make_param_table.py` | Regenerates `PARAMETERS.md` |
 | `PARAMETERS.md` | JSON field → Fusion name, unit, expression |

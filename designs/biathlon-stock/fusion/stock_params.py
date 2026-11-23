@@ -126,6 +126,8 @@ REGISTRY: list[P] = [
     _p("harness_rail_hole_1", "mm", "270 mm", "fit", "trigger to rear rail insert (placeholder until AH and the rail are measured)"),
     _p("harness_rail_hole_2", "mm", "350 mm", "fit", "trigger to front rail insert"),
     _p("harness_rail_y", "mm", "-30 mm", "fit", "bore to insert centre line"),
+    _p("insert_hole_d", "mm", "6.4 mm", "fit", "M5 heat-set insert hole, per insert maker"),
+    _p("insert_depth", "mm", "10 mm", "fit", ""),
 
     # ---- current-rifle reference values (informational, not driving geometry)
     _p("ref_comb_height_current", "mm", "0 mm", "reference", "current comb top relative to bore (+ above); compare with comb_top", expr="m_AB", sources=("AB",)),
@@ -136,6 +138,7 @@ REGISTRY: list[P] = [
     _p("forend_depth", "mm", "55 mm", "stock", "bore to forend bottom", ibu="MC 3.1.6.4 a"),
     _p("forend_tip", "mm", "440 mm", "stock", "trigger to front of the stock"),
     _p("edge_chamfer", "mm", "3 mm", "stock", ""),
+    _p("foot_chamfer", "mm", "0.4 mm", "stock", "elephant's-foot chamfer on bed edges"),
 
     # ---- hardware (placeholders until the action is measured)
     _p("action_rear", "mm", "-105 mm", "hardware", ""),
@@ -146,6 +149,13 @@ REGISTRY: list[P] = [
     _p("barrel_d", "mm", "22 mm", "hardware", "barrel at the action", expr="r_barrel_d_action", sources=("rifle.barrel_diameter_action_mm",)),
     _p("barrel_float", "mm", "2 mm", "hardware", "free-float clearance"),
     _p("guard_bottom", "mm", "90 mm", "hardware", "bore to bottom of the trigger guard", ibu="MC 3.1.6.4 a"),
+    _p("trigger_slot_x0", "mm", "-8 mm", "hardware", ""),
+    _p("trigger_slot_x1", "mm", "28 mm", "hardware", ""),
+    _p("trigger_slot_width", "mm", "12 mm", "hardware", ""),
+    _p("finger_hole_x0", "mm", "-42 mm", "hardware", ""),
+    _p("finger_hole_x1", "mm", "38 mm", "hardware", ""),
+    _p("finger_hole_y0", "mm", "-82 mm", "hardware", ""),
+    _p("finger_hole_y1", "mm", "-45 mm", "hardware", ""),
     _p("mag_well_x0", "mm", "50 mm", "hardware", ""),
     _p("mag_well_x1", "mm", "100 mm", "hardware", ""),
     _p("mag_well_width", "mm", "22 mm", "hardware", ""),
@@ -162,6 +172,7 @@ REGISTRY: list[P] = [
     _p("mag_holder_wall", "mm", "4 mm", "holder", ""),
     _p("mag_holder_top", "mm", "-4 mm", "holder", "bore to top of the holder"),
     _p("mag_holder_floor", "mm", "4 mm", "holder", ""),
+    _p("mag_finger_notch", "mm", "18 mm", "holder", "thumb notch width in the outer wall"),
     _p("mag_holder_end", "mm", "305 mm", "holder", "derived",
        expr="mag_holder_start + mag_holder_count * (spare_mag_t + 2 * fit_snug) + (mag_holder_count + 1) * mag_holder_wall"),
     _p("mag_holder_bottom", "mm", "62 mm", "holder", "derived: bore to holder bottom",
@@ -412,6 +423,54 @@ def printer_fits(repo_root: Path) -> dict:
 
 def repo_root() -> Path:
     return Path(__file__).resolve().parents[3]
+
+
+# ---------------------------------------------------------------------------- build123d
+
+# part.py tuple PARAMS rebuilt from the split Fusion scalars.
+PART_TUPLES = {
+    "harness_rail_holes": ("harness_rail_hole_1", "harness_rail_hole_2"),
+    "bolt_notch": ("bolt_notch_x", "bolt_notch_length", "bolt_notch_depth"),
+    "mag_well": ("mag_well_x0", "mag_well_x1", "mag_well_width"),
+    "spare_mag": ("spare_mag_t", "spare_mag_l", "spare_mag_h"),
+    "rear_tongue": ("rear_tongue_length", "rear_tongue_height", "rear_tongue_width", "rear_tongue_y"),
+    "front_tongue": ("front_tongue_length", "front_tongue_height", "front_tongue_width", "front_tongue_y"),
+    "tie_rod_counterbore": ("tie_rod_cbore_d", "tie_rod_cbore_depth"),
+    "trigger_slot": ("trigger_slot_x0", "trigger_slot_x1", "trigger_slot_width"),
+    "finger_hole": ("finger_hole_x0", "finger_hole_x1", "finger_hole_y0", "finger_hole_y1"),
+}
+
+
+def part_params(res: Result, part_keys) -> dict:
+    """PARAMS overrides for part.py from the same resolved rows Fusion gets.
+
+    Only keys that part.py already has are returned, so part.py does
+    `p = {**PARAMS, **part_params(resolve(load_fit(path)), PARAMS)}`. Values are the evaluated
+    numbers (build123d has no expressions), so both models see identical dimensions.
+    """
+    rows = {r.name: r.value for r in res.rows}
+    out = {}
+    if "face_side" in rows:
+        out["handedness"] = "left" if rows["face_side"] > 0 else "right"
+    if "bolt_dir" in rows:
+        out["bolt_side"] = "right" if rows["bolt_dir"] > 0 else "left"
+    for key, parts in PART_TUPLES.items():
+        if all(n in rows for n in parts):
+            out[key] = tuple(rows[n] for n in parts)
+    for name, v in rows.items():
+        if name in part_keys and name not in out:
+            out[name] = int(v) if name == "mag_holder_count" else v
+    return {k: v for k, v in out.items() if k in part_keys}
+
+
+def params_from_fit(path, part_keys) -> dict:
+    """Convenience for part.py: fit JSON path -> PARAMS overrides (prints warnings and IBU flags)."""
+    res = resolve(load_fit(path), printer_fits(repo_root()))
+    for w in res.warnings:
+        print("fit warning:", w)
+    for f in res.ibu_flags:
+        print("IBU ⚠️ ", f)
+    return part_params(res, part_keys)
 
 
 # ---------------------------------------------------------------------------- CLI
