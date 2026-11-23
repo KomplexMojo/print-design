@@ -83,7 +83,7 @@ PARAMS = {
     "body_width": 50.0,               # main body and forestock thickness
     "wrist_top": -12.0,               # stock top behind the action
     "forend_depth": 55.0,             # bore to forend bottom
-    "forend_tip": 440.0,              # trigger to front of the stock
+    "forend_tip": 455.0,              # trigger to front of the stock (room for 4 slots)
     "edge_chamfer": 3.0,
     "foot_chamfer": 0.4,
     # --- hardware placeholders (until the action is chosen) ---
@@ -98,15 +98,17 @@ PARAMS = {
     "finger_hole": (-42.0, 38.0, -82.0, -45.0),  # x0, x1, y0, y1
     "guard_bottom": 90.0,             # bore to bottom of the (printed) guard loop
     "mag_well": (50.0, 100.0, 22.0),  # x from, x to, width
-    "spare_mag": (14.0, 32.0, 50.0),  # placeholder: thickness (along X), length (lateral), height
+    "spare_mag": (14.0, 32.0, 50.0),  # placeholder: thickness (vertical in the holder),
+                                      # cartridge length (lateral, insertion depth), height (along X)
     # --- spare magazine holder (MC 3.1.6.5.3), on the side away from the face ---
     "mag_holder_count": 4,
-    "mag_holder_start": 228.0,        # trigger to rear of the holder
-    "mag_holder_wall": 4.0,
-    "mag_holder_top": -4.0,           # bore to top of the holder (mags go in from above)
-    "mag_holder_floor": 4.0,
-    "mag_finger_notch": 18.0,         # width of the thumb notch in the outer wall
-    "prone_hand_length": 80.0,        # hand behind the hand stop in prone (J), keep holder clear
+    # Layout from the Anschütz 1827F reference: mags lie horizontally, end to end, in flush
+    # slots along the forend side near its top edge, pushed in sideways.
+    "mag_holder_start": 222.0,        # trigger to rear of the first slot
+    "mag_holder_wall": 3.5,           # web between slots
+    "mag_holder_top": -17.0,          # bore to top of the slots (clears the barrel channel)
+    "mag_finger_notch": (12.0, 5.0, 6.0),  # scallop below each slot: length, depth, height
+    "prone_hand_length": 80.0,        # hand behind the hand stop in prone (J)
     # --- IBU marking surface (MC 3.1.6.4 l) ---
     "marking_start": 150.0,           # measured from the trigger
     "marking_length": 50.0,
@@ -115,7 +117,7 @@ PARAMS = {
     "rear_split": -108.0,
     "front_split": 215.0,
     "rear_tongue": (40.0, 22.0, 22.0, -37.0),   # length, height, width, centre y
-    "front_tongue": (30.0, 28.0, 30.0, -34.0),
+    "front_tongue": (30.0, 22.0, 30.0, -40.0),   # tie rods run below the mag slots
     "bolt_d": 6.0,                    # M6
     "cross_dowel_d": 10.0,
     "tie_rod_spacing": 16.0,          # two M6 rods from the mag well into the forestock
@@ -255,38 +257,30 @@ def grip(p):
 # ---------------------------------------------------------------- spare magazines
 
 def _holder_box(p):
+    """Slot band on the away side: x0, x1, y_bot, y_top, slot depth (lateral), slot length."""
     t, length, h = p["spare_mag"]
     n, wall, snug = p["mag_holder_count"], p["mag_holder_wall"], fits.clearance("snug")
-    pocket_x = t + 2 * snug
+    slot_x = h + 2 * snug
     x0 = p["mag_holder_start"]
-    x1 = x0 + n * pocket_x + (n + 1) * wall
-    z_face = -p["body_width"] / 2                     # side away from the face
-    z_out = z_face - (length + 2 * snug) - wall
+    x1 = x0 + n * slot_x + (n + 1) * wall
     y_top = p["mag_holder_top"]
-    y_bot = y_top - h - snug - p["mag_holder_floor"]
-    return x0, x1, y_bot, y_top, z_out, z_face, pocket_x
-
-
-def spare_mag_holder(p):
-    """Four upright pockets in a row on the forestock side away from the face."""
-    x0, x1, y_bot, y_top, z_out, z_face, _ = _holder_box(p)
-    holder = _box(x0, x1, y_bot, y_top, z_out, z_face + 3)
-    # Blend the holder bottom into the forend with a 45° ramp so nothing snags.
-    return _soften(holder, 2)
+    y_bot = y_top - t - 2 * snug
+    return x0, x1, y_bot, y_top, length + snug, slot_x
 
 
 def spare_mag_pockets(p):
-    x0, x1, y_bot, y_top, z_out, z_face, pocket_x = _holder_box(p)
-    t, length, h = p["spare_mag"]
-    snug, wall = fits.clearance("snug"), p["mag_holder_wall"]
+    """Flush slots cut into the away-side face (-Z in the model frame), one mag per slot."""
+    x0, x1, y_bot, y_top, depth, slot_x = _holder_box(p)
+    wall = p["mag_holder_wall"]
+    nl, nd, nh = p["mag_finger_notch"]
+    z_face = -p["body_width"] / 2
     cut = Part()
     for i in range(p["mag_holder_count"]):
-        px = x0 + wall + i * (pocket_x + wall)
-        cut += _box(px, px + pocket_x, y_top - h - snug, y_top + 1,
-                    z_face - length - snug, z_face + snug)
-        # thumb notch in the outer wall to pull the mag out
-        n = p["mag_finger_notch"]
-        cut += _box(px - 1, px + pocket_x + 1, y_top - n, y_top + 1, z_out - 1, z_out + wall + 0.5)
+        px = x0 + wall + i * (slot_x + wall)
+        cut += _box(px, px + slot_x, y_bot, y_top, z_face - 1, z_face + depth)
+        # scallop under the middle of the slot so a gloved finger can pull the mag
+        cx = px + slot_x / 2
+        cut += _box(cx - nl / 2, cx + nl / 2, y_bot - nh, y_top, z_face - 1, z_face + nd)
     return cut
 
 
@@ -296,7 +290,7 @@ def ibu_checks(p) -> list[str]:
     """Return a list of rule problems (empty when all computed checks pass)."""
     issues = []
     depth = max(p["forend_depth"], p["block_height"], p["guard_bottom"],
-                p["forend_depth"] + p["handstop_height"], -_holder_box(p)[2])
+                p["forend_depth"] + p["handstop_height"])
     if depth > 140:
         issues.append(f"MC 3.1.6.4a: depth below bore {depth:.0f} mm > 140 mm")
     if p["comb_width"] > 40:
@@ -311,14 +305,20 @@ def ibu_checks(p) -> list[str]:
     block_front = p["block_position"] + p["block_length"] / 2 + p["block_ramp"]
     if block_front > p["front_split"] - 3:
         issues.append(f"Standing block front ({block_front:.0f}) crosses the front joint ({p['front_split']:.0f})")
-    x0, x1, y_bot, *_ = _holder_box(p)
-    if x0 < m1 + 15 or x0 < p["front_split"] + 10:
-        issues.append(f"Spare-mag holder starts at {x0:.0f}, inside the marking surface or the front joint")
-    if x1 > p["handstop_position"] - p["prone_hand_length"]:
-        issues.append(f"Spare-mag holder ends at {x1:.0f}, under the prone hand (hand from "
-                      f"{p['handstop_position'] - p['prone_hand_length']:.0f} to the hand stop at {p['handstop_position']:.0f})")
-    if -y_bot > 140:
-        issues.append(f"MC 3.1.6.4a: spare-mag holder bottom {-y_bot:.0f} mm below bore > 140 mm")
+    x0, x1, y_bot, y_top, depth, _ = _holder_box(p)
+    if x0 < m1 + 15 or x0 < p["front_split"] + 5:
+        issues.append(f"Spare-mag slots start at {x0:.0f}, inside the marking surface or the front joint")
+    if x1 > p["forend_tip"] - 8:
+        issues.append(f"Spare-mag slots end at {x1:.0f}, past the forend tip ({p['forend_tip']:.0f})")
+    r_ch = p["barrel_d"] / 2 + p["barrel_float"]
+    if -y_top - r_ch < 3:
+        issues.append(f"Spare-mag slots leave {-y_top - r_ch:.1f} mm under the barrel channel")
+    fl, fh_, fw, fy = p["front_tongue"]
+    dowel_top = fy + fits.hole(p["cross_dowel_d"], "press") / 2
+    if y_bot - dowel_top < 2:
+        issues.append(f"Spare-mag slots leave {y_bot - dowel_top:.1f} mm above the joint cross-dowel")
+    if -p["body_width"] / 2 + depth > p["body_width"] / 2 - 3:
+        issues.append("Spare-mag slots are deeper than the forend is wide")
     if any(m0 - 10 < hx < m1 + 10 for hx in p["harness_rail_holes"]):
         issues.append("MC 3.1.6.4l: a harness-rail insert is in the marking surface")
     if x0 <= p["mag_well"][1]:
@@ -399,7 +399,6 @@ def build(p: dict = PARAMS):
     main -= socket
     tongue = _box(fs - fl, fs + 0.5, fy - fh_ / 2, fy + fh_ / 2, -fw / 2, fw / 2)
     fore += tongue
-    fore += spare_mag_holder(p)
     fore -= spare_mag_pockets(p)
     fore -= channel_and_rods(-1)
     for hx in p["harness_rail_holes"]:      # face side = +Z in the model frame

@@ -256,7 +256,15 @@ rifle weight.
 Checks (flag only, nothing clamped):
 - Main body ⚠️ overhangs as in r1 (inlet, mag well, sockets need supports).
 - IBU computed checks pass: depth 130 mm (block), comb 40 mm, marking surface clear.
-- ⚠️ Spare-mag holder (228–305) runs 35 mm under the prone hand (270–350). Needs a decision.
+- Spare-mag holder redesigned to Darren's Anschütz 1827F reference (2026-11-23; photo is a
+  right-handed stock, so it is mirrored for a left-hander): four mags lie horizontally, end to
+  end, in flush slots along the away-side face near the forend's top edge, pushed in sideways
+  (slot 50.3 long × 14.3 high × 32.2 deep, x 222–441, 17–31 mm below the bore), each with a
+  finger scallop below it. Being flush, the slots no longer conflict with the prone hand, add
+  nothing to the 140 mm depth and stay clear of the marking surface (150–200). To fit them,
+  `forend_tip` went 440 → 455 and the front joint's tongue and tie rods dropped to 40 mm below
+  the bore. Checks added: slots behind the joint and marking surface, inside the forend tip,
+  ≥ 3 mm under the barrel channel and ≥ 2 mm above the cross-dowel.
 - LOP 320 is 30 mm longer than D = 290 (crook of elbow); kept at the current rifle's value.
 
 ## Revision history
