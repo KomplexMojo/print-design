@@ -1,0 +1,23 @@
+{
+    "compatible_printers": [
+        "Bambu Lab H2S 0.4 nozzle",
+        "H2S 0.4 hardened - Stock proto"
+    ],
+    "description": "Outdoor dry-fire prototypes. AMS 2 Pro, dry 65 C 8 h. Less fan for layer bond.",
+    "fan_max_speed": [
+        "40"
+    ],
+    "fan_min_speed": [
+        "10"
+    ],
+    "filament_settings_id": [
+        "Stock PETG HF outdoor @H2S 0.4"
+    ],
+    "from": "User",
+    "inherits": "Bambu PETG HF @BBL H2S",
+    "instantiation": "true",
+    "is_custom_defined": "0",
+    "name": "Stock PETG HF outdoor @H2S 0.4",
+    "type": "filament",
+    "version": "2.0.0.0"
+}

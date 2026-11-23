@@ -1,0 +1,17 @@
+{
+    "compatible_printers": [
+        "Bambu Lab H2S 0.4 nozzle",
+        "H2S 0.4 hardened - Stock proto"
+    ],
+    "description": "Prototype fit parts, indoors only. AMS 2 Pro, dry 50 C 8 h if opened > 1 week.",
+    "filament_settings_id": [
+        "Stock PLA Basic proto @H2S 0.4"
+    ],
+    "from": "User",
+    "inherits": "Bambu PLA Basic @BBL H2S",
+    "instantiation": "true",
+    "is_custom_defined": "0",
+    "name": "Stock PLA Basic proto @H2S 0.4",
+    "type": "filament",
+    "version": "2.0.0.0"
+}

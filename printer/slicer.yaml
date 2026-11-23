@@ -19,6 +19,21 @@ variants:
     overrides: {wall_loops: "4", sparse_infill_density: "40%"}
   petg:
     filament: "Bambu PETG Basic @BBL H2S"
+  # biathlon-stock user presets (import printer/presets/biathlon-stock first).
+  # printloop slices all parts with one variant, so these use the main-body process;
+  # per-part presets are listed in designs/biathlon-stock/print-settings.md.
+  stock-proto:
+    machine: "H2S 0.4 hardened - Stock proto"
+    process: "Stock proto main 0.24 @H2S 0.4"
+    filament: "Stock PLA Basic proto @H2S 0.4"
+  stock-proto-petg:
+    machine: "H2S 0.4 hardened - Stock proto"
+    process: "Stock proto main 0.24 @H2S 0.4"
+    filament: "Stock PETG HF outdoor @H2S 0.4"
+  stock-final:
+    machine: "H2S 0.6 hardened - Stock final"
+    process: "Stock final main 0.24 @H2S 0.6"
+    filament: "Stock PAHT-CF final @H2S 0.6"
 
 # Extra directories to search for preset JSON files (user presets live in
 # BambuStudio/user/<id>/{machine,process,filament}).

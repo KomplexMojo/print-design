@@ -1,0 +1,17 @@
+{
+    "compatible_printers": [
+        "Bambu Lab H2S 0.6 nozzle",
+        "H2S 0.6 hardened - Stock final"
+    ],
+    "description": "Butt pad. External spool only (soft TPU is not AMS-safe). Dry 65 C 8 h.",
+    "filament_settings_id": [
+        "Stock TPU 90A pad @H2S 0.6"
+    ],
+    "from": "User",
+    "inherits": "Bambu TPU 90A @BBL H2S 0.6 nozzle",
+    "instantiation": "true",
+    "is_custom_defined": "0",
+    "name": "Stock TPU 90A pad @H2S 0.6",
+    "type": "filament",
+    "version": "2.0.0.0"
+}

@@ -124,6 +124,7 @@ position (marking surface), and infill/ballast (weight).
   side face is the largest flat face; the action inlet and barrel channel then run
   horizontally and need teardrop or flat-topped sections to avoid support.
 - 100 % infill (or 6+ walls) within ~20 mm of every bolt, dowel and pillar.
+- Per-part slicer presets, supports, strength modifiers, inserts and annealing: `print-settings.md`.
 
 ## Acceptance criteria
 - [ ] Each part fits the H2S plate (340 × 320 mm, diagonal ≤ 440 mm) with 5 mm margin
