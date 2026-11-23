@@ -1,0 +1,29 @@
+{
+    "chamber_temperatures": [
+        "65"
+    ],
+    "compatible_printers": [
+        "Bambu Lab H2S 0.6 nozzle",
+        "H2S 0.6 hardened - Stock final"
+    ],
+    "description": "Final structural parts. Dry 80 C 12 h in a dryer, print from it via external spool. Glue on plate.",
+    "fan_max_speed": [
+        "20"
+    ],
+    "fan_min_speed": [
+        "0"
+    ],
+    "filament_settings_id": [
+        "Stock PAHT-CF final @H2S 0.6"
+    ],
+    "from": "User",
+    "inherits": "Bambu PAHT-CF @BBL H2S 0.6 nozzle",
+    "instantiation": "true",
+    "is_custom_defined": "0",
+    "name": "Stock PAHT-CF final @H2S 0.6",
+    "overhang_fan_speed": [
+        "40"
+    ],
+    "type": "filament",
+    "version": "2.0.0.0"
+}

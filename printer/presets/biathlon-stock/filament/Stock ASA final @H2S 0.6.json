@@ -1,0 +1,23 @@
+{
+    "chamber_temperatures": [
+        "65"
+    ],
+    "compatible_printers": [
+        "Bambu Lab H2S 0.6 nozzle",
+        "H2S 0.6 hardened - Stock final"
+    ],
+    "description": "Accessories. AMS 2 Pro, dry 65 C 12 h.",
+    "fan_max_speed": [
+        "25"
+    ],
+    "filament_settings_id": [
+        "Stock ASA final @H2S 0.6"
+    ],
+    "from": "User",
+    "inherits": "Bambu ASA @BBL H2S 0.6 nozzle",
+    "instantiation": "true",
+    "is_custom_defined": "0",
+    "name": "Stock ASA final @H2S 0.6",
+    "type": "filament",
+    "version": "2.0.0.0"
+}

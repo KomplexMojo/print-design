@@ -1,0 +1,15 @@
+{
+    "from": "User",
+    "inherits": "Bambu Lab H2S 0.4 nozzle",
+    "instantiation": "true",
+    "is_custom_defined": "0",
+    "name": "H2S 0.4 hardened - Stock proto",
+    "nozzle_type": [
+        "hardened_steel",
+        "hardened_steel",
+        "hardened_steel"
+    ],
+    "printer_settings_id": "H2S 0.4 hardened - Stock proto",
+    "type": "machine",
+    "version": "2.0.0.0"
+}
