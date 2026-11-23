@@ -158,7 +158,49 @@ Each will be a `PARAMS` entry so a print can settle it.
 6. Is TC / national federation approval for a printed stock being pursued (deadline 1 May)?
 7. Sub-zero behaviour of PAHT-CF prints: test coupons before the final print.
 
+8. ~~Scan or trace?~~ Decided 2026-11-23: phone scan of grip and cheek (about 1 mm accuracy), calipers for the inlet and screw positions.
+9. ~~Action screws?~~ Decided 2026-11-23: reuse current screws. Darren measures thread and length; pillars and inlet floor sized to them.
+10. ~~Barrel?~~ Decided 2026-11-23: Darren measures with calipers (diameter every 50 mm from the action, total length); channel gets 2 mm free-float clearance. Snow cover or tube still to confirm.
+11. ~~Trigger guard?~~ Decided 2026-11-23: reuse the metal guard, inletted into the main body (already closed and rigid per IBU). Its outline goes into the 140 mm check.
+12. ~~Glove?~~ Decided 2026-11-23: thin race gloves. `glove_thickness` parameter, default 2 mm (estimate), added to grip and guard clearance; Darren confirms with calipers.
+13. ~~Clothing?~~ Decided 2026-11-23: measure in race suit plus base layer. `clothing_allowance` parameter for colder days.
+14. ~~Grip style?~~ Decided 2026-11-23: vertical grip, thumb rest along the left side, palm swell on the right (`palm_swell` parameter).
+15. ~~Joint hardware?~~ Decided 2026-11-23: M6 stainless bolts and cross-dowels; bought aluminium pillars (or tube cut to length).
+16. ~~Ballast?~~ Decided 2026-11-23: sealed ballast pockets in butt and forend now; fill with steel or tungsten after weighing the printed rifle.
+17. ~~Model output?~~ Decided 2026-11-23: each revision exports STL for printing and STEP for Fusion.
+18. ~~First print?~~ Decided 2026-11-23: PLA fit test of grip and comb shells on the current rifle first.
+
+## r1 rough prototype (2026-11-23)
+Built before measurements, for a left-handed male, 178 cm. Every fit value is an estimate
+and every hardware value is a placeholder (generic 32 mm action, 22 mm barrel, 22 × 50 mm mag).
+Purpose: check overall proportions and the 3-part split, not fit to the rifle.
+
+What r1 changed from the layout above, and why:
+- **Main body is straight on the plate (323 mm), not diagonal.** With the grip and the standing
+  block hanging 130–140 mm below the bore, the main body's outline is as tall as it is long at
+  both ends, so it no longer fits diagonally. Splits are at -108 (just behind the grip) and +215
+  mm from the trigger, and the joint tongues are on the rear stock and forestock so the main body
+  stays under 330 mm.
+- **Front joint is pulled together by two M6 tie rods** whose heads sit in the mag well's front
+  wall and whose nuts are steel cross-dowels in the forestock (+250 mm). That keeps every bolt
+  head out of the marking surface (150–200 mm, measured from the trigger).
+- **Rear joint is a 40 mm tongue with two lateral M6 bolts** through the wrist. Only ~50 mm of wrist
+  depth at the split; watch it on the first flex test.
+- Handedness only labels the sides: LH and RH stocks are mirror images, so the cheek side and
+  thumb rest always print on top and the palm side lies on the bed. `palm_swell` is not modelled
+  yet (it would sit on the bed face).
+- Trigger guard is a printed loop as a placeholder for the metal guard (Q11).
+- Butt-plate radius default raised to 150 mm (60 mm over a 120 mm plate is a half circle);
+  hook is set by `hook_drop`, `hook_reach`, `hook_radius`.
+
+Check notes:
+- Main body ⚠️ overhangs (6 %): ceilings of the action inlet, trigger slot, mag well and joint
+  sockets. These are bedding and fit surfaces, so print with tree supports painted only there.
+- IBU computed checks pass: depth below bore 130 mm (block), comb 40 mm, marking surface 50 mm
+  flat both sides, no joint or bolt head in it, sling slot 41 mm.
+- Grip bottom is 135 mm below the bore. It is not forestock under MC 3.1.6.4 a, but kept under 140 anyway.
+
 ## Revision history
 | Rev | Change | Why |
 |---|---|---|
-| 1 | Brief | |
+| 1 | Brief, then r1 rough 3-part model from 178 cm LH estimates | proportions and split check before measurements; see r1 notes above |
