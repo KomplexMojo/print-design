@@ -59,7 +59,31 @@ DEMO_PARAMS = [
     ("mag_slot_len", "mm", "spare_mag_h + 2 * fit_snug", "[demo] slot along X (mags lie horizontally)"),
     ("mag_slot_h", "mm", "spare_mag_t + 2 * fit_snug", "[demo] slot height"),
     ("mag_slot_depth", "mm", "spare_mag_l + fit_snug", "[demo] lateral insertion depth"),
+    # ---- slim skeleton butt: composite of the BIONIC frame, the Bear single-window butt and the
+    #      printed CZ457 / Patronus rear ends (reference-images/butt-section-designs/)
+    ("plate_thickness", "mm", "14 mm", "[demo] butt-plate post, measured from the deepest point of the concave face"),
+    ("comb_beam_h", "mm", "28 mm", "[demo] top beam that carries the cheek (full comb_width)"),
+    ("frame_web", "mm", "12 mm", "[demo] lower strut and window margins"),
+    ("frame_rib", "mm", "10 mm", "[demo] vertical rib between the two windows"),
+    ("frame_width", "mm", "24 mm", "[demo] thickness of the slim frame between the comb beam and the plate post"),
+    ("butt_sagitta", "mm", "buttplate_curve_radius - sqrt(buttplate_curve_radius * buttplate_curve_radius - buttplate_length * buttplate_length / 4)",
+     "[demo] derived: depth of the concave butt face"),
+    ("rs_low_slope", "", "(wrist_heel_y - (hook_tip_y - tip_round)) / (wrist_heel_x - (-lop + hook_thickness))",
+     "[demo] derived: slope of the butt underside"),
+    ("rs_web_v", "mm", "frame_web * sqrt(1 + rs_low_slope * rs_low_slope)", "[demo] derived: strut width measured vertically"),
+    ("rs_win_top", "mm", "comb_top - comb_beam_h", "[demo] derived: top of the windows"),
+    ("rs_win_rear_x", "mm", "-lop + butt_sagitta + plate_thickness", "[demo] derived: front face of the plate post"),
+    ("rs_win_front_x", "mm", "-lop + comb_length - frame_web", "[demo] derived: front of the front window"),
+    ("rs_rib_x", "mm", "(rs_win_rear_x + rs_win_front_x) / 2", "[demo] derived: rib centre"),
+    ("rs_win_low_y", "mm", "butt_bot_y + frame_web", "[demo] derived: lowest window edge, above the toe"),
+    ("rs_win_low_x", "mm", "wrist_heel_x + (rs_win_low_y - wrist_heel_y - rs_web_v) / rs_low_slope",
+     "[demo] derived: where the window bottom meets the strut"),
 ]
+
+
+def strut_y(x):
+    """Upper edge of the butt's lower strut at x (the underside line moved up by frame_web)."""
+    return f"wrist_heel_y + rs_low_slope * (({x}) - wrist_heel_x) + rs_web_v"
 
 
 def gf(y):
@@ -346,6 +370,24 @@ class Builder:
         self.done(sk)
         self.extrude(occs["fore"], sk.profiles.item(0), CUT, sym="2 * body_width", name="cross_dowel")
 
+        # ---- rear stock: slim open frame (comb beam and plate post stay at full width)
+        rear = occs["rear"]
+        sk = self.sketch("butt_windows")
+        r0, r1 = "rs_rib_x - frame_rib / 2", "rs_rib_x + frame_rib / 2"
+        self.poly(sk, [("rs_win_rear_x", "rs_win_top"), (r0, "rs_win_top"), (r0, strut_y(r0)),
+                       ("rs_win_low_x", "rs_win_low_y"), ("rs_win_rear_x", "rs_win_low_y")])
+        self.poly(sk, [(r1, "rs_win_top"), ("rs_win_front_x", "rs_win_top"),
+                       ("rs_win_front_x", strut_y("rs_win_front_x")), (r1, strut_y(r1))])
+        self.done(sk)
+        self.extrude(rear, [sk.profiles.item(i) for i in range(sk.profiles.count)], CUT,
+                     sym="2 * comb_width", name="butt_windows")
+        sk = self.sketch("butt_slim")
+        self.rect(sk, "rs_win_rear_x", "-lop + comb_length", "rs_win_top", "-ibu_depth_max - 60 mm")
+        self.done(sk)
+        side = "(comb_width - frame_width) / 2"
+        self.extrude(rear, sk.profiles.item(0), CUT, start="cast_z + frame_width / 2", dist=side, name="butt_slim_face")
+        self.extrude(rear, sk.profiles.item(0), CUT, start="cast_z - comb_width / 2", dist=side, name="butt_slim_away")
+
         # ---- forestock: hand stop with sling slot
         sk = self.sketch("hand_stop")
         self.rect(sk, "handstop_position", "handstop_position + handstop_length",
@@ -375,7 +417,19 @@ class Builder:
         pat = fore.features.rectangularPatternFeatures.add(pin)
         pat.name = "mag_slots"
 
+        self.colour(occs)
         return occs
+
+    def colour(self, occs):
+        app = adsk.core.Application.get()
+        lib = app.materialLibraries.itemByName("Fusion Appearance Library")
+        names = {"rear": "Plastic - Matte (Yellow)", "main": "Plastic - Matte (Gray)", "fore": "Plastic - Matte (Blue)"}
+        for key, occ in occs.items():
+            a = lib.appearances.itemByName(names[key]) if lib else None
+            if a:
+                occ.appearance = self.d.appearances.itemByName(a.name) or self.d.appearances.addByCopy(a, a.name)
+        self.root.isSketchFolderLightBulbOn = False
+        self.root.isConstructionFolderLightBulbOn = False
 
 
 def report(design, occs, log=print):

@@ -238,6 +238,13 @@ parity check tolerates that only for parts that are fit-tested in Fusion first, 
     both flip direction.
   - In the demo, `chk_holder_hand` and `chk_holder_joint` still use r1's upright-holder rules. They
     need r2's flush-slot rules (from PR 3's part.py).
+  - **Slim skeleton butt** (Darren 2026-11-23, composite of `reference-images/butt-section-designs/`,
+    mainly the BIONIC frame (#01), the Bear single-window butt (#13) and the printed CZ457 and Patronus rear
+    ends (#22, #24)). The comb beam (cheek, `comb_width`) and the butt-plate post (`plate_thickness`
+    behind the concave face) keep their full width. Between them the frame thins to `frame_width` and
+    is opened by two windows, split by a `frame_rib` and bounded by a lower strut `frame_web` wide that runs
+    parallel to the underside. All of it is driven by derived parameters (`rs_*`, `butt_sagitta`). The rear
+    stock went from 1000 to 502 cm³.
   - Demo shortcuts: no chamfers or grip rounding, no tie rods, no harness inserts, no mag window or
     finger scallops, and no teardrop holes.
 
