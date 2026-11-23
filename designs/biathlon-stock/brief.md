@@ -28,8 +28,8 @@ Three parts, all printed on their side (Example 2 in the materials research):
 | Part | Holds | Approx. length | On the plate |
 |---|---|---|---|
 | Rear stock | butt plate, printed butt hook, rear harness connector, comb / cheek piece (one piece, no adjusters) | ~220 mm | flat on its side |
-| Main body | wrist, pistol grip, trigger guard, action inlet, mag well | ~380 mm | diagonal on its side (≤ ~440 mm) |
-| Forestock | printed fixed hand stop with sling attachment, front harness connector, standing raiser, spare-mag holders, IBU marking faces | ~380 mm | diagonal on its side |
+| Main body | wrist, pistol grip, trigger guard, action inlet, mag well, standing shooting block (integral), IBU marking faces | ~380–435 mm | diagonal on its side (≤ ~440 mm) |
+| Forestock | printed fixed hand stop with sling attachment, front harness connector, spare-mag holders | ~380 mm | diagonal on its side |
 
 Joints: tapered tongue (rear) and dovetail (front), each with steel bolts into steel
 cross-dowels, disc-spring washers and a sealed joint line. Tool-only, no quick release.
@@ -66,7 +66,17 @@ cross-dowels, disc-spring washers and a sealed joint line. Tool-only, no quick r
 | `handstop_position` (trigger blade to hand-stop face, fixed, printed in place) | 380 | estimate; from sheet V with B, C, D; check against AG |
 | `handstop_height` / `sling_slot_width` | 25 / 41 | estimate; slot sized for a ≤ 40 mm sling |
 | `harness_front_position` / `harness_rear_position` (from trigger blade) | ? / ? | from AH, AI (current rifle) until a body-based rule is agreed |
-| `standing_raiser_height` | 40 | estimate, B18 |
+| `block_position` (trigger blade to centre of the standing shooting block) | 150 | estimate; from sheet Z and proposed AJ |
+| `block_height` (bore to block bottom, where the support hand bears) | 130 | estimate; from sheet Z (support hand height) and Y; capped at 140 |
+| `block_length` / `block_width` / `block_palm_angle_deg` | 90 / 55 / 10 | estimate; from F, G, J (support hand) |
+
+### Split position (computed)
+The standing block and the IBU marking surface both sit on the main body, so the front
+joint goes forward of both. Checks:
+- `front_split` ≥ max(block front edge, marking surface end) + 15 mm joint margin
+- `rear_split` (behind trigger) + `front_split` ≤ ~435 mm so the main body fits diagonally
+- If `block_position` forces the main body past the plate, flag it; fallback is moving the
+  rear split forward of the comb (more length on the rear stock).
 
 ### IBU compliance (computed checks in the model, flag on failure)
 | Check | Limit | Rule |
@@ -79,7 +89,7 @@ cross-dowels, disc-spring washers and a sealed joint line. Tool-only, no quick r
 | Marking surface | flat, ≥ 40 mm high, both sides, starts 150 mm in front of trigger; no joint or bolt heads in it | 3.1.6.4 l |
 | Electronics / batteries | none | MC 1.3 b |
 
-Parameters that can break a rule: `handstop_height` and `standing_raiser_height` (if they hang below the forend they count toward the 140 mm depth), hand stop or harness connector placed inside the marking surface, `sling_slot_width`, `grip_length`, forend depth,
+Parameters that can break a rule: `block_height` (the shooting block is usually the lowest point of the forend, so it sets the 140 mm depth directly), `handstop_height` (if they hang below the forend they count toward the 140 mm depth), hand stop or harness connector placed inside the marking surface, `sling_slot_width`, `grip_length`, forend depth,
 mag-well position (all feed the 140 mm check), comb cast/thickness, forestock joint
 position (marking surface), and infill/ballast (weight).
 
@@ -140,6 +150,10 @@ Each will be a `PARAMS` entry so a print can settle it.
    V elbow to hand stop (prone), B/C/D arm segments. Proposed additions to the sheet:
    AG current trigger to hand-stop distance, AH and AI current trigger to front and rear
    harness connector distances.
+4b. ~~Standing hand rest?~~ Decided 2026-11-23: a shooting block printed as part of the
+   main body, position and shape from Darren's measurements. Proposed sheet addition:
+   AJ current trigger blade to centre of the support hand in standing. If sheet Z asks for
+   more than 140 mm below the bore, the block is capped and flagged.
 5. Target total weight and balance point.
 6. Is TC / national federation approval for a printed stock being pursued (deadline 1 May)?
 7. Sub-zero behaviour of PAHT-CF prints: test coupons before the final print.
