@@ -13,7 +13,8 @@ Shooting frame:
   away side           : palm swell (bed side of grip), spare-mag holder
   LH -> face side is the shooter's right; RH -> the shooter's left.
 Hardware that is NOT mirrored with the shooter keeps its own side parameters:
-`bolt_side` (the action's bolt handle) and `harness_side`. A right-bolt action in a
+`bolt_side` (the action's bolt handle). The harness rail goes on the side opposite the
+spare-mag holder (the face side), per Darren 2026-11-23. A right-bolt action in a
 left-handed stock is therefore modelled correctly, not as a mirror image.
 
 Print orientation is chosen per part after placement, so each part lies with its
@@ -39,7 +40,12 @@ PARAMS = {
     # --- athlete (estimates for a 178 cm male; replace from the measurement sheet) ---
     "handedness": "left",            # S/T: "left" or "right"; flips every body-fitted side
     "bolt_side": "left",              # action's bolt handle side; set from the action, not mirrored
-    "harness_side": "tbd",            # harness clip side; set once the clip is chosen
+    # Carrying-harness rail: one rail on the side opposite the spare-mag holder (face side).
+    # Placeholder mounting: heat-set inserts for a bought rail until the rail is measured (AH, AI).
+    "harness_rail_holes": (270.0, 350.0),  # trigger to each insert
+    "harness_rail_y": -30.0,               # bore to insert centre line
+    "insert_hole_d": 6.4,                  # M5 heat-set insert, per insert maker
+    "insert_depth": 10.0,
     "bolt_notch": (-62.0, 26.0, 12.0),  # placeholder: x centre, length, depth below the stock top
     "lop": 335.0,                     # trigger blade to butt-plate centre (D, AA)
     "cheek_to_eye": 27.0,             # P
@@ -307,6 +313,10 @@ def ibu_checks(p) -> list[str]:
                       f"{p['handstop_position'] - p['prone_hand_length']:.0f} to the hand stop at {p['handstop_position']:.0f})")
     if -y_bot > 140:
         issues.append(f"MC 3.1.6.4a: spare-mag holder bottom {-y_bot:.0f} mm below bore > 140 mm")
+    if any(m0 - 10 < hx < m1 + 10 for hx in p["harness_rail_holes"]):
+        issues.append("MC 3.1.6.4l: a harness-rail insert is in the marking surface")
+    if any(hx > p["handstop_position"] - 5 for hx in p["harness_rail_holes"]):
+        issues.append("Harness-rail insert at or in front of the hand stop")
     if x0 <= p["mag_well"][1]:
         issues.append("MC 3.1.6.5.3: spare-mag holder touches the magazine well")
     return issues
@@ -388,6 +398,9 @@ def build(p: dict = PARAMS):
     fore += spare_mag_holder(p)
     fore -= spare_mag_pockets(p)
     fore -= channel_and_rods(-1)
+    for hx in p["harness_rail_holes"]:      # face side = +Z in the model frame
+        fore -= _z_hole(hx, p["harness_rail_y"], p["insert_hole_d"],
+                        W / 2 - p["insert_depth"], W / 2 + 1)
 
     # ---- rear stock (its own width; cast shifts it sideways in the assembly only)
     Wb = p["comb_width"]

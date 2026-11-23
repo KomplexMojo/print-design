@@ -63,7 +63,8 @@ cross-dowels, disc-spring washers and a sealed joint line. Tool-only, no quick r
 | `trigger_reach` | 70 | estimate, B6 |
 | `thumb_rest_height` / `depth` | 45 / 12 | estimate, B10 |
 | `handedness` (top-level: flips cheek, thumb rest, palm side, cast, spare-mag holder) | left | Darren, S/T |
-| `bolt_side` / `harness_side` (hardware, not mirrored with handedness) | left / tbd | from the action and harness clip |
+| `bolt_side` (hardware, not mirrored with handedness) | left | from the action |
+| harness rail side | opposite the spare-mag holder (face side) | Darren 2026-11-23 |
 | `handstop_position` (trigger blade to hand-stop face, fixed, printed in place) | 380 | estimate; from sheet V with B, C, D; check against AG |
 | `handstop_height` / `sling_slot_width` | 25 / 41 | estimate; slot sized for a ≤ 40 mm sling |
 | `harness_front_position` / `harness_rear_position` (from trigger blade) | ? / ? | from AH, AI (current rifle) until a body-based rule is agreed |
@@ -206,6 +207,12 @@ What r1 changed from the layout above, and why:
   joint, depth 62 mm. ⚠️ Flagged: with the estimated hand stop at 380 mm and a 90 mm prone hand,
   the holder's front 15 mm sits under the rear of the prone hand. Settles when V / AG and the
   real mag size are in; options are a thinner mag pitch or moving the holder start.
+- **Harness rail** (Darren 2026-11-23): one rail on the side opposite the spare-mag holder, so it
+  follows handedness. r1 has two M5 heat-set insert holes for a bought rail on the forestock's
+  face side at 270 and 350 mm, 30 mm below the bore; positions are placeholders until AH / AI and
+  the rail are measured. Check keeps them out of the marking surface and behind the hand stop.
+- **Standing block** checked against Darren's note (block sits behind the hand stop, toward the
+  trigger): it is centred 150 mm from the trigger, the hand stop is at 380 mm. ✓
 - Trigger guard is a printed loop as a placeholder for the metal guard (Q11).
 - Butt-plate radius default raised to 150 mm (60 mm over a 120 mm plate is a half circle);
   hook is set by `hook_drop`, `hook_reach`, `hook_radius`.
