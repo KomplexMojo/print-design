@@ -2,16 +2,23 @@
 
 Rough r1 prototype for fit only. Three parts: rear stock, main body, forestock.
 
-Frame while modelling (shooting frame = print frame):
+Shooting frame:
   X  forward along the bore, 0 at the trigger blade
   Y  up in the shooting position, 0 on the bore line
-  Z  lateral. +Z is the shooter's right for a left-handed stock. In print, Z is up,
-     so every part lies on its side with the bed on the -Z face.
+  Z  lateral, +Z is always the shooter's RIGHT
 
-A left-handed and a right-handed stock are mirror images, so the printed geometry
-is the same for both: the handed features (cheek side, thumb rest) always sit on the
-top (+Z) side and the palm side lies flat on the bed. `handedness` only says which
-side of the shooter +Z is.
+`handedness` is the top-level switch. The body-fitted features are modelled on a
+"face side" and an "away side", then placed for the shooter:
+  face side (cheek)   : cheek piece / comb, thumb rest, cast reference
+  away side           : palm swell (bed side of grip), spare-mag holder
+  LH -> face side is the shooter's right; RH -> the shooter's left.
+Hardware that is NOT mirrored with the shooter keeps its own side parameters:
+`bolt_side` (the action's bolt handle) and `harness_side`. A right-bolt action in a
+left-handed stock is therefore modelled correctly, not as a mirror image.
+
+Print orientation is chosen per part after placement, so each part lies with its
+flat side on the bed: rear stock and main body with the away side down, forestock
+with the face side down (the mag holder is on its away side).
 
 All fit values are estimates for a 178 cm male until Darren's measurement sheet
 arrives; hardware values are placeholders until the action and sights are chosen.
@@ -30,12 +37,15 @@ SLICE_PROFILE = None
 
 PARAMS = {
     # --- athlete (estimates for a 178 cm male; replace from the measurement sheet) ---
-    "handedness": "left",            # S/T
+    "handedness": "left",            # S/T: "left" or "right"; flips every body-fitted side
+    "bolt_side": "left",              # action's bolt handle side; set from the action, not mirrored
+    "harness_side": "tbd",            # harness clip side; set once the clip is chosen
+    "bolt_notch": (-62.0, 26.0, 12.0),  # placeholder: x centre, length, depth below the stock top
     "lop": 335.0,                     # trigger blade to butt-plate centre (D, AA)
     "cheek_to_eye": 27.0,             # P
     "comb_length": 185.0,             # butt plate to comb front
     "comb_width": 40.0,               # rear stock thickness at the cheek (IBU cap 40)
-    "comb_cast": 0.0,                 # R; lateral offset of the rear stock (assembly only)
+    "comb_cast": 0.0,                 # R; rear stock shifted away from the face (cast-off for RH, cast-on for LH)
     "buttplate_length": 120.0,        # U, Y
     "buttplate_drop": 60.0,           # bore to butt-plate centre (AC)
     "buttplate_curve_radius": 150.0,  # E
@@ -78,6 +88,15 @@ PARAMS = {
     "finger_hole": (-42.0, 38.0, -82.0, -45.0),  # x0, x1, y0, y1
     "guard_bottom": 90.0,             # bore to bottom of the (printed) guard loop
     "mag_well": (50.0, 100.0, 22.0),  # x from, x to, width
+    "spare_mag": (14.0, 32.0, 50.0),  # placeholder: thickness (along X), length (lateral), height
+    # --- spare magazine holder (MC 3.1.6.5.3), on the side away from the face ---
+    "mag_holder_count": 4,
+    "mag_holder_start": 228.0,        # trigger to rear of the holder
+    "mag_holder_wall": 4.0,
+    "mag_holder_top": -4.0,           # bore to top of the holder (mags go in from above)
+    "mag_holder_floor": 4.0,
+    "mag_finger_notch": 18.0,         # width of the thumb notch in the outer wall
+    "prone_hand_length": 90.0,        # hand behind the hand stop in prone (J), keep holder clear
     # --- IBU marking surface (MC 3.1.6.4 l) ---
     "marking_start": 150.0,           # measured from the trigger
     "marking_length": 50.0,
@@ -125,16 +144,17 @@ def _slab(points, z0, z1, arcs=None):
 
 
 def _box(x0, x1, y0, y1, z0, z1):
+    x0, x1 = sorted((x0, x1)); y0, y1 = sorted((y0, y1)); z0, z1 = sorted((z0, z1))
     return Pos((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2) * Box(x1 - x0, y1 - y0, z1 - z0)
 
 
-def _x_hole(x0, x1, y, z, d):
-    """Hole along X, teardrop pointing +Z (print up) so it needs no support."""
-    r = d / 2
+def _x_hole(x0, x1, y, z, d, up=1):
+    """Hole along X with a 45° teardrop roof toward `up` * Z (print up) so it needs no support."""
+    r = d / 2 * up
     with BuildPart() as bp:
         with BuildSketch(Plane.YZ.offset(x0)):
             with Locations((y, z)):
-                Circle(r)
+                Circle(abs(r))
                 # 45° teardrop roof toward +Z (sketch's local Y is world Z)
                 Polygon((0, r * math.sqrt(2)), (-r / math.sqrt(2), r / math.sqrt(2)),
                         (r / math.sqrt(2), r / math.sqrt(2)), align=None)
@@ -223,13 +243,51 @@ def grip(p):
     return g + _soften(pad, 2)
 
 
+# ---------------------------------------------------------------- spare magazines
+
+def _holder_box(p):
+    t, length, h = p["spare_mag"]
+    n, wall, snug = p["mag_holder_count"], p["mag_holder_wall"], fits.clearance("snug")
+    pocket_x = t + 2 * snug
+    x0 = p["mag_holder_start"]
+    x1 = x0 + n * pocket_x + (n + 1) * wall
+    z_face = -p["body_width"] / 2                     # side away from the face
+    z_out = z_face - (length + 2 * snug) - wall
+    y_top = p["mag_holder_top"]
+    y_bot = y_top - h - snug - p["mag_holder_floor"]
+    return x0, x1, y_bot, y_top, z_out, z_face, pocket_x
+
+
+def spare_mag_holder(p):
+    """Four upright pockets in a row on the forestock side away from the face."""
+    x0, x1, y_bot, y_top, z_out, z_face, _ = _holder_box(p)
+    holder = _box(x0, x1, y_bot, y_top, z_out, z_face + 3)
+    # Blend the holder bottom into the forend with a 45° ramp so nothing snags.
+    return _soften(holder, 2)
+
+
+def spare_mag_pockets(p):
+    x0, x1, y_bot, y_top, z_out, z_face, pocket_x = _holder_box(p)
+    t, length, h = p["spare_mag"]
+    snug, wall = fits.clearance("snug"), p["mag_holder_wall"]
+    cut = Part()
+    for i in range(p["mag_holder_count"]):
+        px = x0 + wall + i * (pocket_x + wall)
+        cut += _box(px, px + pocket_x, y_top - h - snug, y_top + 1,
+                    z_face - length - snug, z_face + snug)
+        # thumb notch in the outer wall to pull the mag out
+        n = p["mag_finger_notch"]
+        cut += _box(px - 1, px + pocket_x + 1, y_top - n, y_top + 1, z_out - 1, z_out + wall + 0.5)
+    return cut
+
+
 # ---------------------------------------------------------------- IBU checks
 
 def ibu_checks(p) -> list[str]:
     """Return a list of rule problems (empty when all computed checks pass)."""
     issues = []
     depth = max(p["forend_depth"], p["block_height"], p["guard_bottom"],
-                p["forend_depth"] + p["handstop_height"])
+                p["forend_depth"] + p["handstop_height"], -_holder_box(p)[2])
     if depth > 140:
         issues.append(f"MC 3.1.6.4a: depth below bore {depth:.0f} mm > 140 mm")
     if p["comb_width"] > 40:
@@ -241,6 +299,16 @@ def ibu_checks(p) -> list[str]:
         issues.append("MC 3.1.6.4l: flat side of the forend is under 40 mm high")
     if p["sling_slot_width"] - 1 > 40:
         issues.append("MC 3.1.6.4h: sling slot implies a sling wider than 40 mm")
+    x0, x1, y_bot, *_ = _holder_box(p)
+    if x0 < m1 + 15 or x0 < p["front_split"] + 10:
+        issues.append(f"Spare-mag holder starts at {x0:.0f}, inside the marking surface or the front joint")
+    if x1 > p["handstop_position"] - p["prone_hand_length"]:
+        issues.append(f"Spare-mag holder ends at {x1:.0f}, under the prone hand (hand from "
+                      f"{p['handstop_position'] - p['prone_hand_length']:.0f} to the hand stop at {p['handstop_position']:.0f})")
+    if -y_bot > 140:
+        issues.append(f"MC 3.1.6.4a: spare-mag holder bottom {-y_bot:.0f} mm below bore > 140 mm")
+    if x0 <= p["mag_well"][1]:
+        issues.append("MC 3.1.6.5.3: spare-mag holder touches the magazine well")
     return issues
 
 
@@ -282,7 +350,6 @@ def build(p: dict = PARAMS):
     body -= _box(mx0 - slide, mx1 + slide, -p["forend_depth"] - 1, floor + 1,
                  -mw / 2 - slide, mw / 2 + slide)
     r_ch = p["barrel_d"] / 2 + p["barrel_float"]
-    body -= _x_hole(p["action_front"] - 1, p["forend_tip"] + 1, 0.0, 0.0, 2 * r_ch)
     body -= _box(p["action_front"] - 1, p["forend_tip"] + 1, 0, 50, -r_ch, r_ch)
     sx0 = hs0 + (p["handstop_length"] - p["sling_slot_width"]) / 2
     sy = -p["forend_depth"] - p["handstop_height"] / 2
@@ -300,25 +367,32 @@ def build(p: dict = PARAMS):
     cb_d, cb_depth = p["tie_rod_counterbore"]
     rod_zs = (-p["tie_rod_spacing"] / 2, p["tie_rod_spacing"] / 2)
     dowel_x = fs + 35
-    rod_holes = Part()
-    for z in rod_zs:
-        rod_holes += _x_hole(mx1, dowel_x + 8, fy, z, fits.hole(p["bolt_d"], "slide"))
-        rod_holes += _x_hole(mx1, mx1 + cb_depth, fy, z, cb_d)
-    body -= rod_holes
+
+    def channel_and_rods(up):
+        """Barrel channel and tie-rod holes, teardropped toward the part's print-up side."""
+        cut = _x_hole(p["action_front"] - 1, p["forend_tip"] + 1, 0.0, 0.0, 2 * r_ch, up)
+        for z in rod_zs:
+            cut += _x_hole(mx1, dowel_x + 8, fy, z, fits.hole(p["bolt_d"], "slide"), up)
+            cut += _x_hole(mx1, mx1 + cb_depth, fy, z, cb_d, up)
+        return cut
     body -= _z_hole(dowel_x, fy, fits.hole(p["cross_dowel_d"], "press"))
 
     main = body & _box(rs, fs, -500, 500, -W, W)
     fore = body & _box(fs, 1000, -500, 500, -W, W)
+    main -= channel_and_rods(1)
     socket = _box(fs - fl - snug, fs + 1, fy - fh_ / 2 - snug, fy + fh_ / 2 + snug,
                   -fw / 2 - snug, fw / 2 + snug)
     main -= socket
     tongue = _box(fs - fl, fs + 0.5, fy - fh_ / 2, fy + fh_ / 2, -fw / 2, fw / 2)
-    tongue -= rod_holes
     fore += tongue
+    fore += spare_mag_holder(p)
+    fore -= spare_mag_pockets(p)
+    fore -= channel_and_rods(-1)
 
     # ---- rear stock (its own width; cast shifts it sideways in the assembly only)
     Wb = p["comb_width"]
-    rear = _soften(_slab(pts, -Wb / 2, Wb / 2, arcs), p["edge_chamfer"])
+    c = p["comb_cast"]  # positive moves the rear stock away from the face (-Z here)
+    rear = _soften(_slab(pts, -Wb / 2 - c, Wb / 2 - c, arcs), p["edge_chamfer"])
     rear = rear & _box(-1000, rs, -500, 500, -W, W)
     rl, rh, rw, ry = p["rear_tongue"]
     rtongue = _box(rs - 0.5, rs + rl, ry - rh / 2, ry + rh / 2, -rw / 2, rw / 2)
@@ -330,7 +404,22 @@ def build(p: dict = PARAMS):
         main -= _z_hole(bxp, ry, bolt)
         rear -= _z_hole(bxp, ry, bolt)
 
-    return {"rear": rear, "main": main, "fore": fore}
+    # ---- place for the shooter. Everything above is modelled with the face side on +Z
+    # (true for a left-hander); a right-hander's stock is the mirror image of that.
+    face = 1 if p["handedness"] == "left" else -1
+    if face < 0:
+        rear, main, fore = (x.mirror(Plane.XY) for x in (rear, main, fore))
+
+    # ---- hardware that is not mirrored with the shooter
+    bolt = 1 if p["bolt_side"] == "right" else -1
+    bx_, blen, bdep = p["bolt_notch"]
+    main -= _box(bx_ - blen / 2, bx_ + blen / 2, -bdep, 5, 0, bolt * W)
+
+    # ---- print orientation: rear and main lie on their away side, forestock on its face side
+    def lay(part, bed_side):            # bed_side = +1/-1 lateral side that goes on the bed
+        return part if bed_side < 0 else part.rotate(Axis.X, 180)
+
+    return {"rear": lay(rear, -face), "main": lay(main, -face), "fore": lay(fore, face)}
 
 
 if __name__ == "__main__":

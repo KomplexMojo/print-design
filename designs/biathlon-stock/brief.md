@@ -62,7 +62,8 @@ cross-dowels, disc-spring washers and a sealed joint line. Tool-only, no quick r
 | `grip_circumference` / `grip_length` | 140 / 95 | estimate, B8/B9, B4/B5 |
 | `trigger_reach` | 70 | estimate, B6 |
 | `thumb_rest_height` / `depth` | 45 / 12 | estimate, B10 |
-| `handedness` | right | assumed, B16 |
+| `handedness` (top-level: flips cheek, thumb rest, palm side, cast, spare-mag holder) | left | Darren, S/T |
+| `bolt_side` / `harness_side` (hardware, not mirrored with handedness) | left / tbd | from the action and harness clip |
 | `handstop_position` (trigger blade to hand-stop face, fixed, printed in place) | 380 | estimate; from sheet V with B, C, D; check against AG |
 | `handstop_height` / `sling_slot_width` | 25 / 41 | estimate; slot sized for a ≤ 40 mm sling |
 | `harness_front_position` / `harness_rear_position` (from trigger blade) | ? / ? | from AH, AI (current rifle) until a body-based rule is agreed |
@@ -145,7 +146,10 @@ Each will be a `PARAMS` entry so a print can settle it.
    adjustable modular butt settings are the best check for the derived values.
 4. ~~Hand stop and harness?~~ Decided 2026-11-23: both printed in place at fixed positions
    set from Darren's measurements; the hand stop keeps a sling/strap attachment.
-   Still open: spare-mag holders, and which clips the sling and harness use.
+   Still open: which clips the sling and harness use.
+   Spare mags decided 2026-11-23: four in a row in a holder printed into the forestock side
+   away from the face (left side for Darren), separate from the mag well, clear of the marking
+   surface and hand stop, inside the 140 mm depth.
    Measurement sheet (project files `reference/measurement-diagram/`) letters used:
    V elbow to hand stop (prone), B/C/D arm segments. Proposed additions to the sheet:
    AG current trigger to hand-stop distance, AH and AI current trigger to front and rear
@@ -186,9 +190,22 @@ What r1 changed from the layout above, and why:
   head out of the marking surface (150–200 mm, measured from the trigger).
 - **Rear joint is a 40 mm tongue with two lateral M6 bolts** through the wrist. Only ~50 mm of wrist
   depth at the split; watch it on the first flex test.
-- Handedness only labels the sides: LH and RH stocks are mirror images, so the cheek side and
-  thumb rest always print on top and the palm side lies on the bed. `palm_swell` is not modelled
-  yet (it would sit on the bed face).
+- **Handedness is a top-level parameter** (Darren, 2026-11-23: LH and RH stocks differ a lot).
+  Body-fitted features sit on a face side or an away side and swap with `handedness`: cheek /
+  comb and `comb_cast` (positive = away from the face), thumb rest (face side), palm side of the
+  grip and the spare-mag holder (away side). Hardware that is not mirrored keeps its own
+  parameters: `bolt_side` cuts the bolt-handle notch on that side whatever the handedness, and
+  `harness_side` is reserved until the clip is chosen. Each part then picks its print side:
+  rear stock and main body lie on the away side, the forestock on the face side (holder up).
+  Both hands build and pass checks. Not yet handed: butt-hook offset and `palm_swell` (would sit
+  on the bed face), both left centred in r1.
+- **Spare-mag holder**: four upright pockets in a row on the forestock's away side, x 228 to
+  305 mm from the trigger, top 4 mm below the bore, bottom 62 mm below it. Mags go in from above
+  with a snug fit and a thumb notch in the outer wall. Placeholder mag 14 × 32 × 50 mm until
+  measured. Computed checks: separate part from the mag well, behind the marking surface and
+  joint, depth 62 mm. ⚠️ Flagged: with the estimated hand stop at 380 mm and a 90 mm prone hand,
+  the holder's front 15 mm sits under the rear of the prone hand. Settles when V / AG and the
+  real mag size are in; options are a thinner mag pitch or moving the holder start.
 - Trigger guard is a printed loop as a placeholder for the metal guard (Q11).
 - Butt-plate radius default raised to 150 mm (60 mm over a 120 mm plate is a half circle);
   hook is set by `hook_drop`, `hook_reach`, `hook_radius`.
