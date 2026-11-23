@@ -27,9 +27,9 @@ Three parts, all printed on their side (Example 2 in the materials research):
 
 | Part | Holds | Approx. length | On the plate |
 |---|---|---|---|
-| Rear stock | butt plate, printed butt hook, comb / cheek piece (one piece, no adjusters) | ~220 mm | flat on its side |
+| Rear stock | butt plate, printed butt hook, rear harness connector, comb / cheek piece (one piece, no adjusters) | ~220 mm | flat on its side |
 | Main body | wrist, pistol grip, trigger guard, action inlet, mag well | ~380 mm | diagonal on its side (≤ ~440 mm) |
-| Forestock | hand-stop rail, standing raiser, spare-mag holders, IBU marking faces | ~380 mm | diagonal on its side |
+| Forestock | printed fixed hand stop with sling attachment, front harness connector, standing raiser, spare-mag holders, IBU marking faces | ~380 mm | diagonal on its side |
 
 Joints: tapered tongue (rear) and dovetail (front), each with steel bolts into steel
 cross-dowels, disc-spring washers and a sealed joint line. Tool-only, no quick release.
@@ -46,7 +46,8 @@ cross-dowels, disc-spring washers and a sealed joint line. Tool-only, no quick r
 | Magazine well position and mag outline | ? | calipers |
 | Bore height above inlet floor | ? | calipers |
 | Sight line height above bore (diopter + front globe) | ? | calipers |
-| Harness mount, hand stop and sling hardware | ? | Darren |
+| Sling clip type and width (≤ 40 mm) | ? | Darren / calipers |
+| Harness clip type that the printed connectors must accept | ? | Darren / calipers |
 | Spare magazine holders (count, location) | ? | Darren |
 
 ### Fit (from the athlete; defaults are estimates until measured)
@@ -62,7 +63,9 @@ cross-dowels, disc-spring washers and a sealed joint line. Tool-only, no quick r
 | `trigger_reach` | 70 | estimate, B6 |
 | `thumb_rest_height` / `depth` | 45 / 12 | estimate, B10 |
 | `handedness` | right | assumed, B16 |
-| `handstop_position` | 380 from trigger | estimate, B17 |
+| `handstop_position` (trigger blade to hand-stop face, fixed, printed in place) | 380 | estimate; from sheet V with B, C, D; check against AG |
+| `handstop_height` / `sling_slot_width` | 25 / 41 | estimate; slot sized for a ≤ 40 mm sling |
+| `harness_front_position` / `harness_rear_position` (from trigger blade) | ? / ? | from AH, AI (current rifle) until a body-based rule is agreed |
 | `standing_raiser_height` | 40 | estimate, B18 |
 
 ### IBU compliance (computed checks in the model, flag on failure)
@@ -76,7 +79,7 @@ cross-dowels, disc-spring washers and a sealed joint line. Tool-only, no quick r
 | Marking surface | flat, ≥ 40 mm high, both sides, starts 150 mm in front of trigger; no joint or bolt heads in it | 3.1.6.4 l |
 | Electronics / batteries | none | MC 1.3 b |
 
-Parameters that can break a rule: `standing_raiser_height`, `grip_length`, forend depth,
+Parameters that can break a rule: `handstop_height` and `standing_raiser_height` (if they hang below the forend they count toward the 140 mm depth), hand stop or harness connector placed inside the marking surface, `sling_slot_width`, `grip_length`, forend depth,
 mag-well position (all feed the 140 mm check), comb cast/thickness, forestock joint
 position (marking surface), and infill/ballast (weight).
 
@@ -87,7 +90,8 @@ position (marking surface), and infill/ballast (weight).
 - Joint tongues and dovetails: tapered, snug (0.15) at full engagement.
 - Cross-dowels and pillars: press (0.10) into printed bores, bonded.
 - Magazine in well and spare holders: slide (0.25), with a positive retention catch.
-- Hand stop on rail: slide (0.25), clamped by screw.
+- Hand stop: printed in place on the forestock, no rail. Sling swivel or strap slot through it.
+- Harness connectors: printed in place on rear stock and forestock; mating clip fit (slide or snug) set once the clip is measured.
 - Butt plate and butt hook: printed as part of the rear stock, no adjustment hardware. TPU pad bolted on with heat-set inserts.
 
 ## Loads and environment
@@ -129,7 +133,13 @@ Each will be a `PARAMS` entry so a print can settle it.
 3. ~~One butt or two?~~ Decided 2026-11-23: one fixed butt for both positions, all
    dimensions derived from Darren's measurements, with a printed hook. Darren's current
    adjustable modular butt settings are the best check for the derived values.
-4. Hand stop, harness and spare-mag holders: reuse existing hardware or print?
+4. ~~Hand stop and harness?~~ Decided 2026-11-23: both printed in place at fixed positions
+   set from Darren's measurements; the hand stop keeps a sling/strap attachment.
+   Still open: spare-mag holders, and which clips the sling and harness use.
+   Measurement sheet (project files `reference/measurement-diagram/`) letters used:
+   V elbow to hand stop (prone), B/C/D arm segments. Proposed additions to the sheet:
+   AG current trigger to hand-stop distance, AH and AI current trigger to front and rear
+   harness connector distances.
 5. Target total weight and balance point.
 6. Is TC / national federation approval for a printed stock being pursued (deadline 1 May)?
 7. Sub-zero behaviour of PAHT-CF prints: test coupons before the final print.
