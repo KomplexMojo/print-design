@@ -17,6 +17,7 @@ Nothing is saved; save the document yourself when the result looks right.
 """
 
 import os
+import re
 import sys
 import traceback
 
@@ -70,7 +71,8 @@ def load(design, path, sp, log=print):
             log(f"unit mismatch on {r.name}: design has '{p.unit}', registry '{r.unit}'. Left as is.")
             skipped.append(r.name)
             continue
-        if p.expression != r.expression or p.comment != r.comment:
+        # Fusion re-spaces expressions ("( a + b )"), so compare without whitespace.
+        if re.sub(r"\s+", "", p.expression) != re.sub(r"\s+", "", r.expression) or p.comment != r.comment:
             p.expression = r.expression
             p.comment = r.comment
             if r.name not in created:

@@ -225,15 +225,28 @@ parity check tolerates that only for parts that are fit-tested in Fusion first, 
   Tests: `uv run --with pytest --no-project python -m pytest designs/biathlon-stock/fusion -q` (10 pass).
 - The sample is generated with the fit app's own `buildExport` from its test fixture. The values are
   typical-range midpoints, not Darren's.
-- **Not yet run inside Fusion.** The Fusion MCP was unavailable during this work (Fusion closed).
-  The first run should check: parameter creation, a unitless switch, negative offsets and
-  extrudes (§4), and the read-back of `chk_*`.
+- **Run inside Fusion (2706.1, through the Autodesk Fusion MCP) on 2026-11-23.** These were
+  confirmed against Darren's sample record:
+  - The loader created 162 parameters, and every expression resolves. A second run reports
+    0 changed and skips the 12 `[manual]` r2 overrides.
+  - `fusion_build_demo.py` built the skeleton and three components, each with one valid body and
+    a healthy timeline. Every sketch point is placed by driving dimensions whose expressions are
+    User Parameter expressions.
+  - **§4 works as designed.** With `face_side = -1` and `m_AA = 345 mm`, the model rebuilt with no
+    errors. The mag slots and thumb rest moved to the other side, the bolt notch stayed on the bolt side,
+    and the rear stock grew by 25 mm. Negative offset-plane distances and negative extrude distances
+    both flip direction.
+  - In the demo, `chk_holder_hand` and `chk_holder_joint` still use r1's upright-holder rules. They
+    need r2's flush-slot rules (from PR 3's part.py).
+  - Demo shortcuts: no chamfers or grip rounding, no tie rods, no harness inserts, no mag window or
+    finger scallops, and no teardrop holes.
 
 ## Files
 | File | Purpose |
 |---|---|
 | `stock_params.py` | Registry and resolver (stdlib only), the parameter source for both models. CLI preview, `--csv` for ParameterIO, `params_from_fit()` for part.py |
 | `fusion_load_params.py` | Fusion script: create or update User Parameters from a fit record |
+| `fusion_build_demo.py` | Fusion script: skeleton plus the three components, fully parameter-driven (demo geometry) |
 | `make_param_table.py` | Regenerates `PARAMETERS.md` |
 | `PARAMETERS.md` | JSON field → Fusion name, unit, expression |
 | `test_stock_params.py` | Tests (no Fusion needed) |
