@@ -224,7 +224,43 @@ Check notes:
   flat both sides, no joint or bolt head in it, sling slot 41 mm.
 - Grip bottom is 135 mm below the bore. It is not forestock under MC 3.1.6.4 a, but kept under 140 anyway.
 
+## r2 prototype from the sample fit record (2026-11-23)
+Darren supplied a sample fit record from the fitting app (left-handed, left bolt, Anschütz
+Fortner 1827 straight pull). Values were mapped with `params_from_fit()` from PR #4 and written
+into `PARAMS` as numbers; the record itself is not committed (it holds contact details).
+Print settings: `SLICE_PROFILE = "stock-proto"` (PLA prototype presets from PR #5).
+
+Changed from r1 (fit letter in brackets):
+| Param | r1 | r2 | Source |
+|---|---|---|---|
+| `lop` | 335 | 320 | AA (D = 290 is a check) |
+| `cheek_to_eye` | 27 | 30 | P |
+| `sight_line_above_bore` | 37 | 50 | AB + P, so the comb lands at the current 20 mm (AB) |
+| `buttplate_length` / `buttplate_curve_radius` | 120 / 150 | 150 / 150.6 | AD; E = 20 |
+| `hook_drop` / `hook_reach` | 55 / 30 | 15 / 20 | AF - (AC + AD/2); AE |
+| `grip_depth` / `grip_width` / `grip_chamfer` | 48 / 40 / 14 | 40 / 36 / 11.2 | circumference pi * M = 126 mm |
+| `handstop_position` | 380 | 350 | AG (V = 350 agrees) |
+| `prone_hand_length` | 90 | 80 | J |
+| `block_position` | 150 | 160 | AJ |
+| `block_ramp` | 15 | 5 | keeps the block front (215 - 5) inside the main body |
+| front harness inserts | 270 / 350 | 390 / 410 | around AH = 400, forestock face side |
+| rear harness inserts | none | -260 / -240 | -AI, rear stock face side |
+
+Still placeholders (null or design inputs in the record): barrel diameter and length (22 mm
+used), action inlet outline, screw positions and bore height (generic 32 mm action), trigger and
+guard outline, mag well and spare-mag size (14 × 32 × 50 mm), spare-mag count (4), sights (sight
+line taken from AB + P), comb cast (0), hook radius (40), grip length (85), trigger reach (69),
+thumb-rest height (62), block height (130, from Z / Y once a rule is agreed), harness clip type,
+rifle weight.
+
+Checks (flag only, nothing clamped):
+- Main body ⚠️ overhangs as in r1 (inlet, mag well, sockets need supports).
+- IBU computed checks pass: depth 130 mm (block), comb 40 mm, marking surface clear.
+- ⚠️ Spare-mag holder (228–305) runs 35 mm under the prone hand (270–350). Needs a decision.
+- LOP 320 is 30 mm longer than D = 290 (crook of elbow); kept at the current rifle's value.
+
 ## Revision history
 | Rev | Change | Why |
 |---|---|---|
+| 2 | Prototype from the sample fit record (LH, left bolt, Fortner 1827) | first fitted print; see r2 section |
 | 1 | Brief, then r1 rough 3-part model from 178 cm LH estimates | proportions and split check before measurements; see r1 notes above |

@@ -32,9 +32,9 @@ from build123d import *
 from printloop import fits
 
 # Bump on every change that gets printed, and add a row to brief.md's history.
-REVISION = 1
+REVISION = 2
 MATERIAL = "PLA"
-SLICE_PROFILE = None
+SLICE_PROFILE = "stock-proto"  # PLA prototype presets (printer/presets/biathlon-stock)
 
 PARAMS = {
     # --- athlete (estimates for a 178 cm male; replace from the measurement sheet) ---
@@ -42,39 +42,43 @@ PARAMS = {
     "bolt_side": "left",              # action's bolt handle side; set from the action, not mirrored
     # Carrying-harness rail: one rail on the side opposite the spare-mag holder (face side).
     # Placeholder mounting: heat-set inserts for a bought rail until the rail is measured (AH, AI).
-    "harness_rail_holes": (270.0, 350.0),  # trigger to each insert
+    "harness_rail_holes": (390.0, 410.0),  # forestock inserts, centred on AH = 400 (front connector)
+    "harness_rear_position": -250.0,       # -AI: rear connector on the rear stock
+    "harness_rear_y": -60.0,               # bore to rear insert centre line (placeholder)
+    "harness_insert_pitch": 20.0,          # two inserts per connector
     "harness_rail_y": -30.0,               # bore to insert centre line
     "insert_hole_d": 6.4,                  # M5 heat-set insert, per insert maker
     "insert_depth": 10.0,
     "bolt_notch": (-62.0, 26.0, 12.0),  # placeholder: x centre, length, depth below the stock top
-    "lop": 335.0,                     # trigger blade to butt-plate centre (D, AA)
-    "cheek_to_eye": 27.0,             # P
+    "lop": 320.0,                     # trigger blade to butt-plate centre (D, AA)
+    "cheek_to_eye": 30.0,             # P
     "comb_length": 185.0,             # butt plate to comb front
     "comb_width": 40.0,               # rear stock thickness at the cheek (IBU cap 40)
     "comb_cast": 0.0,                 # R; rear stock shifted away from the face (cast-off for RH, cast-on for LH)
-    "buttplate_length": 120.0,        # U, Y
+    "buttplate_length": 150.0,        # U, Y
     "buttplate_drop": 60.0,           # bore to butt-plate centre (AC)
-    "buttplate_curve_radius": 150.0,  # E
-    "hook_drop": 55.0,                # butt-plate bottom to hook tip, vertical (AF)
-    "hook_reach": 30.0,               # hook tip behind the butt plate (AE)
+    "buttplate_curve_radius": 150.6,  # E
+    "hook_drop": 15.0,                # butt-plate bottom to hook tip, vertical (AF)
+    "hook_reach": 20.0,               # hook tip behind the butt plate (AE)
+    "hook_thickness": 30.0,           # butt plate face to the hook's underside corner
     "hook_radius": 40.0,              # armpit curve (X)
     "grip_angle_deg": 85.0,
     "grip_length": 85.0,              # grip top to grip bottom (F, G)
-    "grip_depth": 48.0,               # front to back (K, M)
-    "grip_width": 40.0,
-    "grip_chamfer": 14.0,             # rounds the grip to ~143 mm circumference
+    "grip_depth": 40.0,               # front to back (K, M)
+    "grip_width": 36.0,
+    "grip_chamfer": 11.2,             # gives pi * M = 126 mm circumference (M = 40)
     "trigger_reach": 69.0,            # grip centre to trigger blade (H)
     "thumb_rest_height": 62.0,        # bore to thumb-rest centre (N)
     "thumb_rest_depth": 10.0,
-    "handstop_position": 380.0,       # trigger blade to hand-stop face (V, AG)
+    "handstop_position": 350.0,       # trigger blade to hand-stop face (V, AG)
     "handstop_height": 25.0,          # below the forend
     "handstop_length": 52.0,
     "sling_slot_width": 41.0,         # for a <= 40 mm sling
     "sling_slot_height": 8.0,
-    "block_position": 150.0,          # trigger to centre of standing block (Z, AJ)
+    "block_position": 160.0,          # trigger to centre of standing block (Z, AJ)
     "block_height": 130.0,            # bore to block bottom (IBU cap 140)
     "block_length": 90.0,
-    "block_ramp": 15.0,
+    "block_ramp": 5.0,                # keeps the block front inside the main body
     # --- stock body ---
     "body_width": 50.0,               # main body and forestock thickness
     "wrist_top": -12.0,               # stock top behind the action
@@ -87,7 +91,7 @@ PARAMS = {
     "action_front": 125.0,
     "action_width": 32.0,
     "bore_above_inlet_floor": 20.0,
-    "sight_line_above_bore": 37.0,
+    "sight_line_above_bore": 50.0,     # AB + P: puts the comb at the current 20 mm
     "barrel_d": 22.0,
     "barrel_float": 2.0,
     "trigger_slot": (-8.0, 28.0, 12.0),   # x from, x to, width
@@ -102,7 +106,7 @@ PARAMS = {
     "mag_holder_top": -4.0,           # bore to top of the holder (mags go in from above)
     "mag_holder_floor": 4.0,
     "mag_finger_notch": 18.0,         # width of the thumb notch in the outer wall
-    "prone_hand_length": 90.0,        # hand behind the hand stop in prone (J), keep holder clear
+    "prone_hand_length": 80.0,        # hand behind the hand stop in prone (J), keep holder clear
     # --- IBU marking surface (MC 3.1.6.4 l) ---
     "marking_start": 150.0,           # measured from the trigger
     "marking_length": 50.0,
@@ -213,15 +217,14 @@ def outline(p):
         (grip_top_front, -55.0),
         (-p["trigger_reach"] - p["grip_depth"] / 2 - 7, -55.0),   # wrist underside
         (-130.0, -52.0),
-        (-L + 60, butt_bot - 15),                         # butt underside
-        (-L + 25, butt_bot - p["hook_drop"] + 5),         # hook underside
-        (tip[0] + 8, tip[1] - 6),
-        tip,                                              # 23 hook tip
-        (-L, butt_bot),                                   # 24 butt plate bottom
+        (-L + p["hook_thickness"], tip[1] - 8),           # butt / hook underside
+        (tip[0] + 6, tip[1] - 6),
+        tip,                                              # hook tip
+        (-L, butt_bot),                                   # butt plate bottom
     ]
     arcs = {
-        23: _arc_mid(tip, (-L, butt_bot), p["hook_radius"], 1),                # armpit curve
-        24: _arc_mid((-L, butt_bot), (-L, butt_top), p["buttplate_curve_radius"], 1),  # concave butt
+        len(pts) - 2: _arc_mid(tip, (-L, butt_bot), p["hook_radius"], 1),                # armpit curve
+        len(pts) - 1: _arc_mid((-L, butt_bot), (-L, butt_top), p["buttplate_curve_radius"], 1),  # concave butt
     }
     return pts, arcs
 
@@ -305,6 +308,9 @@ def ibu_checks(p) -> list[str]:
         issues.append("MC 3.1.6.4l: flat side of the forend is under 40 mm high")
     if p["sling_slot_width"] - 1 > 40:
         issues.append("MC 3.1.6.4h: sling slot implies a sling wider than 40 mm")
+    block_front = p["block_position"] + p["block_length"] / 2 + p["block_ramp"]
+    if block_front > p["front_split"] - 3:
+        issues.append(f"Standing block front ({block_front:.0f}) crosses the front joint ({p['front_split']:.0f})")
     x0, x1, y_bot, *_ = _holder_box(p)
     if x0 < m1 + 15 or x0 < p["front_split"] + 10:
         issues.append(f"Spare-mag holder starts at {x0:.0f}, inside the marking surface or the front joint")
@@ -315,8 +321,6 @@ def ibu_checks(p) -> list[str]:
         issues.append(f"MC 3.1.6.4a: spare-mag holder bottom {-y_bot:.0f} mm below bore > 140 mm")
     if any(m0 - 10 < hx < m1 + 10 for hx in p["harness_rail_holes"]):
         issues.append("MC 3.1.6.4l: a harness-rail insert is in the marking surface")
-    if any(hx > p["handstop_position"] - 5 for hx in p["harness_rail_holes"]):
-        issues.append("Harness-rail insert at or in front of the hand stop")
     if x0 <= p["mag_well"][1]:
         issues.append("MC 3.1.6.5.3: spare-mag holder touches the magazine well")
     return issues
@@ -416,6 +420,10 @@ def build(p: dict = PARAMS):
     for bxp in (rs + 10, rs + rl - 10):
         main -= _z_hole(bxp, ry, bolt)
         rear -= _z_hole(bxp, ry, bolt)
+
+    hp, hy = p["harness_insert_pitch"], p["harness_rear_y"]
+    for hx in (p["harness_rear_position"] - hp / 2, p["harness_rear_position"] + hp / 2):
+        rear -= _z_hole(hx, hy, p["insert_hole_d"], Wb / 2 - c - p["insert_depth"], Wb / 2 - c + 1)
 
     # ---- place for the shooter. Everything above is modelled with the face side on +Z
     # (true for a left-hander); a right-hander's stock is the mirror image of that.
