@@ -78,6 +78,34 @@ DEMO_PARAMS = [
     ("rs_win_low_y", "mm", "butt_bot_y + frame_web", "[demo] derived: lowest window edge, above the toe"),
     ("rs_win_low_x", "mm", "wrist_heel_x + (rs_win_low_y - wrist_heel_y - rs_web_v) / rs_low_slope",
      "[demo] derived: where the window bottom meets the strut"),
+    # ---- bolted tongue joints (Darren 2026-11-23): two bolts per joint along X, hex nuts in the main body
+    ("joint_head_d", "mm", "10 mm", "[demo] M6 socket-head diameter"),
+    ("joint_head_clear", "mm", "1 mm", "[demo] clearance round the head in its cavity"),
+    ("nut_af", "mm", "10 mm", "[demo] M6 nut across flats"),
+    ("nut_m", "mm", "5 mm", "[demo] M6 nut thickness"),
+    ("nut_slot_af", "mm", "nut_af + 2 * fit_snug", "[demo] slot across flats: snug, so the nut cannot turn"),
+    ("nut_slot_len", "mm", "nut_m + 2 * fit_snug", "[demo] slot length along the bolt"),
+    ("bolt_tail", "mm", "8 mm", "[demo] bolt end past the nut slot"),
+    ("rear_tongue_height", "mm", "24 mm", "[manual] bolted joint"),
+    ("rear_tongue_width", "mm", "34 mm", "[manual] bolted joint: both bolts inside the tongue"),
+    ("rear_tongue_y", "mm", "-36 mm", "[manual] bolted joint: below the action inlet floor"),
+    ("rj_bolt_z", "mm", "9 mm", "[demo] rear bolts at +/- this"),
+    ("rj_engage", "mm", "6 mm", "[demo] main-body material between the tongue tip and the nuts"),
+    ("rj_nut_x0", "mm", "rear_split + rear_tongue_length + rj_engage", "[demo] derived"),
+    ("rj_bolt_len", "mm", "rj_nut_x0 + nut_slot_len + bolt_tail - rs_win_front_x", "[demo] derived: rear bolt length under the head"),
+    ("front_tongue_height", "mm", "22 mm", "[manual] bolted joint"),
+    ("front_tongue_y", "mm", "-41 mm", "[manual] bolted joint: heads clear below the mag slots"),
+    ("fj_bolt_z", "mm", "8 mm", "[demo] front bolts at +/- this"),
+    ("fj_engage", "mm", "6 mm", "[demo] main-body material between the tongue tip and the nuts"),
+    ("fj_head_wall", "mm", "8 mm", "[demo] forestock material between the tongue root and the head pocket"),
+    ("fj_pocket_len", "mm", "40 mm", "[demo] head pocket length (hex-key room)"),
+    ("fj_nut_x0", "mm", "front_split - front_tongue_length - fj_engage - nut_slot_len", "[demo] derived"),
+    ("fj_head_x", "mm", "front_split + fj_head_wall", "[demo] derived: head seat face"),
+    ("fj_bolt_len", "mm", "fj_head_x - (fj_nut_x0 - bolt_tail)", "[demo] derived: front bolt length under the head"),
+    ("chk_fj_pocket_slots", "mm", "(mag_holder_top - mag_slot_h) - (front_tongue_y + joint_head_d / 2 + joint_head_clear) - 2 mm",
+     "[demo] head pocket keeps >= 2 mm under the mag slots"),
+    ("chk_fj_pocket_hand", "mm", "handstop_position - (fj_head_x + fj_pocket_len)", "[demo] head pocket behind the hand stop"),
+    ("chk_rj_head_window", "mm", "(rs_win_top - (rear_tongue_y + joint_head_d / 2)) ", "[demo] rear heads fit under the window top"),
 ]
 
 
@@ -336,39 +364,108 @@ class Builder:
         for k in ("main", "fore"):
             self.extrude(occs[k], sk.profiles.item(0), CUT, sym="barrel_d + 2 * barrel_float", name="barrel_channel")
 
-        # ---- joints: tongues on rear stock and forestock, sockets in the main body
-        sk = self.sketch("rear_joint")
-        ry, rh = "rear_tongue_y", "rear_tongue_height"
-        self.rect(sk, "rear_split - fit_loose", "rear_split + rear_tongue_length", f"{ry} - {rh} / 2", f"{ry} + {rh} / 2")
-        self.done(sk)
-        self.extrude(occs["rear"], sk.profiles.item(0), JOIN, sym="rear_tongue_width", name="rear_tongue")
-        sk = self.sketch("rear_socket")
-        self.rect(sk, "rear_split - fit_loose", "rear_split + rear_tongue_length + fit_snug",
-                  f"{ry} - {rh} / 2 - fit_snug", f"{ry} + {rh} / 2 + fit_snug")
-        self.done(sk)
-        self.extrude(occs["main"], sk.profiles.item(0), CUT, sym="rear_tongue_width + 2 * fit_snug", name="rear_socket")
-        sk = self.sketch("rear_bolts")
-        for bx in ("rear_split + rear_tongue_length / 4", "rear_split + 3 * rear_tongue_length / 4"):
-            self.circle(sk, bx, ry, "hole_d_bolt")
-        self.done(sk)
-        prs = [sk.profiles.item(i) for i in range(sk.profiles.count)]
-        for k in ("rear", "main"):
-            self.extrude(occs[k], prs, CUT, sym="2 * body_width", name="rear_bolt_holes")
+        # ---- joints (Darren 2026-11-23): each joint is a tongue that overlaps into a socket, locked
+        # by two bolts running along the stock (X). Heads sit in the outer piece and stay reachable
+        # through a cavity; hex nuts sit in printed slots in the main body that match the nut's flats,
+        # so a nut cannot turn. Both nut slots open upward into the action inlet or barrel channel,
+        # so they are hidden under the action and barrel and need no cover. Bolts pass through
+        # material of both pieces in the overlap.
+        rear, main, fore = occs["rear"], occs["main"], occs["fore"]
 
-        sk = self.sketch("front_joint")
-        fy, fh = "front_tongue_y", "front_tongue_height"
-        self.rect(sk, "front_split - front_tongue_length", "front_split + fit_loose", f"{fy} - {fh} / 2", f"{fy} + {fh} / 2")
+        def tongue_socket(carrier, x0, x1, y, h, w, sx0, sx1, label):
+            sk = self.sketch(f"{label}_tongue")
+            self.rect(sk, x0, x1, f"{y} - {h} / 2", f"{y} + {h} / 2")
+            self.done(sk)
+            self.extrude(carrier, sk.profiles.item(0), JOIN, sym=w, name=f"{label}_tongue")
+            sk = self.sketch(f"{label}_socket")
+            self.rect(sk, sx0, sx1, f"{y} - {h} / 2 - fit_snug", f"{y} + {h} / 2 + fit_snug")
+            self.done(sk)
+            self.extrude(main, sk.profiles.item(0), CUT, sym=f"{w} + 2 * fit_snug", name=f"{label}_socket")
+
+        def yz_sketch(name, x_expr):
+            inp = self.root.constructionPlanes.createInput()
+            inp.setByOffset(self.root.yZConstructionPlane, self.vi(x_expr))
+            pl = self.root.constructionPlanes.add(inp)
+            pl.name = f"{name}_plane"
+            return self.sketch(name, pl)          # sketch x = -Z, sketch y = Y, normal +X
+
+        def nut_slots(label, x0, y, zs, top):
+            """Hex pocket matched to the nut (flats vertical, so it cannot turn), opening up to `top`."""
+            sk = yz_sketch(f"{label}_nut_slots", x0)
+            h, c2 = "nut_slot_af / 2", "nut_slot_af / 2 / (2 * cos(30 deg))"
+            for z in zs:
+                pts = [(z, f"{y} - 2 * {c2}"), (f"{z} + {h}", f"{y} - {c2}"), (f"{z} + {h}", top),
+                       (f"{z} - {h}", top), (f"{z} - {h}", f"{y} - {c2}")]
+                self.poly(sk, [(f"-({zz})", yy) for zz, yy in pts])
+            self.done(sk)
+            prs = [sk.profiles.item(i) for i in range(sk.profiles.count)]
+            self.extrude(main, prs, CUT, dist="nut_slot_len", name=f"{label}_nut_slots")
+
+        def bolt_holes(label, x0, length, y, zs, comps):
+            sk = yz_sketch(f"{label}_bolts", x0)
+            for z in zs:
+                self.circle(sk, f"-({z})", y, "hole_d_bolt")
+            self.done(sk)
+            prs = [sk.profiles.item(i) for i in range(sk.profiles.count)]
+            for occ in comps:
+                self.extrude(occ, prs, CUT, dist=length, name=f"{label}_bolt_holes")
+
+        # rear: butt-stock tongue into the main body; heads in the butt's front window
+        tongue_socket(rear, "rear_split - fit_loose", "rear_split + rear_tongue_length", "rear_tongue_y",
+                      "rear_tongue_height", "rear_tongue_width",
+                      "rear_split - fit_loose", "rear_split + rear_tongue_length + fit_snug", "rear")
+        rz = ("rj_bolt_z", "-rj_bolt_z")
+        nut_slots("rear", "rj_nut_x0", "rear_tongue_y", rz, "-bore_above_inlet_floor + 1 mm")
+        bolt_holes("rear", "rs_win_front_x - 1 mm", "rj_bolt_len + 1 mm", "rear_tongue_y", rz, (rear, main))
+
+        # front: forestock tongue into the main body; heads in a pocket under the forestock,
+        # open at the bottom, behind the mag slots' web and outside the marking surface
+        tongue_socket(fore, "front_split - front_tongue_length", "front_split + fit_loose", "front_tongue_y",
+                      "front_tongue_height", "front_tongue_width",
+                      "front_split - front_tongue_length - fit_snug", "front_split + fit_loose", "front")
+        fz = ("fj_bolt_z", "-fj_bolt_z")
+        nut_slots("front", "fj_nut_x0", "front_tongue_y", fz, "-(barrel_d / 2 + barrel_float) + 1 mm")
+        bolt_holes("front", "fj_nut_x0 - bolt_tail", "fj_bolt_len", "front_tongue_y", fz, (main, fore))
+        # hardware bodies (bolts and nuts) so the joints read in the model; not printed
+        hw = self.root.occurrences.addNewComponent(adsk.core.Matrix3D.create())
+        hw.component.name = "hardware_M6"
+        occs_hw = hw
+
+        def bolt(label, seat, direction, length, y, zs):
+            head_x0 = f"{seat} - 6 mm" if direction > 0 else seat
+            sk = yz_sketch(f"{label}_bolt_heads", head_x0)
+            for z in zs:
+                self.circle(sk, f"-({z})", y, "joint_head_d")
+            self.done(sk)
+            self.extrude(hw, [sk.profiles.item(i) for i in range(sk.profiles.count)], NEW, dist="6 mm", name=f"{label}_heads")
+            shank_x0 = seat if direction > 0 else f"{seat} - {length}"
+            sk = yz_sketch(f"{label}_bolt_shanks", shank_x0)
+            for z in zs:
+                self.circle(sk, f"-({z})", y, "bolt_d")
+            self.done(sk)
+            self.extrude(hw, [sk.profiles.item(i) for i in range(sk.profiles.count)], NEW, dist=length, name=f"{label}_shanks")
+
+        def nuts(label, x0, y, zs):
+            sk = yz_sketch(f"{label}_nuts", f"{x0} + fit_snug")
+            h, c2 = "nut_af / 2", "nut_af / 2 / (2 * cos(30 deg))"
+            for z in zs:
+                pts = [(z, f"{y} - 2 * {c2}"), (f"{z} + {h}", f"{y} - {c2}"), (f"{z} + {h}", f"{y} + {c2}"),
+                       (z, f"{y} + 2 * {c2}"), (f"{z} - {h}", f"{y} + {c2}"), (f"{z} - {h}", f"{y} - {c2}")]
+                self.poly(sk, [(f"-({zz})", yy) for zz, yy in pts])
+            self.done(sk)
+            self.extrude(hw, [sk.profiles.item(i) for i in range(sk.profiles.count)], NEW, dist="nut_m", name=f"{label}_nuts")
+
+        bolt("rear", "rs_win_front_x", 1, "rj_bolt_len", "rear_tongue_y", rz)
+        nuts("rear", "rj_nut_x0", "rear_tongue_y", rz)
+        bolt("front", "fj_head_x", -1, "fj_bolt_len", "front_tongue_y", fz)
+        nuts("front", "fj_nut_x0", "front_tongue_y", fz)
+
+        sk = self.sketch("front_head_pocket")
+        self.rect(sk, "fj_head_x", "fj_head_x + fj_pocket_len", "-forend_depth - 1 mm",
+                  "front_tongue_y + joint_head_d / 2 + joint_head_clear")
         self.done(sk)
-        self.extrude(occs["fore"], sk.profiles.item(0), JOIN, sym="front_tongue_width", name="front_tongue")
-        sk = self.sketch("front_socket")
-        self.rect(sk, "front_split - front_tongue_length - fit_snug", "front_split + fit_loose",
-                  f"{fy} - {fh} / 2 - fit_snug", f"{fy} + {fh} / 2 + fit_snug")
-        self.done(sk)
-        self.extrude(occs["main"], sk.profiles.item(0), CUT, sym="front_tongue_width + 2 * fit_snug", name="front_socket")
-        sk = self.sketch("cross_dowel")
-        self.circle(sk, "cross_dowel_x", fy, "hole_d_dowel")
-        self.done(sk)
-        self.extrude(occs["fore"], sk.profiles.item(0), CUT, sym="2 * body_width", name="cross_dowel")
+        self.extrude(fore, sk.profiles.item(0), CUT, sym="2 * (fj_bolt_z + joint_head_d / 2 + joint_head_clear)",
+                     name="front_head_pocket")
 
         # ---- rear stock: slim open frame (comb beam and plate post stay at full width)
         rear = occs["rear"]
@@ -382,7 +479,7 @@ class Builder:
         self.extrude(rear, [sk.profiles.item(i) for i in range(sk.profiles.count)], CUT,
                      sym="2 * comb_width", name="butt_windows")
         sk = self.sketch("butt_slim")
-        self.rect(sk, "rs_win_rear_x", "-lop + comb_length", "rs_win_top", "-ibu_depth_max - 60 mm")
+        self.rect(sk, "rs_win_rear_x", "rs_rib_x + frame_rib / 2", "rs_win_top", "-ibu_depth_max - 60 mm")
         self.done(sk)
         side = "(comb_width - frame_width) / 2"
         self.extrude(rear, sk.profiles.item(0), CUT, start="cast_z + frame_width / 2", dist=side, name="butt_slim_face")
@@ -448,6 +545,8 @@ def report(design, occs, log=print):
     bad = [up.item(i).name for i in range(up.count)
            if up.item(i).name.startswith("chk_") and up.item(i).value < -1e-7]
     log("chk_* below zero: " + (", ".join(bad) if bad else "none"))
+    for n in ("rj_bolt_len", "fj_bolt_len"):
+        log(f"{n} = {up.itemByName(n).value * 10:.1f} mm")
     tl = design.timeline
     errs = [f"{tl.item(i).name}: {tl.item(i).errorOrWarningMessage}" for i in range(tl.count)
             if tl.item(i).healthState != adsk.fusion.FeatureHealthStates.HealthyFeatureHealthState]

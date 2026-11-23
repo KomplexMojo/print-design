@@ -245,6 +245,20 @@ parity check tolerates that only for parts that are fit-tested in Fusion first, 
     is opened by two windows, split by a `frame_rib` and bounded by a lower strut `frame_web` wide that runs
     parallel to the underside. All of it is driven by derived parameters (`rs_*`, `butt_sagitta`). The rear
     stock went from 1000 to 502 cm³.
+  - **Bolted tongue joints** (Darren 2026-11-23) replace the cross-dowels and lateral bolts. Each joint
+    is a tongue that overlaps into a socket in the main body (`*_tongue_length` is the overlap), locked by two
+    M6 bolts running along the stock. The nuts sit in the main body in hex slots sized to the flats
+    (`nut_af + 2 * fit_snug`), so a nut cannot turn and needs no tool. The slots open upward into the action
+    inlet (rear) or the barrel channel (front), so they are hidden under the action and barrel.
+    - Rear joint: bolt heads seat on the front wall of the butt's front window, where they stay exposed for a
+      hex key. The shank runs through the butt, then the tongue, then `rj_engage` of main-body material,
+      then the nut. The bolt is 98 mm under the head (M6 × 100). The front half of the butt frame is kept
+      full width so the bolt holes have walls.
+    - Front joint: bolt heads sit in a pocket under the forestock that is open at the bottom. The
+      pocket has ≥ 2 mm under the mag slots (`chk_fj_pocket_slots`), sits behind the hand stop, and is
+      outside the marking surface (150–200 mm, on the main body). The bolt is 57 mm (M6 × 55 or 60).
+    - Not yet done: teardrop roofs on the horizontal bolt holes, bolt-length rounding to stock sizes, and covers
+      (not needed while the slots open under the action and barrel).
   - Demo shortcuts: no chamfers or grip rounding, no tie rods, no harness inserts, no mag window or
     finger scallops, and no teardrop holes.
 
