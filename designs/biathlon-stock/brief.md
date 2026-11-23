@@ -166,7 +166,7 @@ Each will be a `PARAMS` entry so a print can settle it.
 8. ~~Scan or trace?~~ Decided 2026-11-23: phone scan of grip and cheek (about 1 mm accuracy), calipers for the inlet and screw positions.
 9. ~~Action screws?~~ Decided 2026-11-23: reuse current screws. Darren measures thread and length; pillars and inlet floor sized to them.
 10. ~~Barrel?~~ Decided 2026-11-23: Darren measures with calipers (diameter every 50 mm from the action, total length); channel gets 2 mm free-float clearance. Snow cover or tube still to confirm.
-11. ~~Trigger guard?~~ Decided 2026-11-23: reuse the metal guard, inletted into the main body (already closed and rigid per IBU). Its outline goes into the 140 mm check.
+11. ~~Trigger guard?~~ Revised 2026-11-23 (Darren): no metal guard. The guard is printed in one piece with the main body, closed and rigid (MC 3.1.6.4 g). As on the Anschütz 1827F, its bottom bar runs forward as the standing-block shelf. (Earlier decision to reuse the metal guard is withdrawn.)
 12. ~~Glove?~~ Decided 2026-11-23: thin race gloves. `glove_thickness` parameter, default 2 mm (estimate), added to grip and guard clearance; Darren confirms with calipers.
 13. ~~Clothing?~~ Decided 2026-11-23: measure in race suit plus base layer. `clothing_allowance` parameter for colder days.
 14. ~~Grip style?~~ Decided 2026-11-23: vertical grip, thumb rest along the left side, palm swell on the right (`palm_swell` parameter).
@@ -213,7 +213,7 @@ What r1 changed from the layout above, and why:
   the rail are measured. Check keeps them out of the marking surface and behind the hand stop.
 - **Standing block** checked against Darren's note (block sits behind the hand stop, toward the
   trigger): it is centred 150 mm from the trigger, the hand stop is at 380 mm. ✓
-- Trigger guard is a printed loop as a placeholder for the metal guard (Q11).
+- Trigger guard: see Q11 and the r2 notes (printed, one piece with the main body).
 - Butt-plate radius default raised to 150 mm (60 mm over a 120 mm plate is a half circle);
   hook is set by `hook_drop`, `hook_reach`, `hook_radius`.
 
@@ -248,7 +248,7 @@ Changed from r1 (fit letter in brackets):
 
 Still placeholders (null or design inputs in the record): barrel diameter and length (22 mm
 used), action inlet outline, screw positions and bore height (generic 32 mm action), trigger and
-guard outline, mag well and spare-mag size (14 × 32 × 50 mm), spare-mag count (4), sights (sight
+mag well and spare-mag size (14 × 32 × 50 mm), spare-mag count (4), sights (sight
 line taken from AB + P), comb cast (0), hook radius (40), grip length (85), trigger reach (69),
 thumb-rest height (62), block height (130, from Z / Y once a rule is agreed), harness clip type,
 rifle weight.
@@ -256,6 +256,14 @@ rifle weight.
 Checks (flag only, nothing clamped):
 - Main body ⚠️ overhangs as in r1 (inlet, mag well, sockets need supports).
 - IBU computed checks pass: depth 130 mm (block), comb 40 mm, marking surface clear.
+- **Printed trigger guard + standing shelf** (Darren 2026-11-23, 1827F layout): the guard is part
+  of the main body. Its opening runs from the grip front to 40 mm ahead of the trigger and from
+  45 to 110 mm below the bore (about 94 × 65 mm), so all four gloved fingers wrap the grip
+  through it. Below it a 20 mm bar is the guard bottom, and it carries on forward as the
+  standing-block shelf to 205 mm, bottom 130 mm below the bore (`block_height`). The magazine
+  drops into a side window in the shelf under the mag well (x 44–106). Checks added: opening
+  ≥ 70 × 55 mm plus 2 × `glove_thickness`, guard bar ≥ 8 mm. Depth below bore is still 130 mm,
+  set by the shelf, which now is also the guard bottom (limit 140).
 - Spare-mag holder redesigned to Darren's Anschütz 1827F reference (2026-11-23; photo is a
   right-handed stock, so it is mirrored for a left-hander): four mags lie horizontally, end to
   end, in flush slots along the away-side face near the forend's top edge, pushed in sideways

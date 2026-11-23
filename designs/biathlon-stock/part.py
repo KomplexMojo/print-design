@@ -95,8 +95,13 @@ PARAMS = {
     "barrel_d": 22.0,
     "barrel_float": 2.0,
     "trigger_slot": (-8.0, 28.0, 12.0),   # x from, x to, width
-    "finger_hole": (-42.0, 38.0, -82.0, -45.0),  # x0, x1, y0, y1
-    "guard_bottom": 90.0,             # bore to bottom of the (printed) guard loop
+    # Printed trigger guard (one piece with the main body, Darren 2026-11-23). As on the 1827F,
+    # the guard's bottom bar runs forward as the standing-block shelf; the opening's rear edge
+    # is the grip front, so all four fingers wrap the grip through it.
+    "finger_hole": (-49.0, 40.0, -110.0, -45.0),  # x0 (grip front, unused), x1, y0, y1
+    "glove_thickness": 2.0,           # race glove; winter glove may be thicker (Q12)
+    "guard_min_opening": (70.0, 55.0),  # bare-hand length x height, glove added on top
+    "mag_window": (44.0, 106.0, -112.0, -50.0),  # lateral window in the shelf under the mag well
     "mag_well": (50.0, 100.0, 22.0),  # x from, x to, width
     "spare_mag": (14.0, 32.0, 50.0),  # placeholder: thickness (vertical in the holder),
                                       # cartridge length (lateral, insertion depth), height (along X)
@@ -195,27 +200,22 @@ def outline(p):
     tip = (-L - p["hook_reach"], butt_bot - p["hook_drop"])
     fd, tipx = p["forend_depth"], p["forend_tip"]
     bx, bl, bh, br = p["block_position"], p["block_length"], p["block_height"], p["block_ramp"]
-    gfront = p["finger_hole"][1] + 7
     grip_top_front = -p["trigger_reach"] + p["grip_depth"] / 2
 
     pts = [
         (-L, butt_top),                                   # 0 heel
         (-L + 12, comb_top),
         (-L + p["comb_length"], comb_top),
-        (-L + p["comb_length"] + 25, p["wrist_top"]),
+        (min(-L + p["comb_length"] + 25, p["action_rear"] - 12), p["wrist_top"]),
         (p["action_rear"] - 10, p["wrist_top"]),
         (p["action_rear"], 0.0),
         (tipx - 8, 0.0),
         (tipx, -8.0),
         (tipx, -fd + 5),
         (tipx - 5, -fd),
-        (bx + bl / 2 + br, -fd),                          # standing block
+        (bx + bl / 2 + br, -fd),                          # standing-block shelf front
         (bx + bl / 2, -bh),
-        (bx - bl / 2, -bh),
-        (bx - bl / 2 - br, -fd),
-        (gfront, -fd),                                    # trigger guard loop
-        (gfront - 5, -p["guard_bottom"]),
-        (grip_top_front, -p["guard_bottom"]),
+        (grip_front_x(p, -bh), -bh),                      # shelf = guard bottom bar, to the grip
         (grip_top_front, -55.0),
         (-p["trigger_reach"] - p["grip_depth"] / 2 - 7, -55.0),   # wrist underside
         (-130.0, -52.0),
@@ -229,6 +229,12 @@ def outline(p):
         len(pts) - 1: _arc_mid((-L, butt_bot), (-L, butt_top), p["buttplate_curve_radius"], 1),  # concave butt
     }
     return pts, arcs
+
+
+def grip_front_x(p, y):
+    """X of the grip's front face at height y (the grip leans back by grip_angle_deg)."""
+    lean = math.tan(math.radians(90 - p["grip_angle_deg"]))
+    return -p["trigger_reach"] + p["grip_depth"] / 2 - lean * max(-50.0 - y, 0.0)
 
 
 def grip(p):
@@ -289,7 +295,7 @@ def spare_mag_pockets(p):
 def ibu_checks(p) -> list[str]:
     """Return a list of rule problems (empty when all computed checks pass)."""
     issues = []
-    depth = max(p["forend_depth"], p["block_height"], p["guard_bottom"],
+    depth = max(p["forend_depth"], p["block_height"],
                 p["forend_depth"] + p["handstop_height"])
     if depth > 140:
         issues.append(f"MC 3.1.6.4a: depth below bore {depth:.0f} mm > 140 mm")
@@ -302,6 +308,13 @@ def ibu_checks(p) -> list[str]:
         issues.append("MC 3.1.6.4l: flat side of the forend is under 40 mm high")
     if p["sling_slot_width"] - 1 > 40:
         issues.append("MC 3.1.6.4h: sling slot implies a sling wider than 40 mm")
+    fx0, fx1, fy0, fy1 = p["finger_hole"]
+    gl, gh = p["guard_min_opening"]
+    open_l = fx1 - grip_front_x(p, fy1)
+    if open_l < gl + 2 * p["glove_thickness"] or (fy1 - fy0) < gh + 2 * p["glove_thickness"]:
+        issues.append(f"Trigger-guard opening {open_l:.0f} x {fy1 - fy0:.0f} mm is tight for a gloved hand")
+    if -p["block_height"] - fy0 > -8:
+        issues.append("MC 3.1.6.4g: guard bottom bar under 8 mm thick; guard may not be rigid")
     block_front = p["block_position"] + p["block_length"] / 2 + p["block_ramp"]
     if block_front > p["front_split"] - 3:
         issues.append(f"Standing block front ({block_front:.0f}) crosses the front joint ({p['front_split']:.0f})")
@@ -354,12 +367,24 @@ def build(p: dict = PARAMS):
     tx0, tx1, tw = p["trigger_slot"]
     body -= _box(tx0, tx1, p["finger_hole"][3] - 1, floor + 1, -tw / 2 - loose, tw / 2 + loose)
     fx0, fx1, fy0, fy1 = p["finger_hole"]
+    corner = 8.0
     with BuildPart() as fh:
         with BuildSketch(Plane.XY.offset(-W)):
-            with Locations(((fx0 + fx1) / 2, (fy0 + fy1) / 2)):
-                RectangleRounded(fx1 - fx0, fy1 - fy0, 10)
+            Polygon((grip_front_x(p, fy1), fy1 + 0.01), (fx1, fy1), (fx1, fy0),
+                    (grip_front_x(p, fy0), fy0), align=None)
         extrude(amount=2 * W)
+        try:
+            fillet(fh.edges().filter_by(Axis.Z).filter_by(lambda e: e.center().X > fx1 - 1), corner)
+        except Exception:
+            pass
     body -= fh.part
+    wx0, wx1, wy0, wy1 = p["mag_window"]
+    with BuildPart() as mw:
+        with BuildSketch(Plane.XY.offset(-W)):
+            with Locations(((wx0 + wx1) / 2, (wy0 + wy1) / 2)):
+                RectangleRounded(wx1 - wx0, wy1 - wy0, 6)
+        extrude(amount=2 * W)
+    body -= mw.part
     mx0, mx1, mw = p["mag_well"]
     body -= _box(mx0 - slide, mx1 + slide, -p["forend_depth"] - 1, floor + 1,
                  -mw / 2 - slide, mw / 2 + slide)
