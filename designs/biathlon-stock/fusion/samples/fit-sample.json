@@ -1,0 +1,938 @@
+{
+  "$schema": "https://nimbus.tail48d5e7.ts.net:8443/schema/biathlon-stock-fit.v1.schema.json",
+  "schema": {
+    "id": "biathlon-stock-fit",
+    "version": "1.0.0"
+  },
+  "document": {
+    "title": "Biathlon stock fit record",
+    "purpose": "Body, hand, head, position and rifle measurements for a made-to-measure 3D-printed biathlon stock. Feeds the parametric CAD model.",
+    "created_at": "2026-11-23T12:00:00.000Z",
+    "generator": {
+      "app": "biathlon-fit-pwa",
+      "version": "1.0.0"
+    },
+    "cad_target": {
+      "repository": "print-design",
+      "design": "designs/biathlon-stock",
+      "parameter_table": "part.py PARAMS"
+    }
+  },
+  "units": {
+    "length": "mm",
+    "angle": "deg",
+    "mass": "kg",
+    "side": "L | R (shooter's left / right)"
+  },
+  "coordinate_frame": {
+    "description": "Shooting frame used by the CAD model (print-design designs/biathlon-stock/part.py).",
+    "x": "Forward along the bore, 0 at the trigger blade",
+    "y": "Up in the shooting position, 0 on the bore line",
+    "z": "Lateral, +Z is always the shooter's right"
+  },
+  "client": {
+    "name": "Sample Athlete",
+    "email": "athlete@example.com",
+    "phone": null,
+    "club_nation": null,
+    "date_measured": "2026-11-23",
+    "measured_by": null
+  },
+  "athlete": {
+    "shooting_hand": "L",
+    "aiming_eye": "L",
+    "cross_dominant": false,
+    "stock_handedness": "left"
+  },
+  "measurement_groups": {
+    "body": "Body",
+    "hand": "Hand (shooting hand)",
+    "head": "Head",
+    "prone": "Prone position",
+    "standing": "Standing position",
+    "rifle": "Current rifle"
+  },
+  "measurements": {
+    "A": {
+      "name": "Standing height",
+      "group": "body",
+      "unit": "mm",
+      "value": 1780,
+      "status": "measured",
+      "how_measured": "Barefoot, back and heels against a wall; floor to top of head.",
+      "typical_range": [
+        1450,
+        2050
+      ],
+      "accepted_range": [
+        1000,
+        2400
+      ]
+    },
+    "B": {
+      "name": "Upper arm length",
+      "group": "body",
+      "unit": "mm",
+      "value": 330,
+      "status": "measured",
+      "how_measured": "Arm hanging; bony shoulder point to tip of the elbow.",
+      "typical_range": [
+        270,
+        400
+      ],
+      "accepted_range": [
+        180,
+        500
+      ]
+    },
+    "C": {
+      "name": "Forearm length",
+      "group": "body",
+      "unit": "mm",
+      "value": 270,
+      "status": "measured",
+      "how_measured": "Elbow bent 90°; elbow crease to wrist crease.",
+      "typical_range": [
+        220,
+        320
+      ],
+      "accepted_range": [
+        150,
+        420
+      ]
+    },
+    "D": {
+      "name": "Crook-of-elbow reach",
+      "group": "body",
+      "unit": "mm",
+      "value": 360,
+      "status": "measured",
+      "how_measured": "Elbow bent 90°, rod laid along the forearm: inside of the elbow crook to the pad of the index finger's first joint (trigger position).",
+      "typical_range": [
+        280,
+        420
+      ],
+      "accepted_range": [
+        200,
+        520
+      ]
+    },
+    "E": {
+      "name": "Shoulder pocket depth",
+      "group": "body",
+      "unit": "mm",
+      "value": 15,
+      "status": "measured",
+      "how_measured": "Lay a ruler vertically across the front of the shoulder (collarbone to arm muscle); deepest gap behind it.",
+      "typical_range": [
+        3,
+        35
+      ],
+      "accepted_range": [
+        0,
+        80
+      ]
+    },
+    "F": {
+      "name": "Hand length",
+      "group": "hand",
+      "unit": "mm",
+      "value": 190,
+      "status": "measured",
+      "how_measured": "Palm flat, fingers together: wrist crease to middle fingertip.",
+      "typical_range": [
+        160,
+        215
+      ],
+      "accepted_range": [
+        120,
+        260
+      ]
+    },
+    "G": {
+      "name": "Palm length",
+      "group": "hand",
+      "unit": "mm",
+      "value": 108,
+      "status": "measured",
+      "how_measured": "Wrist crease to the crease at the base of the middle finger.",
+      "typical_range": [
+        90,
+        125
+      ],
+      "accepted_range": [
+        60,
+        160
+      ]
+    },
+    "H": {
+      "name": "Index finger reach",
+      "group": "hand",
+      "unit": "mm",
+      "value": 55,
+      "status": "measured",
+      "how_measured": "Index finger straight: base crease to the crease of the first joint from the tip.",
+      "typical_range": [
+        40,
+        70
+      ],
+      "accepted_range": [
+        25,
+        95
+      ]
+    },
+    "J": {
+      "name": "Hand breadth",
+      "group": "hand",
+      "unit": "mm",
+      "value": 85,
+      "status": "measured",
+      "how_measured": "Across the knuckles, index to little finger, fingers together (caliper or ruler).",
+      "typical_range": [
+        70,
+        100
+      ],
+      "accepted_range": [
+        50,
+        130
+      ]
+    },
+    "K": {
+      "name": "Hand circumference",
+      "group": "hand",
+      "unit": "mm",
+      "value": 205,
+      "status": "measured",
+      "how_measured": "Tape around the knuckles, thumb excluded.",
+      "typical_range": [
+        170,
+        240
+      ],
+      "accepted_range": [
+        130,
+        300
+      ]
+    },
+    "L": {
+      "name": "Wrist circumference",
+      "group": "hand",
+      "unit": "mm",
+      "value": 163,
+      "status": "measured",
+      "how_measured": "Tape around the wrist just above the wrist bone.",
+      "typical_range": [
+        130,
+        195
+      ],
+      "accepted_range": [
+        100,
+        250
+      ]
+    },
+    "M": {
+      "name": "Grip diameter",
+      "group": "hand",
+      "unit": "mm",
+      "value": 39,
+      "status": "measured",
+      "how_measured": "Largest tube or dowel you can wrap with fingertips just touching the palm.",
+      "typical_range": [
+        30,
+        48
+      ],
+      "accepted_range": [
+        20,
+        65
+      ]
+    },
+    "N": {
+      "name": "Thumb length",
+      "group": "hand",
+      "unit": "mm",
+      "value": 63,
+      "status": "measured",
+      "how_measured": "Base crease of the thumb to the thumb tip.",
+      "typical_range": [
+        50,
+        75
+      ],
+      "accepted_range": [
+        35,
+        100
+      ]
+    },
+    "P": {
+      "name": "Cheek-to-eye height",
+      "group": "head",
+      "unit": "mm",
+      "value": 27,
+      "status": "measured",
+      "how_measured": "Head in shooting posture: cheek contact point up to the centre of the aiming pupil (mirror or photo).",
+      "typical_range": [
+        15,
+        45
+      ],
+      "accepted_range": [
+        5,
+        80
+      ]
+    },
+    "Q": {
+      "name": "Pupil distance",
+      "group": "head",
+      "unit": "mm",
+      "value": 64,
+      "status": "measured",
+      "how_measured": "Centre of one pupil to the other (optician's PD).",
+      "typical_range": [
+        54,
+        74
+      ],
+      "accepted_range": [
+        45,
+        85
+      ]
+    },
+    "R": {
+      "name": "Eye-to-cheek offset",
+      "group": "head",
+      "unit": "mm",
+      "value": 28,
+      "status": "measured",
+      "how_measured": "Sideways distance, aiming pupil to cheek contact point.",
+      "typical_range": [
+        10,
+        45
+      ],
+      "accepted_range": [
+        0,
+        70
+      ]
+    },
+    "S": {
+      "name": "Aiming eye",
+      "group": "head",
+      "unit": "side",
+      "value": "L",
+      "status": "measured",
+      "how_measured": "Dominant eye test: left or right.",
+      "options": [
+        "L",
+        "R"
+      ]
+    },
+    "T": {
+      "name": "Shooting hand",
+      "group": "head",
+      "unit": "side",
+      "value": "L",
+      "status": "measured",
+      "how_measured": "Hand on the trigger: left or right.",
+      "options": [
+        "L",
+        "R"
+      ]
+    },
+    "U": {
+      "name": "Shoulder pocket height, prone",
+      "group": "prone",
+      "unit": "mm",
+      "value": 105,
+      "status": "measured",
+      "how_measured": "In prone with rifle: top to bottom of where the butt plate touches the shoulder.",
+      "typical_range": [
+        60,
+        150
+      ],
+      "accepted_range": [
+        30,
+        220
+      ]
+    },
+    "V": {
+      "name": "Elbow to hand-stop",
+      "group": "prone",
+      "unit": "mm",
+      "value": 335,
+      "status": "measured",
+      "how_measured": "Support elbow on the mat to the front of the support hand at the hand-stop.",
+      "typical_range": [
+        250,
+        420
+      ],
+      "accepted_range": [
+        150,
+        550
+      ]
+    },
+    "W": {
+      "name": "Neck angle, prone",
+      "group": "prone",
+      "unit": "deg",
+      "value": 48,
+      "status": "measured",
+      "how_measured": "Angle between the line of the back and the line of the neck, head on the comb.",
+      "typical_range": [
+        20,
+        75
+      ],
+      "accepted_range": [
+        0,
+        120
+      ]
+    },
+    "X": {
+      "name": "Pocket to armpit, prone",
+      "group": "prone",
+      "unit": "mm",
+      "value": null,
+      "status": "unknown",
+      "how_measured": "Centre of the shoulder pocket straight down to the armpit crease (sets the hook).",
+      "typical_range": [
+        30,
+        120
+      ],
+      "accepted_range": [
+        10,
+        200
+      ]
+    },
+    "Y": {
+      "name": "Shoulder pocket height, standing",
+      "group": "standing",
+      "unit": "mm",
+      "value": 105,
+      "status": "measured",
+      "how_measured": "In standing with rifle: top to bottom of where the butt plate touches the shoulder.",
+      "typical_range": [
+        60,
+        150
+      ],
+      "accepted_range": [
+        30,
+        220
+      ]
+    },
+    "Z": {
+      "name": "Support hand height",
+      "group": "standing",
+      "unit": "mm",
+      "value": 210,
+      "status": "measured",
+      "how_measured": "Support elbow resting on the hip: top of the hip bone up to the top of the support hand (forend contact).",
+      "typical_range": [
+        100,
+        320
+      ],
+      "accepted_range": [
+        30,
+        450
+      ]
+    },
+    "AA": {
+      "name": "Current length of pull",
+      "group": "rifle",
+      "unit": "mm",
+      "value": 335,
+      "status": "measured",
+      "how_measured": "Trigger blade to the centre of the butt plate face.",
+      "typical_range": [
+        290,
+        380
+      ],
+      "accepted_range": [
+        220,
+        450
+      ]
+    },
+    "AB": {
+      "name": "Current comb height",
+      "group": "rifle",
+      "unit": "mm",
+      "value": 10,
+      "status": "measured",
+      "how_measured": "Comb top relative to bore centre line (+ above, − below).",
+      "typical_range": [
+        -10,
+        70
+      ],
+      "accepted_range": [
+        -60,
+        120
+      ]
+    },
+    "AC": {
+      "name": "Current butt plate drop",
+      "group": "rifle",
+      "unit": "mm",
+      "value": 60,
+      "status": "measured",
+      "how_measured": "Bore centre line down to the centre of the butt plate.",
+      "typical_range": [
+        20,
+        110
+      ],
+      "accepted_range": [
+        0,
+        180
+      ]
+    },
+    "AD": {
+      "name": "Current butt height",
+      "group": "rifle",
+      "unit": "mm",
+      "value": 125,
+      "status": "measured",
+      "how_measured": "Butt plate heel (top) to toe (bottom), hook excluded.",
+      "typical_range": [
+        100,
+        160
+      ],
+      "accepted_range": [
+        60,
+        220
+      ]
+    },
+    "AE": {
+      "name": "Current hook length",
+      "group": "rifle",
+      "unit": "mm",
+      "value": 55,
+      "status": "measured",
+      "how_measured": "Butt plate face back to the rear tip of the hook.",
+      "typical_range": [
+        0,
+        110
+      ],
+      "accepted_range": [
+        0,
+        180
+      ]
+    },
+    "AF": {
+      "name": "Current hook drop",
+      "group": "rifle",
+      "unit": "mm",
+      "value": 150,
+      "status": "measured",
+      "how_measured": "Bore centre line down to the hook's inside contact surface.",
+      "typical_range": [
+        90,
+        220
+      ],
+      "accepted_range": [
+        40,
+        300
+      ]
+    },
+    "AG": {
+      "name": "Trigger to hand-stop",
+      "group": "rifle",
+      "unit": "mm",
+      "value": 390,
+      "status": "measured",
+      "how_measured": "Trigger blade forward to the front face of the hand-stop.",
+      "typical_range": [
+        300,
+        480
+      ],
+      "accepted_range": [
+        200,
+        600
+      ]
+    },
+    "AH": {
+      "name": "Trigger to front harness",
+      "group": "rifle",
+      "unit": "mm",
+      "value": 430,
+      "status": "measured",
+      "how_measured": "Trigger blade forward to the front harness connector.",
+      "typical_range": [
+        300,
+        560
+      ],
+      "accepted_range": [
+        150,
+        700
+      ]
+    },
+    "AI": {
+      "name": "Trigger to rear harness",
+      "group": "rifle",
+      "unit": "mm",
+      "value": 240,
+      "status": "measured",
+      "how_measured": "Trigger blade back to the rear harness connector.",
+      "typical_range": [
+        100,
+        380
+      ],
+      "accepted_range": [
+        30,
+        500
+      ]
+    },
+    "AJ": {
+      "name": "Trigger to standing hand",
+      "group": "rifle",
+      "unit": "mm",
+      "value": 160,
+      "status": "measured",
+      "how_measured": "Trigger blade forward to the centre of the support hand in standing.",
+      "typical_range": [
+        80,
+        280
+      ],
+      "accepted_range": [
+        30,
+        450
+      ]
+    }
+  },
+  "rifle": {
+    "make_model": "Anschütz 1827 F Fortner",
+    "action_type": null,
+    "action_type_other": null,
+    "bolt_side": "R",
+    "action_model_serial": null,
+    "barrel_make": null,
+    "barrel_length_mm": null,
+    "barrel_diameter_action_mm": 22,
+    "barrel_diameter_muzzle_mm": null,
+    "barrel_profile": null,
+    "trigger_make_model": null,
+    "trigger_type": null,
+    "rear_sight": null,
+    "front_sight": null,
+    "snow_cover": null,
+    "current_stock": null,
+    "spare_mag_count": 4,
+    "spare_mag_location": null,
+    "harness": null,
+    "hand_stop_rail": null,
+    "weight_kg": 3.9
+  },
+  "cad_parameters": {
+    "handedness": {
+      "value": "left",
+      "unit": null,
+      "method": "direct",
+      "sources": [
+        "T"
+      ],
+      "note": "Top-level switch. Flips cheek / comb, cast, thumb rest, palm swell and spare-mag holder side."
+    },
+    "bolt_side": {
+      "value": "right",
+      "unit": null,
+      "method": "rifle",
+      "sources": [
+        "rifle.bolt_side"
+      ],
+      "note": "Hardware side, not mirrored with handedness."
+    },
+    "lop": {
+      "value": 335,
+      "unit": "mm",
+      "method": "direct",
+      "sources": [
+        "AA",
+        "D",
+        "B",
+        "C"
+      ],
+      "note": "Starts from the current length of pull (AA); single value for prone and standing. Check against D (crook-of-elbow reach)."
+    },
+    "cheek_to_eye": {
+      "value": 27,
+      "unit": "mm",
+      "method": "direct",
+      "sources": [
+        "P"
+      ]
+    },
+    "comb_height_above_bore": {
+      "value": 10,
+      "unit": "mm",
+      "method": "direct",
+      "sources": [
+        "AB",
+        "P"
+      ],
+      "note": "Current comb height relative to the bore (+ above). Adjust with P and the sight-line height."
+    },
+    "comb_cast": {
+      "value": null,
+      "unit": "mm",
+      "method": "design_input",
+      "sources": [
+        "R",
+        "Q"
+      ],
+      "note": "Positive = away from the face. Derive from R (eye-to-cheek offset) and the sight line offset."
+    },
+    "buttplate_length": {
+      "value": 125,
+      "unit": "mm",
+      "method": "direct",
+      "sources": [
+        "AD",
+        "U",
+        "Y"
+      ],
+      "note": "Current butt height. Must cover both shoulder pocket heights U (prone) and Y (standing)."
+    },
+    "buttplate_drop": {
+      "value": 60,
+      "unit": "mm",
+      "method": "direct",
+      "sources": [
+        "AC"
+      ]
+    },
+    "buttplate_curve_radius": {
+      "value": 137.7,
+      "unit": "mm",
+      "method": "derived",
+      "sources": [
+        "E",
+        "AD"
+      ],
+      "formula": "R = (AD/2)^2 / (2*E) + E/2   (circle through the butt plate ends with sagitta E)",
+      "note": "From the shoulder pocket depth. Very large when E is near 0 (flat plate)."
+    },
+    "hook_reach": {
+      "value": 55,
+      "unit": "mm",
+      "method": "direct",
+      "sources": [
+        "AE"
+      ]
+    },
+    "hook_drop": {
+      "value": 27.5,
+      "unit": "mm",
+      "method": "derived",
+      "sources": [
+        "AF",
+        "AC",
+        "AD"
+      ],
+      "formula": "hook_drop = AF - (AC + AD/2)   (butt plate bottom to hook contact, vertical)"
+    },
+    "hook_radius": {
+      "value": null,
+      "unit": "mm",
+      "method": "design_input",
+      "sources": [
+        "X"
+      ],
+      "note": "Armpit curve; X (pocket to armpit) positions it."
+    },
+    "grip_circumference": {
+      "value": 122.5,
+      "unit": "mm",
+      "method": "derived",
+      "sources": [
+        "M"
+      ],
+      "formula": "pi * M"
+    },
+    "grip_length": {
+      "value": null,
+      "unit": "mm",
+      "method": "design_input",
+      "sources": [
+        "F",
+        "G",
+        "J"
+      ]
+    },
+    "trigger_reach": {
+      "value": null,
+      "unit": "mm",
+      "method": "design_input",
+      "sources": [
+        "H",
+        "D"
+      ],
+      "note": "Grip centre to trigger blade; the finger pad must land on the blade with the grip held naturally."
+    },
+    "thumb_rest_height": {
+      "value": null,
+      "unit": "mm",
+      "method": "design_input",
+      "sources": [
+        "N"
+      ]
+    },
+    "prone_hand_length": {
+      "value": 85,
+      "unit": "mm",
+      "method": "direct",
+      "sources": [
+        "J"
+      ],
+      "note": "Hand behind the hand stop in prone; keeps the spare-mag holder clear."
+    },
+    "handstop_position": {
+      "value": 390,
+      "unit": "mm",
+      "method": "direct",
+      "sources": [
+        "AG",
+        "V"
+      ],
+      "note": "Trigger blade to hand-stop face, from the current rifle. Check against V."
+    },
+    "block_position": {
+      "value": 160,
+      "unit": "mm",
+      "method": "direct",
+      "sources": [
+        "AJ"
+      ],
+      "note": "Trigger blade to centre of the standing shooting block."
+    },
+    "block_height": {
+      "value": null,
+      "unit": "mm",
+      "method": "design_input",
+      "sources": [
+        "Z",
+        "AJ"
+      ],
+      "ibu_constraint": "forestock_depth",
+      "note": "Bore to block bottom. IBU cap 140 mm."
+    },
+    "harness_front_position": {
+      "value": 430,
+      "unit": "mm",
+      "method": "direct",
+      "sources": [
+        "AH"
+      ],
+      "note": "X of the front harness connector (forward of the trigger is positive)."
+    },
+    "harness_rear_position": {
+      "value": -240,
+      "unit": "mm",
+      "method": "derived",
+      "sources": [
+        "AI"
+      ],
+      "formula": "-AI",
+      "note": "X of the rear harness connector (behind the trigger, so negative)."
+    },
+    "mag_holder_count": {
+      "value": 4,
+      "unit": "count",
+      "method": "rifle",
+      "sources": [
+        "rifle.spare_mag_count"
+      ]
+    },
+    "barrel_d": {
+      "value": 22,
+      "unit": "mm",
+      "method": "rifle",
+      "sources": [
+        "rifle.barrel_diameter_action_mm"
+      ],
+      "note": "Placeholder until measured with calipers on the barrel."
+    }
+  },
+  "ibu_constraints": [
+    {
+      "id": "forestock_depth",
+      "rule": "IBU MC 3.1.6.4 a",
+      "limit_mm": {
+        "max": 140
+      },
+      "text": "Forestock depth below the bore line, including magazine and trigger guard, at most 140 mm.",
+      "affected_parameters": [
+        "block_height",
+        "handstop_height",
+        "forend_depth",
+        "guard_bottom"
+      ]
+    },
+    {
+      "id": "cheek_piece",
+      "rule": "IBU MC 3.1.6.4 b",
+      "limit_mm": {
+        "max": 40
+      },
+      "text": "Cheek piece thickness at most 40 mm.",
+      "affected_parameters": [
+        "comb_width",
+        "comb_cast"
+      ]
+    },
+    {
+      "id": "no_folding",
+      "rule": "IBU MC 3.1.6.4 c",
+      "text": "No folding stock; joints tool-only and rigid.",
+      "affected_parameters": []
+    },
+    {
+      "id": "trigger_guard",
+      "rule": "IBU MC 3.1.6.4 g",
+      "text": "Trigger guard closed and rigid.",
+      "affected_parameters": [
+        "guard_bottom"
+      ]
+    },
+    {
+      "id": "min_weight",
+      "rule": "IBU MC 3.1.6.4 i",
+      "limit_kg": {
+        "min": 3.5
+      },
+      "text": "Rifle at least 3.5 kg without magazines and ammunition (ballast pockets if short).",
+      "affected_parameters": []
+    },
+    {
+      "id": "marking_surface",
+      "rule": "IBU MC 3.1.6.4 l",
+      "limit_mm": {
+        "min_height": 40,
+        "start_from_trigger": 150
+      },
+      "text": "Flat marking surface at least 40 mm high on both sides, starting 150 mm in front of the trigger; no joint or bolt heads in it.",
+      "affected_parameters": [
+        "handstop_position",
+        "harness_front_position",
+        "front_split",
+        "block_position"
+      ]
+    },
+    {
+      "id": "sling_width",
+      "rule": "IBU MC (sling)",
+      "limit_mm": {
+        "max": 40
+      },
+      "text": "Sling at most 40 mm wide.",
+      "affected_parameters": [
+        "sling_slot_width"
+      ]
+    }
+  ],
+  "validation": {
+    "errors": [],
+    "warnings": [],
+    "unknown": [
+      "X"
+    ],
+    "missing": []
+  },
+  "photos": [],
+  "notes": null,
+  "sign_off": {
+    "confirmed": true,
+    "name": "Sample Athlete",
+    "date": "2026-11-23"
+  }
+}
