@@ -410,6 +410,18 @@ them with `[manual]` rows at the top of `DEMO_PARAMS`. The TPU covers remain the
 - **Harness connectors.** Two M5 heat-set inserts each (`harness_pitch` apart, placeholder), at the fitted positions: the
   front pair on the forestock on the side opposite the mag slots, the rear pair in the butt's comb beam.
 
+### Bolt travel and thumb room behind the action (Darren, 2026-11-24)
+- The Fortner bolt travels about 45 mm back past the rear of the action (`act_bolt_travel`, 43.16 mm measured), and
+  the thumb needs room behind it to push the bolt forward again (`bolt_thumb_room`, 22 mm placeholder).
+- From the action's rear back to `bolt_clear_x` the stock is a flat at `wrist_top`, 2 mm below the receiver's
+  underside, over the full width. The comb rises behind it (`comb_rise`), so `comb_length` is derived from it. The
+  ramp up to the stock top beside the action now starts at the action's rear (`wrist_step`).
+- `chk_comb_flat` keeps at least 90 mm of comb for the cheek; `chk_wrist_socket` keeps 5 mm over the rear joint socket.
+- The rear joint studs are longer for it (150 mm, see PARTS.md), because their heads sit in the butt's front window.
+- Rear sight above the cheek rest: 47.2 mm measured, so P = 47 mm. With the current comb 20 mm above the bore (AB),
+  `sight_line_above_bore` becomes 67 mm and the comb stays where it was. Pending: bore centre to aperture centre.
+- Known defect: with the narrower butt windows one corner round (`butt_windows_round`) fails; those corners are sharp.
+
 ### Parameter tolerance (checked 2026-11-24)
 Ten driving measurements (AA, AC, AD, AE, AF, E, P, AG, J, M) were scaled together and one at a time.
 Standing height (A) drives nothing by itself; the stock follows the rifle-fit measurements.

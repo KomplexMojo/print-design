@@ -97,6 +97,7 @@ ACTIONS = {
                    # Fortner straight-pull handle: long notch in the bolt-side wall, deeper step for the lever (placeholders)
                    "bolt_notch_x": "-50 mm", "bolt_notch_length": "70 mm", "bolt_notch_depth": "14 mm",
                    "act_bolt_step_len": "25 mm", "act_bolt_step_depth": "18 mm",
+                   "act_bolt_travel": "45 mm",      # Fortner bolt, rearward travel past the action's rear (43.16 measured, Darren 2026-11-24)
                    "act_rel_len": "0 mm"},     # no separate release scoop: the lever sits inside the 60 mm well
     },
     "izhmash_7_4": {
@@ -236,6 +237,7 @@ REGISTRY: list[P] = [
     _p("act_trig_x0", "mm", "-42 mm", "action", "trigger to the rear of the trigger pocket"),
     _p("act_trig_x1", "mm", "22 mm", "action", "trigger to the front of the trigger pocket"),
     _p("act_trig_w", "mm", "26.2 mm", "action", "trigger pocket width"),
+    _p("act_bolt_travel", "mm", "45 mm", "action", "how far the bolt travels back past the rear of the action; the stock stays below it"),
     _p("act_bolt_step_len", "mm", "0 mm", "action", "length of the deeper step at the rear of the bolt-handle notch (0 = none)"),
     _p("act_bolt_step_depth", "mm", "18 mm", "action", "bore to the floor of that step"),
     _p("act_rel_len", "mm", "0 mm", "action", "length of the magazine-release scoop behind the magazine well (0 = none)"),

@@ -8,7 +8,7 @@ Every fastener is a standard catalogue size. Checked 2026-11-24.
 
 | # | Item | Standard | Size | Qty | Where it goes | Set by |
 |---|---|---|---|---|---|---|
-| 1 | Threaded rod, cut to length | DIN 976-1, M6, A2 stainless | 95 mm long | 2 | Rear joint studs (butt to main body) | `rj_bolt_len` (fits 90 to 98 mm) |
+| 1 | Threaded rod, cut to length | DIN 976-1, M6, A2 stainless | 150 mm long | 2 | Rear joint studs (butt to main body) | `rj_bolt_len` (146.7 mm; fits 145 to 153 mm) |
 | 2 | Threaded rod, cut to length | DIN 976-1, M6, A2 stainless | 60 mm long | 2 | Front joint studs (forestock to main body) | `fj_bolt_len` (fits 55 to 63 mm) |
 | 3 | Hex nut | ISO 4032, M6, A2 | 10 mm across flats, 5.2 mm thick | 8 | Joints: 4 captive in the main body's slots, 4 in the counterbores | `nut_af`, `nut_m` |
 | 4 | Plain washer | ISO 7089, M6, A2 | 12 mm outside, 1.6 mm thick | 4 | Under the 4 outer joint nuts | `joint_cbore_d` (13.5 mm counterbore) |

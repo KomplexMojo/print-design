@@ -65,7 +65,7 @@ DEMO_PARAMS = [
     ("chk_holder_hand", "mm", "0 mm", "[manual] superseded: the prone pad sits below the slots, so the two no longer compete"),
     ("chk_rail_handstop", "mm", "0 mm", "[manual] superseded by the chk_harness_* checks"),
     ("mag_side", "", "-face_side", "[demo] side of the spare-mag slots: +1 = shooter's right, -1 = left. Default is the side away from the face; set +1 or -1 to choose. The slots always sit in the same place along the forestock"),
-    ("sight_line_above_bore", "mm", "50 mm", "[manual] r2: AB + P puts the comb at the current 20 mm"),
+    ("sight_line_above_bore", "mm", "67 mm", "[manual] PENDING MEASUREMENT: derived as current comb height (AB, 20 mm) + the measured rear sight above the cheek rest (47.2 mm, Darren 2026-11-24). Confirm with bore centre to sight aperture centre"),
     ("forend_tip", "mm", "455 mm", "[manual] locked: forestock length; the hand stop moves along it"),
     ("forend_depth", "mm", "62 mm", "[manual] restyle: 6 mm webs above and below the mag slots; IBU MC 3.1.6.4 a"),
     ("grip_depth", "mm", "40 mm", "[manual] locked"),
@@ -87,7 +87,14 @@ DEMO_PARAMS = [
     ("tip_rake", "mm", "6 mm", "[demo] forend nose leans back by this much"),
     ("tip_depth", "mm", "38 mm", "[demo] bore to the bottom of the forend nose"),
     ("comb_nose", "mm", "12 mm", "[demo] heel to comb, and comb to wrist ramps"),
-    ("comb_length", "mm", "lop + action_rear - comb_nose - 18 mm", "[manual] derived: the comb always ends 18 mm behind the wrist's low point, whatever the length of pull"),
+    ("bolt_thumb_room", "mm", "22 mm", "[demo] PLACEHOLDER: room for the thumb behind the bolt at the end of its travel (Darren 2026-11-24)"),
+    ("bolt_clear_x", "mm", "action_rear - act_bolt_travel - bolt_thumb_room", "[demo] derived: the stock stays below the bolt from the action's rear back to here"),
+    ("wrist_top", "mm", "-(act_bed_w / 2 + 2 mm)", "[demo] derived: the flat behind the action sits 2 mm below the receiver's underside, so the bolt and the thumb pass over it"),
+    ("comb_rise", "mm", "18 mm", "[demo] length of the ramp from the bolt flat up to the comb"),
+    ("wrist_step", "mm", "10 mm", "[demo] length of the ramp from the bolt flat up to the stock top beside the action; it starts at the action's rear"),
+    ("comb_length", "mm", "lop + bolt_clear_x - comb_rise", "[manual] derived: the comb starts behind the bolt's travel and the thumb, whatever the length of pull"),
+    ("chk_comb_flat", "mm", "comb_length - comb_nose - 90 mm", "[demo] USER-FITTED RANGE: at least 90 mm of comb left for the cheek"),
+    ("chk_wrist_socket", "mm", "wrist_top - (rear_tongue_y + rear_tongue_height / 2) - 5 mm", "[demo] 5 mm of wall between the bolt flat and the rear joint socket"),
     ("comb_front_r", "mm", "14 mm", "[demo] round where the comb turns down to the wrist"),
     ("hook_thickness", "mm", "30 mm", "[demo] butt face to the hook's underside corner"),
     ("hook_round", "mm", "6 mm", "[demo]"),
@@ -301,7 +308,7 @@ DEMO_PARAMS = [
     ("chk_harness_front_lo", "mm", "harness_front_position - harness_pitch / 2 - front_split - 12 mm", "[demo] USER-FITTED RANGE: front harness connector ahead of the front joint"),
     ("chk_harness_front_hi", "mm", "forend_tip - tip_rake - 10 mm - (harness_front_position + harness_pitch / 2)", "[demo] USER-FITTED RANGE: front harness connector behind the forend nose"),
     ("chk_harness_rear_lo", "mm", "harness_rear_position - harness_pitch / 2 - (-lop + 25 mm)", "[demo] USER-FITTED RANGE: rear harness connector ahead of the butt plate"),
-    ("chk_harness_rear_hi", "mm", "butt_flare_x - (harness_rear_position + harness_pitch / 2) - 5 mm", "[demo] USER-FITTED RANGE: rear harness connector behind the butt's flare"),
+    ("chk_harness_rear_hi", "mm", "(-lop + comb_length) - (harness_rear_position + harness_pitch / 2) - 5 mm", "[demo] USER-FITTED RANGE: rear harness connector behind the front of the comb"),
     ("chk_lop_min", "mm", "comb_length - 80 mm", "[demo] USER-FITTED RANGE: shortest stock the butt takes"),
     ("keel_w", "mm", "8 mm", "[demo] pad keel width at its neck"),
     ("keel_flare", "mm", "2 mm", "[demo] dovetail undercut per side"),
@@ -789,8 +796,9 @@ class Builder:
             ("-lop", "-buttplate_drop + buttplate_length / 2"),                  # 0 heel
             ("-lop + comb_nose", "comb_top"),                                     # 1
             ("-lop + comb_length", "comb_top"),                                   # 2 comb front
-            ("action_rear - comb_nose", "wrist_top"),                             # 3 wrist low point
-            ("rear_split", "stock_top_y"),                                               # 4 ramp ends on the joint line
+            ("bolt_clear_x", "wrist_top"),                                        # 3 rear end of the bolt flat
+            ("action_rear", "wrist_top"),                                         # 4 bolt flat runs to the action's rear
+            ("action_rear + wrist_step", "stock_top_y"),                          # 5 ramp up beside the action (the bed is cut out of it)
             ("forend_tip", "stock_top_y"),                                               # 5 nose top
             ("forend_tip - tip_rake", "-tip_depth"),                              # 6 nose bottom
             ("tip_sweep_x", ffd),                                                 # 7 underside turns up
@@ -805,7 +813,7 @@ class Builder:
             ("-lop - hook_reach", "hook_tip_y"),                                  # 16 hook tip
             ("-lop", "butt_bot_y"),                                               # 17 toe
         ]
-        self.poly(sk, P, arcs={16: "hook_radius", 17: "buttplate_curve_radius"})
+        self.poly(sk, P, arcs={17: "hook_radius", 18: "buttplate_curve_radius"})
         for xs in ("rear_split", "front_split"):
             self.poly(sk, [(xs, "sight_line_above_bore + 50 mm"), (xs, "-ibu_depth_max - 60 mm")], closed=False)
         self.done(sk)
@@ -829,10 +837,10 @@ class Builder:
         self.extrude(fore, fore_pr, NEW, sym="body_width", name="fore_blank")
 
         # ---- flowing profile: each outline corner gets its own radius (convex ones >= body_round)
-        self.corners(rear, [(*P[1], "comb_nose"), (*P[2], "comb_front_r"), (*P[3], "body_round"),
-                            (*P[13], "wrist_heel_r"), (*P[14], "hook_round + body_round"), (*P[17], "hook_round")], "rear")
-        self.corners(fore, [(*P[5], "tip_round"), (*P[6], "tip_round + body_round"),
-                            (*P[8], "belly_sweep_r"), (*P[9], "belly_sweep_r")], "fore")
+        self.corners(rear, [(*P[1], "comb_nose"), (*P[2], "comb_front_r"), (*P[3], "comb_front_r"),
+                            (*P[14], "wrist_heel_r"), (*P[15], "hook_round + body_round"), (*P[18], "hook_round")], "rear")
+        self.corners(fore, [(*P[6], "tip_round"), (*P[7], "tip_round + body_round"),
+                            (*P[9], "belly_sweep_r"), (*P[10], "belly_sweep_r")], "fore")
 
         # ---- faceted belly under the forend, then the hand stop, then the side rounds
         self.belly(main, "main")
