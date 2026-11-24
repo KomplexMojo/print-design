@@ -333,10 +333,12 @@ not mean redoing the design. Everything that depends on the action now lives in 
   to `action_front`. The cradle fills it exactly and is fused to the main body for printing (`FUSE_ACTION = True` in
   `fusion_build_demo.py`; the default keeps it apart so it can be reviewed).
 - **Family 1 cradle** (round receiver), laid out from Darren's own 1827 F stock, muzzle to butt: half-round barrel
-  channel (`barrel_r`), the step at `action_front`, half-round receiver bed (`act_bed_w`), locating pin (`act_pin_x`),
-  magazine well, seat for the steel cross key (`act_key_*`), narrow through-slot (`act_slot_*`), front screw
-  (`act_screw_front_x`), a deeper rectangular trigger pocket (`act_trig_*`) and the rear screw (`act_screw_rear_x`).
-  Both screws run in pillar bores (`act_pillar_d`, bore `act_screw_hole_d`), counterbored from the underside.
+  channel (`barrel_r`), the step at `action_front`, half-round receiver bed (`act_bed_w`), front mounting bolt
+  (`act_screw_front_x`), locating pin (`act_pin_x`), magazine well, seat for the steel cross key (`act_key_*`), rear
+  mounting bolt (`act_screw_rear_x`) and a deeper rectangular trigger pocket (`act_trig_*`). The two bolts straddle the
+  magazine well and are centred on it (`chk_bolts_centred`). Both go in from below through pillar bores
+  (`act_pillar_d`, bore `act_screw_hole_d`) with recessed heads; the rear one sits ahead of the guard leg and the
+  standing block, so a key reaches it (`chk_pillar_guard`).
 - **Measured (2026-11-24):** bed width 30.19 mm, magazine well width 16.00 mm, action bolt holes 6.84 mm (two bolts),
   trigger pocket width 26.2 mm. Every position, length and depth is still a placeholder.
 - **Adding an action.** Add a preset. Write a new cradle builder only if the receiver is not a round one on two vertical screws.

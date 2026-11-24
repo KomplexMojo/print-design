@@ -125,7 +125,7 @@ One parameter per numeric value in the JSON. S and T (sides) are not parameters;
 | Fusion name | JSON `cad_parameters` key | Unit | Expression | Sample | Status | IBU | Note |
 |---|---|---|---|---|---|---|---|
 | `action_rear` |  | mm | `-105 mm` | -105 | action |  |  |
-| `action_front` |  | mm | `128 mm` | 128 | action |  |  |
+| `action_front` |  | mm | `146 mm` | 146 | action |  |  |
 | `action_width` |  | mm | `32 mm` | 32 | action |  |  |
 | `bore_above_inlet_floor` |  | mm | `20 mm` | 20 | fixed |  |  |
 | `sight_line_above_bore` |  | mm | `37 mm` | 37 | fixed |  | diopter + front globe |

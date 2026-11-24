@@ -39,7 +39,8 @@ import adsk.fusion
 
 DATUM = 1000.0  # mm
 OBSOLETE_PARAMS = ("chk_pillar_mag", "chk_pillar_front", "act_receiver_d", "sling_tab_r", "rel_len", "guard_div",
-                   "block_top_len", "grip_toe", "rs_rib_x", "saddle_h", "block_bolt_x", "block_insert_depth")
+                   "block_top_len", "grip_toe", "rs_rib_x", "saddle_h", "block_bolt_x", "block_insert_depth",
+                   "chk_slot_pillar", "chk_key_slot", "act_slot_x0", "act_slot_x1", "act_slot_w")
 FUSE_BLOCK = False   # True joins the standing block into the main body (the printed part)
 FUSE_ACTION = False  # True joins the action cradle into the main body (the printed part); False keeps it apart for review
 
@@ -196,9 +197,11 @@ DEMO_PARAMS = [
     ("act_bed_r", "mm", "act_bed_w / 2", "[demo] derived: bed radius, copied from the measured inlet of the existing stock"),
     ("barrel_r", "mm", "barrel_d / 2 + barrel_float", "[demo] derived: half-round barrel channel radius"),
     ("chk_cradle_side", "mm", "(body_width - cradle_w) / 2 - 3 mm", "[demo] main-body wall beside the cradle"),
-    ("chk_pillar_guard", "mm", "act_screw_front_x - act_pillar_d / 2 - guard_front_x", "[demo] front screw pillar ahead of the trigger guard leg"),
-    ("chk_slot_pillar", "mm", "act_slot_x0 - (act_screw_front_x + act_pillar_d / 2)", "[demo] through-slot ahead of the front pillar"),
-    ("chk_key_slot", "mm", "act_key_x - act_slot_x1 - 2 mm", "[demo] cross key ahead of the through-slot"),
+    ("chk_pillar_guard", "mm", "act_screw_rear_x - act_pillar_d / 2 - guard_front_x", "[demo] rear bolt pillar ahead of the trigger guard leg, so a key reaches it past the standing block"),
+    ("chk_key_pillar", "mm", "act_key_x - (act_screw_rear_x + act_pillar_d / 2) - 2 mm", "[demo] cross key ahead of the rear bolt pillar"),
+    ("chk_pillar_front", "mm", "action_front - (act_screw_front_x + act_pillar_d / 2) - 2 mm", "[demo] front bolt pillar inside the cradle"),
+    ("chk_bolts_centred", "mm", "0.5 mm - abs((act_screw_front_x + act_screw_rear_x) / 2 - (mag_well_x0 + mag_well_x1) / 2)",
+     "[demo] the two mounting bolts are centred on the magazine well"),
     ("chk_mag_key", "mm", "mag_well_x0 - fit_slide - (act_key_x + act_key_w) - 2 mm", "[demo] magazine well ahead of the cross key"),
     ("chk_trig_floor", "mm", "-finger_hole_y1 - act_trig_depth - min_wall", "[demo] floor under the trigger pocket"),
     ("pad_t", "mm", "3 mm", "[demo] prone hand pad thickness"),
@@ -736,11 +739,10 @@ class Builder:
                 else:
                     self.extrude(occ, sk.profiles.item(0), CUT, sym=width, name=name)
 
-        # 1827 F layout, muzzle to butt: receiver front step (action_front), locating pin, magazine well,
-        # steel cross key, narrow through-slot, front screw, deeper trigger pocket, rear screw
+        # 1827 F layout, muzzle to butt: receiver front step (action_front), front mounting bolt, locating pin,
+        # magazine well, steel cross key, rear mounting bolt, deeper trigger pocket
         through("mag_well", "mag_well_x0 - fit_slide", "mag_well_x1 + fit_slide", f"{fd} - 1 mm", "0 mm",
                 "mag_well_width + 2 * fit_slide")
-        through("release_slot", "act_slot_x0", "act_slot_x1", f"{fd} - 1 mm", "0 mm", "act_slot_w")
         through("trigger_pocket", "act_trig_x0", "act_trig_x1", "-act_trig_depth", "0 mm", "act_trig_w")
         through("trigger_slot", "trigger_slot_x0", "trigger_slot_x1", "finger_hole_y1 - 1 mm", "-act_trig_depth + 1 mm", "trigger_slot_width",
                 comps=(main,))
@@ -770,8 +772,8 @@ class Builder:
             for occ in comps:
                 self.extrude(occ, sk.profiles.item(0), CUT, dist=depth if down > 0 else f"-({depth})", name=name)
 
-        for nm, x, under in (("front", "act_screw_front_x", fd), ("rear", "act_screw_rear_x", "finger_hole_y1")):
-            drill(f"{nm}_pillar_bore", "0 mm", x, "act_pillar_d", "ibu_depth_max", both if nm == "front" else (main,))
+        for nm, x, under in (("front", "act_screw_front_x", fd), ("rear", "act_screw_rear_x", fd)):
+            drill(f"{nm}_pillar_bore", "0 mm", x, "act_pillar_d", "ibu_depth_max", both)
             drill(f"{nm}_screw_counterbore", f"{under} + act_cbore", x, "act_head_d + 3 mm", "act_cbore + 2 mm", (main,))
         drill("locating_pin", "-act_bed_r + 1 mm", "act_pin_x", "act_pin_d", "7 mm", (act,))
 
