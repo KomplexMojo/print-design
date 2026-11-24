@@ -48,6 +48,7 @@ DEMO_PARAMS = [
     ("forend_depth", "mm", "62 mm", "[manual] restyle: 6 mm webs above and below the mag slots; IBU MC 3.1.6.4 a"),
     ("grip_depth", "mm", "40 mm", "[manual] r2: from grip_circumference"),
     ("grip_width", "mm", "36 mm", "[manual] r2"),
+    ("grip_length", "mm", "80 mm", "[manual] Darren 2026-11-24: 5 mm of margin to the 140 mm line (chk_depth_grip)"),
     ("grip_angle_deg", "deg", "78 deg", "[manual] restyle: raked like current biathlon grips"),
     ("mag_holder_start", "mm", "222 mm", "[manual] r2 flush slots"),
     ("mag_holder_wall", "mm", "3.5 mm", "[manual] r2 web between slots"),
