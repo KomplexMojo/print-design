@@ -41,7 +41,7 @@ DATUM = 1000.0  # mm
 OBSOLETE_PARAMS = ("chk_pillar_mag", "chk_pillar_front", "act_receiver_d", "sling_tab_r", "rel_len", "guard_div",
                    "block_top_len", "grip_toe", "rs_rib_x", "saddle_h", "block_bolt_x", "block_insert_depth",
                    "chk_slot_pillar", "chk_key_slot", "act_slot_x0", "act_slot_x1", "act_slot_w",
-                   "wrist_facet_w", "wrist_facet_h", "chk_belly_step")
+                   "wrist_facet_w", "wrist_facet_h", "chk_belly_step", "chk_rel_travel", "chk_bolts_centred")
 FUSE_BLOCK = False   # True joins the standing block into the main body (the printed part)
 FUSE_ACTION = False  # True joins the action cradle into the main body (the printed part); False keeps it apart for review
 
@@ -203,8 +203,6 @@ DEMO_PARAMS = [
     ("chk_pillar_guard", "mm", "act_screw_rear_x - act_pillar_d / 2 - guard_front_x", "[demo] rear bolt pillar ahead of the trigger guard leg, so a key reaches it past the standing block"),
     ("chk_key_pillar", "mm", "act_key_x - (act_screw_rear_x + act_pillar_d / 2) - 2 mm", "[demo] cross key ahead of the rear bolt pillar"),
     ("chk_pillar_front", "mm", "action_front - (act_screw_front_x + act_pillar_d / 2) - 2 mm", "[demo] front bolt pillar inside the cradle"),
-    ("chk_bolts_centred", "mm", "0.5 mm - abs((act_screw_front_x + act_screw_rear_x) / 2 - (mag_well_x0 + mag_well_x1) / 2)",
-     "[demo] the two mounting bolts are centred on the magazine well"),
     ("chk_mag_key", "mm", "mag_well_x0 - fit_slide - (act_key_x + act_key_w) - 2 mm", "[demo] magazine well ahead of the cross key"),
     ("chk_trig_rear", "mm", "trigger_slot_x0 - (grip_front_x - grip_lean * (grip_top_y - finger_hole_y1))",
      "[demo] the trigger opening ends at the rear of the guard opening, just ahead of the grip front"),
@@ -229,7 +227,8 @@ DEMO_PARAMS = [
     ("mag_flare", "mm", "4 mm", "[demo] flare round the magazine well's bottom entry (45 degrees), so magazines guide in"),
     ("rel_scoop_r", "mm", "(act_rel_len * act_rel_len / 4 + act_rel_depth * act_rel_depth) / (2 * act_rel_depth)",
      "[demo] derived: radius of the release-lever scoop from its length and depth"),
-    ("chk_rel_travel", "mm", "act_rel_len - act_rel_travel - act_rel_lever", "[demo] the release scoop covers the lever and its full fore-aft travel"),
+    ("chk_front_bolt_joint", "mm", "(fj_nut_x0 - bolt_tail) - (act_screw_front_x + (act_head_d + 3 mm) / 2) - 1 mm",
+     "[demo] the front mounting bolt stays behind the front joint's fasteners"),
     ("chk_rel_bolt", "mm", "(mag_well_x0 - fit_slide - act_rel_len) - (act_screw_rear_x + (act_head_d + 3 mm) / 2) - 2 mm",
      "[demo] the release scoop stays clear of the rear bolt counterbore"),
     ("chk_bolt_step_socket", "mm", "-(rear_tongue_y + rear_tongue_height / 2) - act_bolt_step_depth - 2 mm",

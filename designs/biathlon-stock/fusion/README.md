@@ -336,7 +336,7 @@ not mean redoing the design. Everything that depends on the action now lives in 
   channel (`barrel_r`), the step at `action_front`, half-round receiver bed (`act_bed_w`), front mounting bolt
   (`act_screw_front_x`), locating pin (`act_pin_x`), magazine well, seat for the steel cross key (`act_key_*`), rear
   mounting bolt (`act_screw_rear_x`) and a deeper rectangular trigger pocket (`act_trig_*`). The two bolts straddle the
-  magazine well and are centred on it (`chk_bolts_centred`). Both go in from below through pillar bores
+  magazine well. Both go in from below through pillar bores
   (`act_pillar_d`, bore `act_screw_hole_d`) with recessed heads; the rear one sits ahead of the guard leg and the
   standing block, so a key reaches it (`chk_pillar_guard`).
 - **Measured (2026-11-24):** bed width 30.19 mm, magazine well width 16.00 mm, action bolt holes 6.84 mm (two bolts),
@@ -356,9 +356,11 @@ not mean redoing the design. Everything that depends on the action now lives in 
   by `pocket_r` (5 mm, estimated from photos).
 - **Flared magazine entry.** The bottom of the magazine well has a 45 degree funnel, `mag_flare` wide, clear of both bolt
   counterbores (`chk_flare_bolts`) and inside the flat of the belly (`chk_flare_belly`).
-- **Magazine-release scoop.** A rounded relief in the underside just behind the magazine well, toward the trigger (`act_rel_len`,
-  `act_rel_depth`, radius `rel_scoop_r`), as wide as the flared entry, clear of the rear bolt counterbore (`chk_rel_bolt`). The lever moves fore-aft, so the scoop must
-  cover the lever plus its travel (`act_rel_travel`, `act_rel_lever`, `chk_rel_travel`); the rear bolt limits it to about 13 mm.
+- **Magazine well (measured).** Seen from the underside it is one slot, 60 mm long and 15 mm wide, that takes the
+  magazine and, in its rear part, the release lever. There is no separate scoop (`act_rel_len` = 0 for this action).
+  The front mounting bolt sits ahead of the slot and the rear one behind it. Their positions
+  (`act_screw_front_x`, `act_screw_rear_x`) must match the action's threaded holes exactly, so they are explicit
+  parameters pending measurement and are never derived from the well.
 - **Fortner bolt-handle notch.** A long notch in the bolt-side wall (`bolt_notch_x`, `bolt_notch_length`,
   `bolt_notch_depth`) with a deeper step at its rear for the lever (`act_bolt_step_len`, `act_bolt_step_depth`). It is cut
   on the side given by `bolt_dir`, which comes from the rifle's bolt side in the fit record and is not a mirror of the

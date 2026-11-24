@@ -80,11 +80,14 @@ ACTIONS = {
         # Layout read from Darren's own 1827 F stock (2026-11-24), muzzle to butt: round barrel channel, step,
         # receiver bed, FRONT mounting bolt, locating pin, magazine well, steel cross key, REAR mounting bolt,
         # trigger pocket. The two bolts straddle the magazine well, centred on it, heads recessed from below
-        # (Darren, 2026-11-24). MEASURED: act_bed_w, mag_well_width, act_screw_hole_d, act_trig_w, trigger opening 20 x 60, stock top to pocket floor 43, bed bottom to pocket floor 31. Every
+        # (Darren, 2026-11-24). MEASURED: act_bed_w, magazine well 60 x 15, act_screw_hole_d, act_trig_w, trigger opening 20 x 60, stock top to pocket floor 43, bed bottom to pocket floor 31. Every
         # position, length and depth is still a placeholder.
-        "values": {"act_bed_w": "30.19 mm", "mag_well_width": "16 mm", "act_screw_hole_d": "6.84 mm", "act_trig_w": "26.2 mm",
-                   "action_rear": "-105 mm", "action_front": "146 mm", "action_width": "32 mm",
-                   "act_screw_front_x": "136 mm", "act_pin_x": "122 mm", "mag_well_x0": "74 mm", "mag_well_x1": "114 mm",
+        "values": {"act_bed_w": "30.19 mm", "act_screw_hole_d": "6.84 mm", "act_trig_w": "26.2 mm",
+                   # magazine well, seen from the underside: one slot 60 x 15 mm that takes the magazine and, in its
+                   # rear part, the release lever (Darren, measured 2026-11-24; an earlier top reading gave 16.00 wide)
+                   "mag_well_width": "15 mm", "mag_well_x0": "74 mm", "mag_well_x1": "134 mm",
+                   "action_rear": "-105 mm", "action_front": "164 mm", "action_width": "32 mm",
+                   "act_screw_front_x": "156 mm", "act_pin_x": "143 mm",
                    "act_key_x": "62 mm", "act_screw_rear_x": "52 mm",
                    # trigger opening: 20 x 60 mm (Darren, measured), ending at the rear of the guard opening by the grip
                    # outer pocket: its front step is 12.5 mm ahead of the opening (Darren's third depth photo, as read)
@@ -94,8 +97,7 @@ ACTIONS = {
                    # Fortner straight-pull handle: long notch in the bolt-side wall, deeper step for the lever (placeholders)
                    "bolt_notch_x": "-50 mm", "bolt_notch_length": "70 mm", "bolt_notch_depth": "14 mm",
                    "act_bolt_step_len": "25 mm", "act_bolt_step_depth": "18 mm",
-                   # scoop behind the magazine well (toward the trigger) for the release lever (placeholders)
-                   "act_rel_len": "12 mm", "act_rel_depth": "5 mm"},
+                   "act_rel_len": "0 mm"},     # no separate release scoop: the lever sits inside the 60 mm well
     },
     "izhmash_7_4": {
         "label": "Izhmash BI-7-4", "code": 2, "family": 1,
@@ -222,8 +224,8 @@ REGISTRY: list[P] = [
     _p("action_type", "", "1", "action", "action preset code: 1 = Anschütz 1827 F / 1825 Fortner, 2 = Izhmash BI-7-4", sources=("rifle.action_type",)),
     _p("action_family", "", "1", "action", "cradle builder: 1 = round receiver, half-round bed, two vertical screws"),
     _p("act_bed_w", "mm", "30.19 mm", "action", "width across the half-round receiver bed"),
-    _p("act_screw_front_x", "mm", "136 mm", "action", "trigger to the front mounting bolt, ahead of the magazine well"),
-    _p("act_screw_rear_x", "mm", "52 mm", "action", "trigger to the rear mounting bolt, behind the magazine well"),
+    _p("act_screw_front_x", "mm", "156 mm", "action", "PENDING MEASUREMENT: trigger to the front mounting bolt. Must match the action's threaded hole exactly; never derived"),
+    _p("act_screw_rear_x", "mm", "52 mm", "action", "PENDING MEASUREMENT: trigger to the rear mounting bolt. Must match the action's threaded hole exactly; never derived"),
     _p("act_pin_x", "mm", "122 mm", "action", "trigger to the locating pin behind the receiver's front step"),
     _p("act_pin_d", "mm", "4 mm", "action", "locating pin hole"),
     _p("act_key_x", "mm", "62 mm", "action", "trigger to the rear face of the steel cross key (recoil bearing)"),
