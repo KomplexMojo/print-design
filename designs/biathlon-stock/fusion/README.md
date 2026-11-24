@@ -372,8 +372,7 @@ First run, all masses placeholders: 3.79 kg, centre of gravity 121 mm ahead of t
 middle and 35 mm ahead of its front end. The barrelled action (1880 g, own balance point guessed) decides the result.
 
 ### Spare-magazine slots (Darren, 2026-11-24)
-- **Lead-in.** The mouth of every slot is rounded (`mag_lead_r`, 2.5 mm) so a magazine seats easily. At the top the
-  round just touches three of the harness rail's nut pockets at the surface; the nuts stay captive below it.
+- **Lead-in.** The mouth of every slot is rounded (`mag_lead_r`, 2.5 mm) so a magazine seats easily.
 Each of the four holder slots is 36 × 9.5 mm (`mag_slot_len`, `mag_slot_h`, measured) with rounded corners
 (`mag_slot_r`, placeholder), spaced `mag_holder_wall` apart. The slots are 42 mm deep (`mag_slot_depth`, measured), which leaves 8 mm of wall on
 the face side (`chk_slot_wall`); the harness rail inserts moved above the slots (`harness_rail_y`, `chk_rail_slots`).
@@ -434,19 +433,16 @@ them with `[manual]` rows at the top of `DEMO_PARAMS`. The TPU covers remain the
   both window rims are rounded (`strut_round`), so the rib, lower strut and plate post are rounded bars that run
   into the plate without a step. `frame_width` and `slim_cove` no longer drive geometry. About 45 cm³ heavier.
 
-### Harness rail (Darren, 2026-11-24)
-- **Standard rail, not printed threads.** The harness's sliding block and nut clamp in an accessory rail, and the
-  connection carries the whole rifle. So the front connector is a bought aluminium rail (Anschütz / UIT pattern,
-  `rail_w` x `rail_h`, both PENDING MEASUREMENT), let in flush on the side opposite the spare mags, `rail_len` long
-  from `rail_x0`. It replaces the two heat-set inserts.
-- **Load path.** Four M5 countersunk screws go through the rail and right through the forestock at `rail_y`, just
-  under the barrel channel (`chk_rail_barrel`), into steel nuts in hex pockets on the mag side (`rail_nut_depth`,
-  no-snag). The printed part is only clamped between metal.
-- **Knock-on.** The spare-mag slots moved down 3.75 mm (`mag_holder_top` is derived from `rail_y`) to clear the nuts
-  while keeping `min_wall` over the front joint's head pocket (`chk_fj_pocket_slots`). Where the rail pocket overlaps
-  the slots a 0.6 mm skin is left (`chk_rail_web`). The butt windows no longer follow the slot line (`comb_beam_h`).
-- **Fitted range.** `harness_front_position` must sit on the rail (`chk_harness_front_lo`, `chk_harness_front_hi`):
-  284 to 420 mm ahead of the trigger.
+### Harness anchor (Darren, 2026-11-24)
+- **A measured position, not a rail.** The front harness point is `harness_front_position` from the fit record
+  (measurement AH). The rail tried in r33 is removed and the spare-mag slots are back at their height.
+- **Load path.** The harness carries the whole rifle, so nothing goes into printed threads or a heat-set insert. A
+  steel sleeve nut (`anchor_sleeve_d`, `anchor_head_d`, PENDING the harness's thread) goes in from the mag side with
+  its head recessed (`anchor_head_h`, no-snag) and reaches right through the forestock at `anchor_y`, below the mag
+  slots and the barrel. The harness's threaded end screws into it from the other side, and its own nut locks against
+  a steel washer in a flush seat (`anchor_washer_d`, `anchor_washer_t`).
+- **Fitted range.** The anchor must sit ahead of the spare-mag slots and behind the nose (`chk_harness_front_lo`,
+  `chk_harness_front_hi`): 400 to 429 mm ahead of the trigger with the current head size. Darren's is 400.
 - **Rear connector.** Still two heat-set inserts on the comb beam, pending how the rear of the harness attaches.
 
 ### Parameter tolerance (checked 2026-11-24)

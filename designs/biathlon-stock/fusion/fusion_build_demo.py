@@ -41,7 +41,7 @@ DATUM = 1000.0  # mm
 OBSOLETE_PARAMS = ("chk_pillar_mag", "act_receiver_d", "sling_tab_r", "rel_len", "guard_div",
                    "block_top_len", "grip_toe", "rs_rib_x", "saddle_h", "block_bolt_x", "block_insert_depth",
                    "chk_slot_pillar", "chk_key_slot", "act_slot_x0", "act_slot_x1", "act_slot_w",
-                   "wrist_facet_w", "wrist_facet_h", "chk_belly_step", "chk_rel_travel", "chk_bolts_centred", "sling_head_h", "finger_clear", "blk_scoop_d", "chk_comb_length", "chk_pad_pocket", "blk_win_web", "block_slot_r", "chk_block_top_flat", "collar_round", "rear_cap", "wrist_round")
+                   "wrist_facet_w", "wrist_facet_h", "chk_belly_step", "chk_rel_travel", "chk_bolts_centred", "sling_head_h", "finger_clear", "blk_scoop_d", "chk_comb_length", "chk_pad_pocket", "rail_w", "rail_h", "rail_y", "chk_rail_barrel", "chk_rail_web", "rail_x0", "rail_len", "rail_screw_inset", "rail_nut_depth", "chk_rail_nose", "blk_win_web", "block_slot_r", "chk_block_top_flat", "collar_round", "rear_cap", "wrist_round")
 FUSE_BLOCK = False   # True joins the standing block into the main body (the printed part)
 FUSE_ACTION = False  # True joins the action cradle into the main body (the printed part); False keeps it apart for review
 
@@ -74,13 +74,7 @@ DEMO_PARAMS = [
     ("grip_angle_deg", "deg", "78 deg", "[manual] restyle: raked like current biathlon grips"),
     ("mag_holder_start", "mm", "222 mm", "[manual] r2 flush slots"),
     ("mag_holder_wall", "mm", "8 mm", "[manual] web between the spare-mag slots, re-spaced for the 36 mm slots"),
-    # ---- harness rail (Darren 2026-11-24): a bought aluminium accessory rail, let in flush on the side opposite the
-    # spare mags and bolted right through the forestock. The harness's sliding block and nut clamp in the rail.
-    ("rail_w", "mm", "22 mm", "[demo] PENDING MEASUREMENT: outside width of the aluminium harness rail (Anschutz / UIT pattern, nominal 22 mm)"),
-    ("rail_h", "mm", "7.4 mm", "[demo] PENDING MEASUREMENT: outside height of the rail (nominal 7.4 mm); the pocket is this deep, so the rail sits flush"),
-    ("rail_y", "mm", "-17 mm", "[demo] rail centre line: its through-bolts pass just under the barrel channel"),
-    ("chk_rail_barrel", "mm", "-13 mm - (rail_y + 2.75 mm)", "[demo] the rail's through-bolts stay under the barrel channel"),
-    ("mag_holder_top", "mm", "rail_y - 5.75 mm", "[manual] derived: the spare-mag slots start just below the nuts of the harness rail's through-bolts, and stay above the front joint's head pocket"),
+    ("mag_holder_top", "mm", "-19 mm", "[manual] restyle: 6 mm web under the barrel channel"),
     ("min_wall", "mm", "6 mm", "[demo] thinnest structural web allowed in PAHT-CF"),
     # ---- body section
     ("body_round", "mm", "6 mm", "[demo] edge round on the side faces of every rigid part"),
@@ -198,7 +192,6 @@ DEMO_PARAMS = [
     ("chk_slots_handstop", "mm", "forend_tip - tip_rake - 8 mm - (mag_holder_start + mag_holder_count * mag_slot_len + (mag_holder_count - 1) * mag_holder_wall)", "[demo] the row of slots ends before the forend nose"),
     ("mag_slot_depth", "mm", "42 mm", "[demo] spare-mag holder slot depth into the forestock (Darren, measured 2026-11-24)"),
     ("mag_lead_r", "mm", "2.5 mm", "[demo] rounded lead-in round the mouth of each spare-mag slot (Darren 2026-11-24); the web between slots keeps a 3 mm flat"),
-    ("chk_rail_web", "mm", "body_width - mag_slot_depth - rail_h - 0.4 mm", "[demo] a skin is left between the rail pocket and the spare-mag slots where they overlap"),
     ("harness_rail_y", "mm", "-10 mm", "[manual] harness rail inserts moved above the mag slots, which now reach to within 8 mm of the face side"),
     ("chk_slot_wall", "mm", "body_width - mag_slot_depth - min_wall", "[demo] wall left on the face side behind the mag slots"),
     ("chk_rail_slots", "mm", "(harness_rail_y - insert_hole_d / 2) - mag_holder_top - 3 mm", "[demo] harness inserts clear above the mag slots"),
@@ -316,18 +309,21 @@ DEMO_PARAMS = [
     ("chk_trig_floor", "mm", "-finger_hole_y1 - act_trig_depth - min_wall", "[demo] floor under the trigger pocket"),
     ("pad_t", "mm", "3 mm", "[demo] prone hand pad thickness"),
     ("pad_wrap", "mm", "14 mm", "[demo] the pad wraps this far up each side of the forend"),
-    ("rail_x0", "mm", "fj_head_x + fj_pocket_len + 9 mm", "[demo] derived: rear end of the harness rail, ahead of the front joint"),
-    ("rail_len", "mm", "160 mm", "[demo] length the rail is cut to"),
-    ("rail_screw_inset", "mm", "15 mm", "[demo] first and last rail bolt, from the rail's ends"),
-    ("rail_nut_depth", "mm", "m5_nut_m + 1 mm", "[demo] no-snag: the rail bolts' M5 nuts sit in hex pockets on the mag side, 1 mm under the surface"),
-    ("chk_rail_nose", "mm", "forend_tip - tip_rake - 8 mm - (rail_x0 + rail_len)", "[demo] the rail ends behind the forend's nose"),
     ("pad_x0", "mm", "fj_head_x + fj_pocket_len + 4 mm", "[demo] locked: the prone pad always starts just ahead of the front joint and runs to the hand stop, wherever that is"),
     ("chk_handstop_min", "mm", "handstop_position - pad_x0 - 40 mm", "[demo] USER-FITTED RANGE: furthest back the hand stop can sit"),
     ("chk_handstop_max", "mm", "forend_tip - tip_rake - 4 mm - tip_sweep_x", "[demo] USER-FITTED RANGE: furthest forward the hand stop can sit"),
     ("harness_pitch", "mm", "20 mm", "[demo] PLACEHOLDER: spacing of the two inserts of each harness connector"),
     ("harness_rear_y", "mm", "comb_top - 14 mm", "[demo] height of the rear harness connector, in the comb beam"),
-    ("chk_harness_front_lo", "mm", "harness_front_position - (rail_x0 + 12 mm)", "[demo] USER-FITTED RANGE: the harness block sits on the rail, 12 mm inside its rear end"),
-    ("chk_harness_front_hi", "mm", "rail_x0 + rail_len - 12 mm - harness_front_position", "[demo] USER-FITTED RANGE: the harness block sits on the rail, 12 mm inside its front end"),
+    # ---- harness anchor (Darren 2026-11-24): no rail. One steel sleeve nut at the measured harness position, right
+    # through the forestock; the harness's threaded end screws into it and its own nut locks against a steel washer.
+    ("anchor_y", "mm", "-36 mm", "[demo] height of the harness anchor: below the spare-mag slots and the barrel, above the belly facet"),
+    ("anchor_sleeve_d", "mm", "9 mm", "[demo] PENDING MEASUREMENT: outside diameter of the M6 sleeve nut (set by the harness's thread)"),
+    ("anchor_head_d", "mm", "15 mm", "[demo] PENDING: head diameter of the sleeve nut"),
+    ("anchor_head_h", "mm", "3 mm", "[demo] no-snag: depth of the head's recess on the mag side"),
+    ("anchor_washer_d", "mm", "12 mm", "[demo] M6 washer, ISO 7089, under the harness's lock nut"),
+    ("anchor_washer_t", "mm", "1.6 mm", "[demo] washer thickness; its seat is this deep, so the washer sits flush"),
+    ("chk_harness_front_lo", "mm", "harness_front_position - anchor_head_d / 2 - (mag_holder_start + mag_holder_count * mag_slot_len + (mag_holder_count - 1) * mag_holder_wall) - 2 mm", "[demo] USER-FITTED RANGE: the harness anchor sits ahead of the spare-mag slots"),
+    ("chk_harness_front_hi", "mm", "forend_tip - tip_rake - 20 mm - harness_front_position", "[demo] USER-FITTED RANGE: the harness anchor sits behind the forend's nose"),
     ("chk_harness_rear_lo", "mm", "harness_rear_position - harness_pitch / 2 - (-lop + 25 mm)", "[demo] USER-FITTED RANGE: rear harness connector ahead of the butt plate"),
     ("chk_harness_rear_hi", "mm", "(-lop + comb_length) - (harness_rear_position + harness_pitch / 2) - 5 mm", "[demo] USER-FITTED RANGE: rear harness connector behind the front of the comb"),
     ("chk_lop_min", "mm", "comb_length - 80 mm", "[demo] USER-FITTED RANGE: shortest stock the butt takes"),
@@ -1326,44 +1322,33 @@ class Builder:
             fl = self.extrude(main, sk.profiles.item(0), CUT, start=start, dist="flute_d + 1 mm", name=f"body_flute_{nm}")
             self.fillet_z_edges(main, fl, "mag_slot_r", f"body_flute_corners_{nm}")
 
-        # harness rail (Darren 2026-11-24). The harness carries the whole rifle, so the load does not go into
-        # printed threads or heat-set inserts: a bought aluminium rail sits flush in a pocket on the side opposite
-        # the spare mags and is held by four M5 countersunk screws that go right through the forestock, under the
-        # barrel channel, into steel nuts in hex pockets on the mag side. The harness block slides in the rail to
-        # harness_front_position and its own nut clamps it.
-        RAIL_BOLTS = 4
-        sk = self.sketch("harness_rail_pocket", face)
-        self.rect(sk, "rail_x0 - fit_slide", "rail_x0 + rail_len + fit_slide",
-                  "rail_y - rail_w / 2 - fit_slide", "rail_y + rail_w / 2 + fit_slide")
+        # harness anchor (Darren 2026-11-24): a measured position, not a rail. The harness carries the whole rifle,
+        # so the load does not go into printed threads or a heat-set insert. A steel sleeve nut goes in from the
+        # mag side, its head recessed, and reaches right through the forestock. The harness's threaded end screws
+        # into it from the other side and its own nut locks against a steel washer in a flush seat.
+        hx = "harness_front_position"
+        sk = self.sketch("harness_anchor_bore", face)
+        self.circle(sk, hx, "anchor_y", "anchor_sleeve_d + 2 * fit_slide")
         self.done(sk)
-        self.extrude(fore, sk.profiles.item(0), CUT, dist="mag_side * rail_h", name="harness_rail_pocket")
-        bolt_x = [f"rail_x0 + rail_screw_inset + {i} * (rail_len - 2 * rail_screw_inset) / {RAIL_BOLTS - 1}"
-                  for i in range(RAIL_BOLTS)]
-        sk = self.sketch("harness_rail_bolts", face)
-        for x in bolt_x:
-            self.circle(sk, x, "rail_y", "cap_screw_d")
+        self.extrude(fore, self.profiles(sk), CUT, dist="mag_side * body_width", name="harness_anchor_bore")
+        sk = self.sketch("harness_anchor_washer_seat", face)
+        self.circle(sk, hx, "anchor_y", "anchor_washer_d + 0.5 mm")
         self.done(sk)
-        self.extrude(fore, self.profiles(sk), CUT, dist="mag_side * body_width", name="harness_rail_bolts")
-        sk = self.sketch("harness_rail_nuts", away)
-        af = "(m5_nut_af + 2 * fit_snug)"
-        for x in bolt_x:
-            self.poly(sk, [(f"{x} + {af} / sqrt(3)", "rail_y"), (f"{x} + {af} / (2 * sqrt(3))", f"rail_y + {af} / 2"),
-                           (f"{x} - {af} / (2 * sqrt(3))", f"rail_y + {af} / 2"), (f"{x} - {af} / sqrt(3)", "rail_y"),
-                           (f"{x} - {af} / (2 * sqrt(3))", f"rail_y - {af} / 2"), (f"{x} + {af} / (2 * sqrt(3))", f"rail_y - {af} / 2")])
+        seat = max(self.profiles(sk), key=lambda pr: pr.areaProperties().area)
+        self.extrude(fore, [seat], CUT, dist="mag_side * anchor_washer_t", name="harness_anchor_washer_seat")
+        sk = self.sketch("harness_anchor_head_recess", away)
+        self.circle(sk, hx, "anchor_y", "anchor_head_d + 0.5 mm")
         self.done(sk)
-        self.extrude(fore, self.profiles(sk), CUT, dist="-mag_side * rail_nut_depth", name="harness_rail_nuts")
-        # the rail itself, for the picture and the mass: a plain bar with the slot's opening
-        sk = self.sketch("harness_rail", face)
-        self.rect(sk, "rail_x0", "rail_x0 + rail_len", "rail_y - rail_w / 2", "rail_y + rail_w / 2")
-        self.done(sk)
+        seat = max(self.profiles(sk), key=lambda pr: pr.areaProperties().area)
+        self.extrude(fore, [seat], CUT, dist="-mag_side * anchor_head_h", name="harness_anchor_head_recess")
+        # the sleeve nut, for the picture
         hw_occ = occs["hw"]
-        self.extrude(hw_occ, sk.profiles.item(0), NEW, dist="mag_side * rail_h", name="harness_rail")
-        rail_body = hw_occ.component.bRepBodies.item(hw_occ.component.bRepBodies.count - 1)
-        rail_body.name = "harness_rail"
-        sk = self.sketch("harness_rail_slot", face)
-        self.rect(sk, "rail_x0 - 1 mm", "rail_x0 + rail_len + 1 mm", "rail_y - 5 mm", "rail_y + 5 mm")
+        sk = self.sketch("harness_anchor_head", away)
+        self.circle(sk, hx, "anchor_y", "anchor_head_d")
         self.done(sk)
-        self.extrude(hw_occ, sk.profiles.item(0), CUT, dist="mag_side * 4 mm", name="harness_rail_slot", bodies=[rail_body])
+        self.extrude(hw_occ, [max(self.profiles(sk), key=lambda pr: pr.areaProperties().area)], NEW,
+                     dist="-mag_side * anchor_head_h", name="harness_anchor_head")
+        hw_occ.component.bRepBodies.item(hw_occ.component.bRepBodies.count - 1).name = "harness_anchor"
 
         # rear harness connector (user-fitted): two heat-set inserts on the butt's comb beam, PENDING the rear hardware
         rear_face = self.offset_plane("harness_rear_plane", "cast_z - mag_side * comb_width / 2")
