@@ -432,6 +432,21 @@ them with `[manual]` rows at the top of `DEMO_PARAMS`. The TPU covers remain the
   both window rims are rounded (`strut_round`), so the rib, lower strut and plate post are rounded bars that run
   into the plate without a step. `frame_width` and `slim_cove` no longer drive geometry. About 45 cm³ heavier.
 
+### Harness rail (Darren, 2026-11-24)
+- **Standard rail, not printed threads.** The harness's sliding block and nut clamp in an accessory rail, and the
+  connection carries the whole rifle. So the front connector is a bought aluminium rail (Anschütz / UIT pattern,
+  `rail_w` x `rail_h`, both PENDING MEASUREMENT), let in flush on the side opposite the spare mags, `rail_len` long
+  from `rail_x0`. It replaces the two heat-set inserts.
+- **Load path.** Four M5 countersunk screws go through the rail and right through the forestock at `rail_y`, just
+  under the barrel channel (`chk_rail_barrel`), into steel nuts in hex pockets on the mag side (`rail_nut_depth`,
+  no-snag). The printed part is only clamped between metal.
+- **Knock-on.** The spare-mag slots moved down 3.75 mm (`mag_holder_top` is derived from `rail_y`) to clear the nuts
+  while keeping `min_wall` over the front joint's head pocket (`chk_fj_pocket_slots`). Where the rail pocket overlaps
+  the slots a 0.6 mm skin is left (`chk_rail_web`). The butt windows no longer follow the slot line (`comb_beam_h`).
+- **Fitted range.** `harness_front_position` must sit on the rail (`chk_harness_front_lo`, `chk_harness_front_hi`):
+  284 to 420 mm ahead of the trigger.
+- **Rear connector.** Still two heat-set inserts on the comb beam, pending how the rear of the harness attaches.
+
 ### Parameter tolerance (checked 2026-11-24)
 Ten driving measurements (AA, AC, AD, AE, AF, E, P, AG, J, M) were scaled together and one at a time.
 Standing height (A) drives nothing by itself; the stock follows the rifle-fit measurements.
