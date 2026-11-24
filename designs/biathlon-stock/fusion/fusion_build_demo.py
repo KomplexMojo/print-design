@@ -181,6 +181,8 @@ DEMO_PARAMS = [
     ("rj_bolt_len", "mm", "rj_nut_x0 + nut_slot_len + bolt_tail - rj_seat_x", "[demo] derived: rear fastener length under the head"),
     # ---- no-snag rule (Darren 2026-11-24): every fastener head is recessed; each margin below must stay >= 0
     ("act_head_h", "mm", "6 mm", "[demo] action bolt head height"),
+    ("act_bolt_hole_d", "mm", "act_screw_d + 2 * fit_slide + hole_shrink", "[demo] derived: printed clearance hole for the 6 mm action bolt (the 6.84 mm reading was the hole in the wood stock)"),
+    ("chk_bolt_clamp", "mm", "forend_depth - act_cbore - act_bed_r - 15 mm", "[demo] at least 15 mm of solid stock between the bolt head seat and the bed"),
     ("chk_head_action", "mm", "act_cbore - act_head_h", "[demo] no-snag: action bolt heads below the underside"),
     ("chk_head_rear_joint", "mm", "joint_cbore - joint_head_h", "[demo] no-snag: rear joint heads inside their counterbores"),
     ("chk_head_front_joint", "mm", "forend_depth - 2 mm + front_tongue_y - joint_head_d / 2 - joint_head_clear",
@@ -841,7 +843,8 @@ class Builder:
         self.done(sk)
         self.extrude(act, sk.profiles.item(0), CUT, sym="act_key_len", name="cross_key_seat")
 
-        # bedding screws: vertical pillar bores from the bed to the underside, counterbored for the heads
+        # mounting bolts: a stepped hole each. A bolt-sized hole runs from the bed down, and only the bottom
+        # act_cbore of it is opened to head size, so the head clamps against solid stock (Darren 2026-11-24)
         def xz_sketch(name, y_expr):
             y = self.ev(y_expr)
             pl = self.offset_plane(f"{name}_plane", y_expr, root.xZConstructionPlane)
@@ -861,7 +864,7 @@ class Builder:
                 self.extrude(occ, sk.profiles.item(0), CUT, dist=depth if down > 0 else f"-({depth})", name=name)
 
         for nm, x, under in (("front", "act_screw_front_x", fd), ("rear", "act_screw_rear_x", fd)):
-            drill(f"{nm}_pillar_bore", "0 mm", x, "act_pillar_d", "ibu_depth_max", both)
+            drill(f"{nm}_bolt_hole", "0 mm", x, "act_bolt_hole_d", "ibu_depth_max", both)
             drill(f"{nm}_screw_counterbore", f"{under} + act_cbore", x, "act_head_d + 3 mm", "act_cbore + 2 mm", (main,))
         # flared magazine entry: a 45 degree funnel round the bottom of the well
         yb, x0, x1 = self.ev(fd), self.ev("mag_well_x0 - fit_slide") - 0.01, self.ev("mag_well_x1 + fit_slide") + 0.01
