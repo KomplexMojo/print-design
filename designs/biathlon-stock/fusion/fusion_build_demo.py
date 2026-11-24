@@ -197,6 +197,7 @@ DEMO_PARAMS = [
     ("mag_slot_r", "mm", "3 mm", "[demo] PLACEHOLDER: corner radius of the spare-mag slots"),
     ("chk_slots_handstop", "mm", "forend_tip - tip_rake - 8 mm - (mag_holder_start + mag_holder_count * mag_slot_len + (mag_holder_count - 1) * mag_holder_wall)", "[demo] the row of slots ends before the forend nose"),
     ("mag_slot_depth", "mm", "42 mm", "[demo] spare-mag holder slot depth into the forestock (Darren, measured 2026-11-24)"),
+    ("mag_lead_r", "mm", "2.5 mm", "[demo] rounded lead-in round the mouth of each spare-mag slot (Darren 2026-11-24); the web between slots keeps a 3 mm flat"),
     ("chk_rail_web", "mm", "body_width - mag_slot_depth - rail_h - 0.4 mm", "[demo] a skin is left between the rail pocket and the spare-mag slots where they overlap"),
     ("harness_rail_y", "mm", "-10 mm", "[manual] harness rail inserts moved above the mag slots, which now reach to within 8 mm of the face side"),
     ("chk_slot_wall", "mm", "body_width - mag_slot_depth - min_wall", "[demo] wall left on the face side behind the mag slots"),
@@ -1290,6 +1291,16 @@ class Builder:
             ents, forec.xConstructionAxis, self.vi("mag_holder_count"), self.vi("mag_slot_len + mag_holder_wall"),
             adsk.fusion.PatternDistanceType.SpacingPatternDistanceType)
         forec.features.rectangularPatternFeatures.add(pin).name = "mag_slots"
+        # lead-in: the mouth of every slot is rounded, so a magazine finds its way in and seats easily
+        mx0, mx1 = self.ev("mag_holder_start") - 0.05, self.ev("mag_holder_start + mag_holder_count * (mag_slot_len + mag_holder_wall)")
+        my0, my1 = self.ev("mag_holder_top - mag_slot_h") - 0.005, self.ev("mag_holder_top") + 0.005
+        side_sign = self.ev("mag_side * 1 mm")
+
+        def not_slot_mouth(e):
+            m = self.mid(e)
+            return not (m.z * side_sign > 0 and mx0 < m.x < mx1 and my0 < m.y < my1)
+
+        self.round_faces(fore, "body_width / 2", "mag_lead_r", "mag_slot_lead_in", skip=not_slot_mouth)
 
         face = self.offset_plane("flute_side_plane", "-mag_side * body_width / 2")     # the side opposite the slots
         # flutes: shallow recesses on the line of the spare-mag slots. On the forestock's face side they mirror the
