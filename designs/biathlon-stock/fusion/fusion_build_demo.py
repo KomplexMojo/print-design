@@ -41,7 +41,7 @@ DATUM = 1000.0  # mm
 OBSOLETE_PARAMS = ("chk_pillar_mag", "act_receiver_d", "sling_tab_r", "rel_len", "guard_div",
                    "block_top_len", "grip_toe", "rs_rib_x", "saddle_h", "block_bolt_x", "block_insert_depth",
                    "chk_slot_pillar", "chk_key_slot", "act_slot_x0", "act_slot_x1", "act_slot_w",
-                   "wrist_facet_w", "wrist_facet_h", "chk_belly_step", "chk_rel_travel", "chk_bolts_centred", "sling_head_h", "finger_clear")
+                   "wrist_facet_w", "wrist_facet_h", "chk_belly_step", "chk_rel_travel", "chk_bolts_centred", "sling_head_h", "finger_clear", "blk_scoop_d")
 FUSE_BLOCK = False   # True joins the standing block into the main body (the printed part)
 FUSE_ACTION = False  # True joins the action cradle into the main body (the printed part); False keeps it apart for review
 
@@ -102,6 +102,10 @@ DEMO_PARAMS = [
     ("guard_corner_r", "mm", "8 mm", "[demo] radius of the other corners of the trigger opening"),
     ("blk_tuck", "mm", "12 mm", "[demo] the block starts this far behind the front of the trigger opening, clear of the hand on the grip"),
     ("blk_scoop_r", "mm", "30 mm", "[demo] radius of the finger scoop on the block's rear face"),
+    ("guard_blend_r", "mm", "14 mm", "[demo] radius that blends the guard rail into the block's rear face"),
+    ("rear_cap", "mm", "6 mm", "[demo] the block's rear face is rigid to this depth, so the rail can blend into it; the TPU cover starts behind it"),
+    ("guard_gusset_r", "mm", "18 mm", "[demo] radius that carries the guard's front leg down into the top of the block"),
+    ("collar_h", "mm", "4 mm", "[demo] rigid band round the top of the block; the TPU cover butts against it"),
     ("guard_round", "mm", "3 mm", "[demo] edge round on the guard"),
     ("rel_front_x", "mm", "guard_front_x - guard_rake - guard_bar", "[demo] derived: front of the trigger opening"),
     ("finger_hole_x1", "mm", "rel_front_x", "[manual] trigger opening front"),
@@ -231,6 +235,7 @@ DEMO_PARAMS = [
     ("act_bed_r", "mm", "act_bed_w / 2", "[demo] derived: bed radius, copied from the measured inlet of the existing stock"),
     ("barrel_r", "mm", "barrel_d / 2 + barrel_float", "[demo] derived: half-round barrel channel radius"),
     ("chk_cradle_side", "mm", "(body_width - cradle_w) / 2 - 3 mm", "[demo] main-body wall beside the cradle"),
+    ("chk_gusset_bolt", "mm", "act_screw_rear_x - (act_head_d + 3 mm) / 2 - (guard_front_x + guard_gusset_r)", "[demo] the leg-to-block gusset stays clear of the rear bolt's key hole"),
     ("chk_pillar_guard", "mm", "act_screw_rear_x - act_pillar_d / 2 - guard_front_x", "[demo] rear bolt pillar ahead of the trigger guard leg, so a key reaches it past the standing block"),
     ("chk_key_pillar", "mm", "act_key_x - (act_screw_rear_x + act_pillar_d / 2) - 2 mm", "[demo] cross key ahead of the rear bolt pillar"),
     ("chk_pillar_front", "mm", "action_front - (act_screw_front_x + act_pillar_d / 2) - 2 mm", "[demo] front bolt pillar inside the cradle"),
@@ -761,44 +766,60 @@ class Builder:
         top_e = f"{y1} + 6 mm"                      # the leg's top is buried in the body
         rr, rc = "guard_rear_r", "guard_corner_r"
         sk = self.sketch("trigger_guard")
-        self.poly(sk, [(f"{rf} - {rc}", top_e), ("guard_front_x", top_e), (lf(gbm), gbm),
+        rg, rb = "guard_gusset_r", "guard_blend_r"
+        self.poly(sk, [(f"{rf} - {rc}", top_e), ("guard_front_x", top_e),
+                       (lf(f"{gbm} + {rg}"), f"{gbm} + {rg}"), (f"{lf(gbm)} + {rg}", gbm),          # 2 -> 3: leg flows into the block top
+                       ("blk_rear_x + rear_cap + 8 mm", gbm), ("blk_rear_x + rear_cap + 8 mm", f"{gbm} - {rb}"),   # inside the block
+                       (f"blk_rear_x - {rb}", gbm),                                                # 5 -> 6: rail flows into the block's rear face
                        (f"{gf(gbm)} - 6 mm", gbm), (f"{gf(f'{fh0} + {rr}')} - 6 mm", f"{fh0} + {rr}"),
-                       (gf(f"{fh0} + {rr}"), f"{fh0} + {rr}"), (f"{gf(fh0)} + {rr}", fh0),          # 5 -> 6: rail into grip
-                       (f"{rf} - {rc}", fh0), (rf, f"{fh0} + {rc}"),                               # 7 -> 8: front lower corner
-                       (rf, f"{y1} - {rc}"), (f"{rf} - {rc}", y1)],                                # 9 -> 10: front upper corner
-                  arcs={5: rr, 7: rc, 9: rc})
+                       (gf(f"{fh0} + {rr}"), f"{fh0} + {rr}"), (f"{gf(fh0)} + {rr}", fh0),          # 9 -> 10: rail into grip
+                       (f"{rf} - {rc}", fh0), (rf, f"{fh0} + {rc}"),                               # 11 -> 12: front lower corner
+                       (rf, f"{y1} - {rc}"), (f"{rf} - {rc}", y1)],                                # 13 -> 14: front upper corner
+                  arcs={2: rg, 5: f"2 * {rb}", 9: rr, 11: rc, 13: rc})
         self.done(sk)
         self.extrude(blk, sk.profiles.item(0), NEW, sym="guard_width", name="trigger_guard")
         self.round_faces(blk, "guard_width / 2", "guard_round", "guard_round", skip_y=(top_e,))
 
+        def block_profile(sk, inset, x_shift="0 mm", y_top=None, y_low=None):
+            lo = y_low or f"{bh} + {inset}"
+            self.poly(sk, [(f"blk_rear_x + {inset} + {x_shift}", y_top or btop), (f"blk_front_x - {inset}", y_top or btop),
+                           (f"blk_front_x - blk_front_rake - {inset}", lo), (f"blk_rear_x + blk_rake + {inset} + {x_shift}", lo)],
+                      arcs={3: "blk_scoop_r"})                                                     # finger scoop at the rear
+            self.done(sk)
+
         def block_solid(occ, name, inset, width, corner_r, edge_r):
             lo = f"{bh} + {inset}"
             sk = self.sketch(name)
-            self.poly(sk, [(f"blk_rear_x + {inset}", btop), (f"blk_front_x - {inset}", btop),
-                           (f"blk_front_x - blk_front_rake - {inset}", lo), (f"blk_rear_x + blk_rake + {inset}", lo)],
-                      arcs={3: "blk_scoop_r"})                                                     # finger scoop at the rear
-            self.done(sk)
+            block_profile(sk, inset)
             self.extrude(occ, sk.profiles.item(0), NEW, sym=width, name=name)
             b = occ.component.bRepBodies.item(occ.component.bRepBodies.count - 1)
             self.corners(occ, [(f"blk_front_x - blk_front_rake - {inset}", lo, corner_r),
                                (f"blk_rear_x + blk_rake + {inset}", lo, corner_r)], name, body=b)
             self.round_faces(occ, f"({width}) / 2", edge_r, f"{name}_round", skip_y=(btop,), body=b)
+            return b
 
         block_solid(bcov, "block_cover", "0 mm", "block_width", "block_corner_r", "block_round")
         block_solid(blk, "block_core", ct, f"block_width - 2 * {ct}", f"block_corner_r - {ct}", f"block_round - {ct}")
         self.combine((blk, body("block")), [(blk, body("block", 1))], JOIN, "guard_block_join", keep=False)
+        # rigid collar: the block's top band and its rear face keep the full outer shape in the rigid part, so
+        # the guard rail can blend into the rear face and the TPU cover ends on a square shoulder
+        collar = block_solid(blk, "block_collar", "0 mm", "block_width", "block_corner_r", "block_round")
+        sk = self.sketch("block_cover_zone")
+        block_profile(sk, "-5 mm", x_shift="rear_cap + 5 mm", y_top=f"{btop} - collar_h", y_low=f"{bh} - 5 mm")
+        self.extrude(blk, sk.profiles.item(0), CUT, sym="2 * body_width", name="block_cover_zone", bodies=[collar])
+        self.combine((blk, body("block")), [(blk, body("block", 1))], JOIN, "guard_collar_join", keep=False)
         self.combine((bcov, body("bcover")), [(blk, body("block"))], CUT, "block_cover_boot")
-        sk = self.yz_sketch("block_keel", f"blk_rear_x + blk_rake + {ct} + block_corner_r")
+        sk = self.yz_sketch("block_keel", f"blk_rear_x + blk_rake + rear_cap + block_corner_r")
         lo = f"{bh} + {ct}"
         kn, kw = "keel_w / 2", "keel_w / 2 + keel_flare"
         self.poly(sk, [(f"-({kn})", lo), (kn, lo), (kw, f"{lo} + keel_h"), (f"-({kw})", f"{lo} + keel_h")])
         self.done(sk)
-        klen = f"blk_front_x - blk_rear_x - blk_rake - blk_front_rake - 2 * {ct} - 2 * block_corner_r"
+        klen = f"blk_front_x - blk_rear_x - blk_rake - rear_cap - blk_front_rake - {ct} - 2 * block_corner_r"
         self.extrude(blk, sk.profiles.item(0), CUT, dist=klen, name="block_keel_groove")
         self.extrude(bcov, sk.profiles.item(0), JOIN, dist=klen, name="block_keel")
         sk = self.sketch("block_slot")          # the long oblong slot through the slab
-        self.rect(sk, f"blk_rear_x + blk_rake + {ct} + blk_win_web", f"blk_front_x - blk_front_rake - {ct} - blk_win_web",
-                  f"{lo} + keel_h + 5 mm", f"{gbm} - blk_win_web")
+        self.rect(sk, f"blk_rear_x + blk_rake + rear_cap + blk_win_web", f"blk_front_x - blk_front_rake - {ct} - blk_win_web",
+                  f"{lo} + keel_h + 5 mm", f"{gbm} - collar_h - blk_win_web")
         self.done(sk)
         for occ, nm in ((blk, "core"), (bcov, "cover")):
             f = self.extrude(occ, sk.profiles.item(0), CUT, sym="2 * body_width", name=f"block_slot_{nm}")

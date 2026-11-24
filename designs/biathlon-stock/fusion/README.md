@@ -310,8 +310,12 @@ now builds it, still entirely from User Parameters. Review images come from `fus
   finger scoop (`blk_scoop_r`), so the hand wraps the grip freely. It runs forward under the release lever to
   `blk_front_x`, 2 mm short of the magazine (`act_rel_zone` pending measurement), so the magazine drops free
   (`chk_block_mag`). A hole through it gives a key access to the rear mounting bolt.
+- **Blended joint.** Nothing meets at a right angle. The front leg flows into the block top through `guard_gusset_r`,
+  which carries the load from the leg into the block, and the rail flows into the block's rear face through
+  `guard_blend_r`. Both blends are part of the guard's profile. The block's top band (`collar_h`) and rear face
+  (`rear_cap`) are rigid at the full outer shape, so the blends land on rigid material.
 - **Block cover.** `tpu_block_cover` is a removable TPU boot, `cover_t` thick, that slips over the block from below and
-  wraps its bottom, sides and ends. A dovetail keel under the core holds it on (the TPU rule). Its outer shape is the
+  wraps its bottom, sides and front, ending on the collar's shoulder. A dovetail keel under the core holds it on (the TPU rule). Its outer shape is the
   athlete-specific hold surface: `block_width`, `block_height`, `block_corner_r`, `block_round`.
 - **IBU.** The assembled block counts toward MC 3.1.6.4 a: `chk_depth_block` and the build report's lowest point of
   `standing_block` both check it. Any replacement block must keep `block_height` at or under 140 mm.
