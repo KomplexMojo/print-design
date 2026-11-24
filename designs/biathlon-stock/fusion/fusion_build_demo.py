@@ -122,7 +122,7 @@ DEMO_PARAMS = [
     ("sling_tab_w", "mm", "40 mm", "[demo] Biatar sling end tab width (Darren, measured 2026-11-24)"),
     ("sling_hole_d", "mm", "5.5 mm", "[demo] Biatar sling eyelet (Darren, measured): M5 thumb screw"),
     ("sling_hole_inset", "mm", "17 mm", "[demo] Biatar sling: tab tip to eyelet centre (Darren, confirmed 2026-11-24)"),
-    ("sling_seat_d", "mm", "2 mm", "[demo] depth of the sling seat"),
+    ("sling_seat_d", "mm", "5.5 mm", "[demo] depth of the sling seat: tab thickness plus the screw head, so the head is recessed"),
     ("sling_seat_r", "mm", "(sling_tab_w + 1 mm) / 2", "[demo] derived: the seat's semicircular end, matching the tab's round tip"),
     ("sling_tip_x", "mm", "handstop_position + handstop_length - tip_round - 2 mm", "[demo] derived: where the tab's tip sits"),
     ("sling_hole_x", "mm", "sling_tip_x - sling_hole_inset", "[demo] derived: sling screw insert"),
@@ -173,7 +173,23 @@ DEMO_PARAMS = [
     ("rj_bolt_z", "mm", "9 mm", "[demo] rear bolts at +/- this"),
     ("rj_engage", "mm", "6 mm", "[demo] main-body material between the tongue tip and the nuts"),
     ("rj_nut_x0", "mm", "rear_split + rear_tongue_length + rj_engage", "[demo] derived"),
-    ("rj_bolt_len", "mm", "rj_nut_x0 + nut_slot_len + bolt_tail - rs_win_front_x", "[demo] derived: rear fastener length under the head"),
+    ("joint_cbore", "mm", "7 mm", "[demo] rear joint: the heads sit this deep in counterbores in the window wall (nothing proud to snag)"),
+    ("joint_head_h", "mm", "6 mm", "[demo] M6 socket head or nut height"),
+    ("rj_seat_x", "mm", "rs_win_front_x + joint_cbore", "[demo] derived: rear joint head seat"),
+    ("rj_bolt_len", "mm", "rj_nut_x0 + nut_slot_len + bolt_tail - rj_seat_x", "[demo] derived: rear fastener length under the head"),
+    # ---- no-snag rule (Darren 2026-11-24): every fastener head is recessed; each margin below must stay >= 0
+    ("act_head_h", "mm", "6 mm", "[demo] action bolt head height"),
+    ("chk_head_action", "mm", "act_cbore - act_head_h", "[demo] no-snag: action bolt heads below the underside"),
+    ("chk_head_rear_joint", "mm", "joint_cbore - joint_head_h", "[demo] no-snag: rear joint heads inside their counterbores"),
+    ("chk_head_front_joint", "mm", "forend_depth - 2 mm + front_tongue_y - joint_head_d / 2 - joint_head_clear",
+     "[demo] no-snag: front joint heads above the underside, inside their pocket"),
+    ("cap_head_d", "mm", "8.5 mm", "[demo] M5 low-head cap screw: head diameter"),
+    ("cap_head_h", "mm", "3.5 mm", "[demo] M5 low-head cap screw: head height"),
+    ("cap_cbore", "mm", "4 mm", "[demo] counterbore depth for the grip cap screw"),
+    ("chk_head_cap", "mm", "cap_cbore - cap_head_h", "[demo] no-snag: grip cap screw head below the cap"),
+    ("sling_tab_t", "mm", "2 mm", "[demo] PLACEHOLDER: thickness of the sling's end tab"),
+    ("sling_head_h", "mm", "3.5 mm", "[demo] sling screw: low-head M5 (a wing screw would stand proud)"),
+    ("chk_head_sling", "mm", "sling_seat_d - sling_tab_t - sling_head_h", "[demo] no-snag: sling screw head below the hand stop's underside"),
     ("front_tongue_height", "mm", "20 mm", "[manual] restyle: bolted joint"),
     ("front_tongue_y", "mm", "-46 mm", "[manual] restyle: head pocket leaves min_wall under the mag slots"),
     ("fj_bolt_z", "mm", "8 mm", "[demo] front bolts at +/- this"),
@@ -191,7 +207,7 @@ DEMO_PARAMS = [
     ("chk_rj_head_window", "mm", "(rs_win_top - (rear_tongue_y + joint_head_d / 2)) ", "[demo] rear heads fit under the window top"),
     # ---- TPU inserts (Darren 2026-11-24): surfaces shaped purely by the athlete's body are separate TPU parts
     ("tpu_wall", "mm", "4 mm", "[demo] thinnest TPU over the rigid grip core"),
-    ("cap_t", "mm", "5 mm", "[demo] rigid cap under the grip that locks the TPU sleeve"),
+    ("cap_t", "mm", "7 mm", "[demo] rigid cap under the grip that locks the TPU sleeve; thick enough to counterbore the screw head"),
     ("cap_screw_d", "mm", "5.5 mm", "[demo] M5 clearance hole in the cap"),
     ("stock_top_y", "mm", "-(act_bed_r - act_wall_h)", "[demo] derived: top edge of the stock beside the action, from the measured bed depth"),
     ("act_trig_depth", "mm", "act_bed_r + act_trig_drop", "[demo] derived: bore to the trigger pocket floor (measured 31 mm below the bed)"),
@@ -908,7 +924,12 @@ class Builder:
                       "rear_split - fit_loose", "rear_split + rear_tongue_length + fit_snug", "rear")
         rz = ("rj_bolt_z", "-rj_bolt_z")
         nut_slots("rear", "rj_nut_x0", "rear_tongue_y", rz, "-act_bed_r + 5 mm", both)
-        bolt_holes("rear", "rs_win_front_x - 1 mm", "rj_bolt_len + 1 mm", "rear_tongue_y", rz, (rear, main))
+        bolt_holes("rear", "rs_win_front_x - 1 mm", "rj_bolt_len + joint_cbore + 1 mm", "rear_tongue_y", rz, (rear, main))
+        sk = self.yz_sketch("rear_head_counterbores", "rs_win_front_x - 1 mm")
+        for z in rz:
+            self.circle(sk, f"-({z})", "rear_tongue_y", "joint_head_d + 2 * joint_head_clear")
+        self.done(sk)
+        self.extrude(rear, self.profiles(sk), CUT, dist="joint_cbore + 1 mm", name="rear_head_counterbores")
 
         # front: forestock tongue into the main body; heads in a pocket under the forestock,
         # open at the bottom, min_wall below the mag slots and outside the marking surface
@@ -948,7 +969,7 @@ class Builder:
             self.done(sk)
             self.extrude(hw, self.profiles(sk), NEW, dist="nut_m", name=f"{label}_nuts")
 
-        bolt("rear", "rs_win_front_x", 1, "rj_bolt_len", "rear_tongue_y", rz)
+        bolt("rear", "rj_seat_x", 1, "rj_bolt_len", "rear_tongue_y", rz)
         nuts("rear", "rj_nut_x0", "rear_tongue_y", rz)
         bolt("front", "fj_head_x", -1, "fj_bolt_len", "front_tongue_y", fz)
         nuts("front", "fj_nut_x0", "front_tongue_y", fz)
@@ -1106,6 +1127,7 @@ class Builder:
         self.done(sk)
         prs = sorted(self.profiles(sk), key=lambda pr: pr.areaProperties().area)
         self.extrude(cap, prs[-1], CUT, sym="2 * cap_t + 2 mm", name="cap_screw_hole")
+        drill("cap_screw_counterbore", f"{gbot} + cap_cbore", cx, "cap_head_d + 1 mm", "cap_cbore + 1 mm", (cap,))
         self.extrude(main, prs, CUT, sym="2 * (cap_t + insert_depth)", name="cap_insert_hole")
 
         if FUSE_BLOCK:

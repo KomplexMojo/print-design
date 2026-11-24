@@ -321,6 +321,18 @@ now builds it, still entirely from User Parameters. Review images come from `fus
 - **Rounds.** The guard is rounded as its own body and then joined, and the forestock hull is rounded before the hand
   stop is joined. The build reports no skipped rounds.
 
+### No-snag rule (Darren, 2026-11-24)
+Nothing on the stock may catch clothing, so every fastener head is recessed and each has a margin that must stay >= 0:
+| Fastener | How it is recessed | Check |
+|---|---|---|
+| Action bolts (2) | counterbores `act_cbore` deep in the underside | `chk_head_action` |
+| Rear joint (2) | counterbores `joint_cbore` deep in the butt window's front wall | `chk_head_rear_joint` |
+| Front joint (2) | inside the head pocket under the forestock | `chk_head_front_joint` |
+| Grip cap screw | low-head M5 in a `cap_cbore` counterbore; the cap is 7 mm thick to take it | `chk_head_cap` |
+| Sling screw | low-head M5; the seat is as deep as the tab plus the head (`sling_seat_d`) | `chk_head_sling` |
+
+A wing or thumb screw on the sling would stand proud, so the model assumes a low-head screw. `sling_tab_t` is a placeholder.
+
 ## 11. Action cradle (2026-11-24)
 Darren's requirement: the stock must take a real barrelled action on its mounting screws, and a different action must
 not mean redoing the design. Everything that depends on the action now lives in one component, `action_cradle`.
