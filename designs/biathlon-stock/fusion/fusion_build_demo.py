@@ -41,19 +41,36 @@ DATUM = 1000.0  # mm
 OBSOLETE_PARAMS = ("chk_pillar_mag", "act_receiver_d", "sling_tab_r", "rel_len", "guard_div",
                    "block_top_len", "grip_toe", "rs_rib_x", "saddle_h", "block_bolt_x", "block_insert_depth",
                    "chk_slot_pillar", "chk_key_slot", "act_slot_x0", "act_slot_x1", "act_slot_w",
-                   "wrist_facet_w", "wrist_facet_h", "chk_belly_step", "chk_rel_travel", "chk_bolts_centred", "sling_head_h", "finger_clear", "blk_scoop_d", "blk_win_web", "block_slot_r", "chk_block_top_flat", "collar_round", "rear_cap", "core_neck", "guard_gusset_r", "collar_h", "wrist_round",
+                   "wrist_facet_w", "wrist_facet_h", "chk_belly_step", "chk_rel_travel", "chk_bolts_centred", "sling_head_h", "finger_clear", "blk_scoop_d", "chk_comb_length", "chk_pad_pocket", "blk_win_web", "block_slot_r", "chk_block_top_flat", "collar_round", "rear_cap", "core_neck", "guard_gusset_r", "collar_h", "wrist_round",
                    "chk_gusset_bolt")
 FUSE_BLOCK = False   # True joins the standing block into the main body (the printed part)
 FUSE_ACTION = False  # True joins the action cradle into the main body (the printed part); False keeps it apart for review
 
 # r2 values (PR 3) that differ from the r1 registry defaults: written as [manual] so the
 # loader leaves them alone on the next run. New demo-only shape parameters are [demo].
+# What an athlete's fit record may change (Darren 2026-11-24): stock length (lop), cheek height (cheek_to_eye),
+# hand stop position, the two harness connector positions, and which side the spare magazines sit on. Every other
+# dimension is locked: the rows below pin the ones the loader would otherwise drive from body measurements.
+USER_FITTED = ("lop", "cheek_to_eye", "handstop_position", "harness_front_position", "harness_rear_position", "face_side")
 DEMO_PARAMS = [
+    ("buttplate_length", "mm", "150 mm", "[manual] locked: butt plate heel to toe"),
+    ("buttplate_drop", "mm", "60 mm", "[manual] locked: bore to butt-plate centre"),
+    ("buttplate_curve_radius", "mm", "150 mm", "[manual] locked: curve of the butt plate"),
+    ("hook_drop", "mm", "15 mm", "[manual] locked: butt-plate bottom to hook contact"),
+    ("hook_reach", "mm", "20 mm", "[manual] locked: hook tip behind the butt plate"),
+    ("grip_circumference", "mm", "125.7 mm", "[manual] locked: grip girth (the TPU sleeve is the athlete-specific part)"),
+    ("prone_hand_length", "mm", "80 mm", "[manual] locked: no longer drives geometry"),
+    ("mag_holder_count", "", "4", "[manual] locked: four spare magazines"),
+    ("barrel_d", "mm", "22 mm", "[manual] locked: set by the action, not by the athlete"),
+    ("chk_holder_joint", "mm", "mag_holder_start - front_split - 5 mm", "[manual] the spare-mag slots start ahead of the front joint"),
+    ("chk_holder_hand", "mm", "0 mm", "[manual] superseded: the prone pad sits below the slots, so the two no longer compete"),
+    ("chk_rail_handstop", "mm", "0 mm", "[manual] superseded by the chk_harness_* checks"),
+    ("mag_side", "", "-face_side", "[demo] side of the spare-mag slots: +1 = shooter's right, -1 = left. Default is the side away from the face; set +1 or -1 to choose. The slots always sit in the same place along the forestock"),
     ("sight_line_above_bore", "mm", "50 mm", "[manual] r2: AB + P puts the comb at the current 20 mm"),
-    ("forend_tip", "mm", "handstop_position + handstop_length + 53 mm", "[manual] derived: the forend ends a fixed distance ahead of the hand stop, so it follows measurement AG"),
+    ("forend_tip", "mm", "455 mm", "[manual] locked: forestock length; the hand stop moves along it"),
     ("forend_depth", "mm", "62 mm", "[manual] restyle: 6 mm webs above and below the mag slots; IBU MC 3.1.6.4 a"),
-    ("grip_depth", "mm", "grip_circumference / PI", "[manual] derived: grip depth equals the measured grip diameter M"),
-    ("grip_width", "mm", "0.9 * grip_circumference / PI", "[manual] derived: grip width is 90 % of the measured grip diameter M"),
+    ("grip_depth", "mm", "40 mm", "[manual] locked"),
+    ("grip_width", "mm", "36 mm", "[manual] locked"),
     ("grip_length", "mm", "80 mm", "[manual] Darren 2026-11-24: 5 mm of margin to the 140 mm line (chk_depth_grip)"),
     ("grip_angle_deg", "deg", "78 deg", "[manual] restyle: raked like current biathlon grips"),
     ("mag_holder_start", "mm", "222 mm", "[manual] r2 flush slots"),
@@ -72,7 +89,6 @@ DEMO_PARAMS = [
     ("tip_depth", "mm", "38 mm", "[demo] bore to the bottom of the forend nose"),
     ("comb_nose", "mm", "12 mm", "[demo] heel to comb, and comb to wrist ramps"),
     ("comb_length", "mm", "lop + action_rear - comb_nose - 18 mm", "[manual] derived: the comb always ends 18 mm behind the wrist's low point, whatever the length of pull"),
-    ("chk_comb_length", "mm", "comb_length - 80 mm", "[demo] enough comb left for the cheek"),
     ("comb_front_r", "mm", "14 mm", "[demo] round where the comb turns down to the wrist"),
     ("hook_thickness", "mm", "30 mm", "[demo] butt face to the hook's underside corner"),
     ("hook_round", "mm", "6 mm", "[demo]"),
@@ -242,7 +258,6 @@ DEMO_PARAMS = [
     ("fj_pocket_len", "mm", "34 mm", "[demo] head pocket length (socket room)"),
     ("fj_nut_x0", "mm", "front_split - front_tongue_length - fj_engage - nut_slot_len", "[demo] derived"),
     ("fj_head_x", "mm", "front_split + fj_head_wall", "[demo] derived: head seat face"),
-    ("chk_handstop_min", "mm", "handstop_position - prone_hand_length - (fj_head_x + fj_pocket_len) - 4 mm", "[demo] the hand stop and prone pad sit ahead of the front joint: sets the shortest AG the layout takes"),
     ("fj_seat_x", "mm", "fj_head_x - joint_cbore", "[demo] derived: front fastener seat, at the bottom of its counterbore"),
     ("fj_bolt_len", "mm", "fj_seat_x - (fj_nut_x0 - bolt_tail)", "[demo] derived: front fastener length under the head"),
     ("chk_fj_seat_wall", "mm", "fj_head_wall - joint_cbore - min_wall", "[demo] forestock left between the front counterbores and the tongue root"),
@@ -274,7 +289,16 @@ DEMO_PARAMS = [
     ("chk_trig_floor", "mm", "-finger_hole_y1 - act_trig_depth - min_wall", "[demo] floor under the trigger pocket"),
     ("pad_t", "mm", "3 mm", "[demo] prone hand pad thickness"),
     ("pad_wrap", "mm", "14 mm", "[demo] the pad wraps this far up each side of the forend"),
-    ("pad_x0", "mm", "handstop_position - prone_hand_length", "[demo] derived: the pad covers the prone hand (J) behind the hand stop"),
+    ("pad_x0", "mm", "fj_head_x + fj_pocket_len + 4 mm", "[demo] locked: the prone pad always starts just ahead of the front joint and runs to the hand stop, wherever that is"),
+    ("chk_handstop_min", "mm", "handstop_position - pad_x0 - 40 mm", "[demo] USER-FITTED RANGE: furthest back the hand stop can sit"),
+    ("chk_handstop_max", "mm", "forend_tip - tip_rake - 4 mm - tip_sweep_x", "[demo] USER-FITTED RANGE: furthest forward the hand stop can sit"),
+    ("harness_pitch", "mm", "20 mm", "[demo] PLACEHOLDER: spacing of the two inserts of each harness connector"),
+    ("harness_rear_y", "mm", "comb_top - 14 mm", "[demo] height of the rear harness connector, in the comb beam"),
+    ("chk_harness_front_lo", "mm", "harness_front_position - harness_pitch / 2 - front_split - 12 mm", "[demo] USER-FITTED RANGE: front harness connector ahead of the front joint"),
+    ("chk_harness_front_hi", "mm", "forend_tip - tip_rake - 10 mm - (harness_front_position + harness_pitch / 2)", "[demo] USER-FITTED RANGE: front harness connector behind the forend nose"),
+    ("chk_harness_rear_lo", "mm", "harness_rear_position - harness_pitch / 2 - (-lop + 25 mm)", "[demo] USER-FITTED RANGE: rear harness connector ahead of the butt plate"),
+    ("chk_harness_rear_hi", "mm", "butt_flare_x - (harness_rear_position + harness_pitch / 2) - 5 mm", "[demo] USER-FITTED RANGE: rear harness connector behind the butt's flare"),
+    ("chk_lop_min", "mm", "comb_length - 80 mm", "[demo] USER-FITTED RANGE: shortest stock the butt takes"),
     ("keel_w", "mm", "8 mm", "[demo] pad keel width at its neck"),
     ("keel_flare", "mm", "2 mm", "[demo] dovetail undercut per side"),
     ("keel_h", "mm", "5 mm", "[demo] pad keel height"),
@@ -303,7 +327,6 @@ DEMO_PARAMS = [
     ("belly_ramp", "mm", "30 mm", "[demo] length of the ramp from the wrist underside down to the belly, ahead of the guard opening"),
     ("chk_ramp_bolt", "mm", "act_screw_rear_x - (act_head_d + 3 mm) / 2 - (rel_front_x + belly_ramp)", "[demo] the rear bolt counterbore sits on the flat belly, ahead of the ramp"),
     ("spine_d", "mm", "10 mm", "[demo] rigid front strip of the grip above the guard bar, so the TPU edge there is full thickness"),
-    ("chk_pad_pocket", "mm", "pad_x0 - (fj_head_x + fj_pocket_len) - 4 mm", "[demo] the pad starts ahead of the joint's head pocket"),
     ("chk_pad_slots", "mm", "(mag_holder_top - mag_slot_h) - (-forend_fore_depth + pad_wrap) - 2 mm", "[demo] the pad stays below the mag slots"),
 ]
 
@@ -1184,12 +1207,12 @@ class Builder:
         self.fillet_z_edges(rear, f, "win_round", "butt_windows_round")
 
         # ---- forestock: flush horizontal spare-mag slots on the away side, patterned by count
-        away = self.offset_plane("away_side", "away_z")
+        away = self.offset_plane("mag_side_plane", "mag_side * body_width / 2")
         sk = self.sketch("mag_slot", away)
         self.rect(sk, "mag_holder_start", "mag_holder_start + mag_slot_len",
                   "mag_holder_top - mag_slot_h", "mag_holder_top")
         self.done(sk)
-        slot = self.extrude(fore, sk.profiles.item(0), CUT, dist="face_side * mag_slot_depth", name="mag_slot")
+        slot = self.extrude(fore, sk.profiles.item(0), CUT, dist="-mag_side * mag_slot_depth", name="mag_slot")
         forec = fore.component
         ents = adsk.core.ObjectCollection.create()
         ents.add(slot)
@@ -1201,14 +1224,14 @@ class Builder:
             adsk.fusion.PatternDistanceType.SpacingPatternDistanceType)
         forec.features.rectangularPatternFeatures.add(pin).name = "mag_slots"
 
-        face = self.offset_plane("face_side_plane", "face_z")
+        face = self.offset_plane("flute_side_plane", "-mag_side * body_width / 2")     # the side opposite the slots
         # flutes: shallow recesses on the line of the spare-mag slots. On the forestock's face side they mirror the
         # slots; on both sides of the main body they carry the line back toward the grip. They stop short of the
         # IBU marking surface. One line then runs from the butt windows through the main body to the forend.
         sk = self.sketch("mag_flute", face)
         self.rect(sk, "mag_holder_start", "mag_holder_start + mag_slot_len", "mag_holder_top - mag_slot_h", "mag_holder_top")
         self.done(sk)
-        fl = self.extrude(fore, sk.profiles.item(0), CUT, dist="-face_side * flute_d", name="mag_flute")
+        fl = self.extrude(fore, sk.profiles.item(0), CUT, dist="mag_side * flute_d", name="mag_flute")
         ents = adsk.core.ObjectCollection.create()
         ents.add(fl)
         rounded = self.fillet_z_edges(fore, fl, "mag_slot_r", "mag_flute_corners")
@@ -1225,12 +1248,19 @@ class Builder:
             fl = self.extrude(main, sk.profiles.item(0), CUT, start=start, dist="flute_d + 1 mm", name=f"body_flute_{nm}")
             self.fillet_z_edges(main, fl, "mag_slot_r", f"body_flute_corners_{nm}")
 
-        # harness rail on the face side: two heat-set inserts, opposite the mag slots
-        sk = self.sketch("harness_rail_inserts", face)
-        for h in ("harness_rail_hole_1", "harness_rail_hole_2"):
-            self.circle(sk, h, "harness_rail_y", "insert_hole_d")
+        # harness connectors (user-fitted): two heat-set inserts each, at the positions from the fit record. Front:
+        # on the forestock, on the side opposite the mag slots and above them. Rear: on the butt's comb beam.
+        sk = self.sketch("harness_front_inserts", face)
+        for sg in ("-", "+"):
+            self.circle(sk, f"harness_front_position {sg} harness_pitch / 2", "harness_rail_y", "insert_hole_d")
         self.done(sk)
-        self.extrude(fore, self.profiles(sk), CUT, dist="-face_side * insert_depth", name="harness_rail_inserts")
+        self.extrude(fore, self.profiles(sk), CUT, dist="mag_side * insert_depth", name="harness_front_inserts")
+        rear_face = self.offset_plane("harness_rear_plane", "cast_z - mag_side * comb_width / 2")
+        sk = self.sketch("harness_rear_inserts", rear_face)
+        for sg in ("-", "+"):
+            self.circle(sk, f"harness_rear_position {sg} harness_pitch / 2", "harness_rear_y", "insert_hole_d")
+        self.done(sk)
+        self.extrude(rear, self.profiles(sk), CUT, dist="mag_side * insert_depth", name="harness_rear_inserts")
 
         # ---- TPU prone hand pad: a 3 mm skin over the belly behind the hand stop. It sits in a
         # recess (so no edge can peel), wraps up both sides and snaps in with a dovetail keel.

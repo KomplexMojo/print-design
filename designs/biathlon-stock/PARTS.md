@@ -15,7 +15,7 @@ Every fastener is a standard catalogue size. Checked 2026-11-24.
 | 5 | Low-head socket cap screw | DIN 7984, M5 x 12, A2 | head 8.5 mm wide, 3.5 mm high | 1 | Grip cap | `cap_head_d`, `cap_head_h`, `cap_cbore` |
 | 6 | Low-head socket cap screw | DIN 7984, M5 x 20, A2 | head 8.5 mm wide, 3.5 mm high | 1 | Sling clamp plate | `clamp_t`, `sling_tab_t`, `sling_nut_y` |
 | 7 | Hex nut | ISO 4032, M5, A2 | 8 mm across flats, 4.7 mm thick | 1 | Captive in the hand stop, for the sling bolt | `m5_nut_af`, `m5_nut_m` |
-| 8 | Heat-set threaded insert, brass | M5, for a 6.4 mm hole, up to 9.5 mm long | | 3 | 1 in the grip core (cap screw), 2 in the forestock (harness rail) | `insert_hole_d`, `insert_depth` |
+| 8 | Heat-set threaded insert, brass | M5, for a 6.4 mm hole, up to 9.5 mm long | | 5 | 1 in the grip core (cap screw), 2 in the forestock and 2 in the butt (harness connectors) | `insert_hole_d`, `insert_depth` |
 | 9 | Aluminium tube | 10 mm outside x 1.5 mm wall (7 mm bore) | cut to 38.4 mm | 2 | Bedding pillars for the action bolts | `act_pillar_d`, `act_pillar_id`, `act_pillar_len` |
 
 Notes:

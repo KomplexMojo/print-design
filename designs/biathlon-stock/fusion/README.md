@@ -382,6 +382,28 @@ The butt, main body and forestock are separate prints, but they should read as o
 - **One colour.** All rigid printed parts share one appearance; TPU parts and the two small ASA parts differ.
 Fixed features did not move: the action cradle, bolt positions, magazine well, trigger pocket, joints and marking surface.
 
+### What is fitted to the athlete, and what is locked (Darren, 2026-11-24)
+Rifles are fitted by stock length and cheek height; everything that meets the action and barrel is a fixed dimension.
+So only these follow the fit record (`USER_FITTED` in `fusion_build_demo.py`):
+
+| Fitted item | Parameter | From | Range the layout takes | Check |
+|---|---|---|---|---|
+| Stock length | `lop` | AA | 215 mm and up; built at 256 and 368 mm | `chk_lop_min` |
+| Cheek height | `cheek_to_eye` (sets `comb_top`) | P | built at 24 and 36 mm | `chk_cheek` |
+| Hand stop position | `handstop_position` | AG | 307 to 365 mm from the trigger | `chk_handstop_min`, `chk_handstop_max` |
+| Front harness connector | `harness_front_position` | AH | 237 to 429 mm | `chk_harness_front_lo`, `chk_harness_front_hi` |
+| Rear harness connector | `harness_rear_position` | AI | from 35 mm ahead of the butt plate to the butt's flare | `chk_harness_rear_lo`, `chk_harness_rear_hi` |
+| Spare-mag side | `mag_side` (default: away from the face) | T | left or right; same place along the forestock | |
+
+Everything else is locked: the butt plate, hook, grip, guard, standing block frame, forestock length, magazine slots,
+joints and the whole action cradle. The loader would drive some of these from body measurements; the build script pins
+them with `[manual]` rows at the top of `DEMO_PARAMS`. The TPU covers remain the place for per-athlete shape.
+
+- **Hand stop.** The forestock is a fixed length; the hand stop slides along it and the prone pad always runs from just
+  ahead of the front joint to the hand stop.
+- **Harness connectors.** Two M5 heat-set inserts each (`harness_pitch` apart, placeholder), at the fitted positions: the
+  front pair on the forestock on the side opposite the mag slots, the rear pair in the butt's comb beam.
+
 ### Parameter tolerance (checked 2026-11-24)
 Ten driving measurements (AA, AC, AD, AE, AF, E, P, AG, J, M) were scaled together and one at a time.
 Standing height (A) drives nothing by itself; the stock follows the rifle-fit measurements.
