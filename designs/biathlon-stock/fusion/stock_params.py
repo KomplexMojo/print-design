@@ -93,7 +93,7 @@ ACTIONS = {
                    # outer pocket: its front step is 12.5 mm ahead of the opening (Darren's third depth photo, as read)
                    "act_trig_x0": "-48 mm", "act_trig_x1": "26.5 mm", "act_wall_h": "12 mm", "act_trig_drop": "31 mm",
                    "trigger_slot_x0": "-46 mm", "trigger_slot_x1": "14 mm", "trigger_slot_width": "20 mm",
-                   "act_screw_d": "6 mm", "act_head_d": "10 mm",
+                   "act_screw_d": "6 mm", "act_head_d": "10 mm", "act_pillar_d": "10 mm",
                    # Fortner straight-pull handle: long notch in the bolt-side wall, deeper step for the lever (placeholders)
                    "bolt_notch_x": "-50 mm", "bolt_notch_length": "70 mm", "bolt_notch_depth": "14 mm",
                    "act_bolt_step_len": "25 mm", "act_bolt_step_depth": "18 mm",
@@ -247,7 +247,7 @@ REGISTRY: list[P] = [
     _p("act_trig_drop", "mm", "31 mm", "action", "bottom of the receiver bed down to the trigger pocket floor"),
     _p("act_screw_d", "mm", "6 mm", "action", "action screw thread"),
     _p("act_head_d", "mm", "10 mm", "action", "action screw head"),
-    _p("act_pillar_d", "mm", "12 mm", "action", "aluminium bedding pillar outside diameter"),
+    _p("act_pillar_d", "mm", "10 mm", "action", "aluminium bedding pillar outside diameter (10 x 1.5 mm tube)"),
     _p("act_cbore", "mm", "8 mm", "action", "screw-head counterbore depth from the stock underside"),
     _p("cradle_wall", "mm", "5 mm", "action", "cradle wall each side of the receiver"),
     _p("cradle_floor", "mm", "3 mm", "action", "cradle material under the inlet floor"),

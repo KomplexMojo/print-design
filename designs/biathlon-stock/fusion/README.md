@@ -366,8 +366,9 @@ not mean redoing the design. Everything that depends on the action now lives in 
   channel (`barrel_r`), the step at `action_front`, half-round receiver bed (`act_bed_w`), front mounting bolt
   (`act_screw_front_x`), locating pin (`act_pin_x`), magazine well, seat for the steel cross key (`act_key_*`), rear
   mounting bolt (`act_screw_rear_x`) and a deeper rectangular trigger pocket (`act_trig_*`). The two bolts straddle the
-  magazine well. Both go in from below through stepped holes: a bolt-sized hole
-  (`act_bolt_hole_d`, 6.6 mm for the 6 mm bolt) from the bed down, opened to head size only for the bottom `act_cbore`; the rear one sits ahead of the guard leg and the
+  magazine well. Both go in from below through stepped holes: a bore for an aluminium bedding
+  pillar (10 × 1.5 mm tube, `act_pillar_d`, `act_pillar_id`, length `act_pillar_len`) from the bed down to the head seat,
+  opened to head size only for the bottom `act_cbore`, so the bolt clamps metal to metal; the rear one sits ahead of the guard leg and the
   standing block, so a key reaches it (`chk_pillar_guard`).
 - **Measured (2026-11-24):** bed width 30.19 mm, magazine well width 16.00 mm, action bolt holes 6.84 mm (two bolts),
   trigger pocket width 26.2 mm, and the trigger opening inside it, 20 × 60 mm. The opening goes through to the guard and

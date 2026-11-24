@@ -182,6 +182,11 @@ DEMO_PARAMS = [
     # ---- no-snag rule (Darren 2026-11-24): every fastener head is recessed; each margin below must stay >= 0
     ("act_head_h", "mm", "6 mm", "[demo] action bolt head height"),
     ("act_bolt_hole_d", "mm", "act_screw_d + 2 * fit_slide + hole_shrink", "[demo] derived: printed clearance hole for the 6 mm action bolt (the 6.84 mm reading was the hole in the wood stock)"),
+    ("act_pillar_id", "mm", "7 mm", "[demo] bedding pillar bore: 10 x 1.5 mm aluminium tube"),
+    ("act_pillar_bore_d", "mm", "act_pillar_d + 2 * fit_press", "[demo] derived: printed bore for the pillar, press fit and bedded in epoxy"),
+    ("act_pillar_len", "mm", "forend_depth - act_cbore - act_bed_r - 0.5 mm", "[demo] derived: pillar length, head seat to just under the receiver"),
+    ("chk_pillar_head", "mm", "act_pillar_d - act_head_d", "[demo] the bolt head bears on the pillar, not on plastic"),
+    ("chk_pillar_bolt", "mm", "act_pillar_id - act_screw_d - 0.5 mm", "[demo] the bolt passes through the pillar"),
     ("chk_bolt_clamp", "mm", "forend_depth - act_cbore - act_bed_r - 15 mm", "[demo] at least 15 mm of solid stock between the bolt head seat and the bed"),
     ("chk_head_action", "mm", "act_cbore - act_head_h", "[demo] no-snag: action bolt heads below the underside"),
     ("chk_head_rear_joint", "mm", "joint_cbore - joint_head_h", "[demo] no-snag: rear joint heads inside their counterbores"),
@@ -843,8 +848,9 @@ class Builder:
         self.done(sk)
         self.extrude(act, sk.profiles.item(0), CUT, sym="act_key_len", name="cross_key_seat")
 
-        # mounting bolts: a stepped hole each. A bolt-sized hole runs from the bed down, and only the bottom
-        # act_cbore of it is opened to head size, so the head clamps against solid stock (Darren 2026-11-24)
+        # mounting bolts: a stepped hole each. A bore for an aluminium bedding pillar runs from the bed down to
+        # the head seat, and only the bottom act_cbore is opened to head size. The bolt head bears on the
+        # pillar and the pillar on the receiver, metal to metal (Darren 2026-11-24)
         def xz_sketch(name, y_expr):
             y = self.ev(y_expr)
             pl = self.offset_plane(f"{name}_plane", y_expr, root.xZConstructionPlane)
@@ -864,7 +870,7 @@ class Builder:
                 self.extrude(occ, sk.profiles.item(0), CUT, dist=depth if down > 0 else f"-({depth})", name=name)
 
         for nm, x, under in (("front", "act_screw_front_x", fd), ("rear", "act_screw_rear_x", fd)):
-            drill(f"{nm}_bolt_hole", "0 mm", x, "act_bolt_hole_d", "ibu_depth_max", both)
+            drill(f"{nm}_pillar_bore", "0 mm", x, "act_pillar_bore_d", "ibu_depth_max", both)
             drill(f"{nm}_screw_counterbore", f"{under} + act_cbore", x, "act_head_d + 3 mm", "act_cbore + 2 mm", (main,))
         # flared magazine entry: a 45 degree funnel round the bottom of the well
         yb, x0, x1 = self.ev(fd), self.ev("mag_well_x0 - fit_slide") - 0.01, self.ev("mag_well_x1 + fit_slide") + 0.01
@@ -996,6 +1002,14 @@ class Builder:
         hw = root.occurrences.addNewComponent(adsk.core.Matrix3D.create())
         hw.component.name = "hardware_M6"
         occs["hw"] = hw
+        # bedding pillars (aluminium tube), shown so the stepped holes read correctly; not printed
+        sk, fx, down = xz_sketch("bedding_pillars", f"{fd} + act_cbore")
+        for x in ("act_screw_front_x", "act_screw_rear_x"):
+            self.circle(sk, fx(x), "0 mm", "act_pillar_d")
+            self.circle(sk, fx(x), "0 mm", "act_pillar_id")
+        self.done(sk)
+        rings = [pr for pr in self.profiles(sk) if pr.profileLoops.count == 2]
+        self.extrude(hw, rings, NEW, dist="-(act_pillar_len)" if down > 0 else "act_pillar_len", name="bedding_pillars")
 
         def bolt(label, seat, direction, length, y, zs):
             head_x0 = f"{seat} - 6 mm" if direction > 0 else seat
