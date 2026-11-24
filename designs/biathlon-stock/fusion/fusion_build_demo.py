@@ -40,8 +40,16 @@ DEMO_PARAMS = [
     ("mag_holder_top", "mm", "-17 mm", "[manual] r2 bore to top of the slots"),
     ("front_tongue_height", "mm", "22 mm", "[manual] r2"),
     ("front_tongue_y", "mm", "-40 mm", "[manual] r2: joint below the slots"),
-    ("finger_hole_x1", "mm", "40 mm", "[manual] r2 guard opening front"),
-    ("finger_hole_y0", "mm", "-110 mm", "[manual] r2 guard opening bottom"),
+    ("guard_front_x", "mm", "45 mm", "[demo] BIONIC-style: front of the small trigger-guard loop"),
+    ("guard_bar", "mm", "8 mm", "[demo] trigger-guard bar thickness"),
+    ("guard_rake", "mm", "10 mm", "[demo] guard front leans back by this much"),
+    ("finger_hole_x1", "mm", "guard_front_x - guard_rake - guard_bar", "[manual] guard opening front"),
+    ("finger_hole_y0", "mm", "-guard_bottom + guard_bar", "[manual] guard opening bottom"),
+    ("block_top_len", "mm", "60 mm", "[demo] palm rest: length where it joins the forend"),
+    ("block_width", "mm", "body_width", "[demo] palm rest width"),
+    ("body_round", "mm", "4 mm", "[demo] edge round on the side faces of every part"),
+    ("chk_mark_round", "mm", "forend_depth - 2 * body_round - marking_height",
+     "[demo] MC 3.1.6.4 l: flat side of the forend stays >= 40 mm high after rounding"),
     ("hook_thickness", "mm", "30 mm", "[demo] butt face to the hook's underside corner"),
     ("grip_top_y", "mm", "-50 mm", "[demo] bore to grip top"),
     ("grip_toe", "mm", "5 mm", "[demo] grip bottom corner cut"),
@@ -206,6 +214,27 @@ class Builder:
         sk.isComputeDeferred = False
         return sk
 
+    def round_sides(self, occ):
+        """Round every edge of the side faces (normal along Z) so the part is not square in section."""
+        comp = occ.component
+        body = comp.bRepBodies.item(0)
+        edges = adsk.core.ObjectCollection.create()
+        for f in body.faces:
+            g = f.geometry
+            if g.surfaceType == adsk.core.SurfaceTypes.PlaneSurfaceType and abs(g.normal.z) > 0.99:
+                for e in f.edges:
+                    edges.add(e)
+        fil = comp.features.filletFeatures
+        inp = fil.createInput()
+        try:
+            inp.edgeSetInputs.addConstantRadiusEdgeSet(edges, self.vi("body_round"), True)
+        except AttributeError:
+            inp.addConstantRadiusEdgeSet(edges, self.vi("body_round"), True)
+        try:
+            fil.add(inp).name = f"{comp.name}_round"
+        except Exception as e:
+            print(f"round_sides skipped on {comp.name}: {e}")
+
     def offset_plane(self, name, expr):
         inp = self.root.constructionPlanes.createInput()
         inp.setByOffset(self.root.xYConstructionPlane, self.vi(expr))
@@ -290,9 +319,9 @@ class Builder:
             ("forend_tip", "-tip_round"),
             ("forend_tip", "-forend_depth + tip_round"),
             ("forend_tip - tip_round", "-forend_depth"),
-            ("block_position + block_length / 2 + block_ramp", "-forend_depth"),  # shelf front
-            ("block_position + block_length / 2", "-block_height"),
-            (gf("-block_height"), "-block_height"),                               # guard bar to grip
+            ("guard_front_x", "-forend_depth"),                                    # guard loop front
+            ("guard_front_x - guard_rake", "-guard_bottom"),
+            (gf("-guard_bottom"), "-guard_bottom"),                               # guard bar to grip
             ("grip_front_x", "wrist_under_y"),
             ("-trigger_reach - grip_depth / 2 - wrist_ramp", "wrist_under_y"),
             ("wrist_heel_x", "wrist_heel_y"),
@@ -313,6 +342,8 @@ class Builder:
         self.extrude(occs["rear"], rear_pr, NEW, start="cast_z - comb_width / 2", dist="comb_width", name="rear_blank")
         self.extrude(occs["main"], main_pr, NEW, sym="body_width", name="main_blank")
         self.extrude(occs["fore"], fore_pr, NEW, sym="body_width", name="fore_blank")
+        for k in ("rear", "main", "fore"):
+            self.round_sides(occs[k])
 
         # ---- main body: grip (away skin, grip_width toward the face)
         sk = self.sketch("grip")
@@ -340,6 +371,22 @@ class Builder:
                        ("grip_front_x", "grip_top_y")])
         self.done(sk)
         self.extrude(occs["main"], sk.profiles.item(0), CUT, sym="2 * body_width", name="guard_opening")
+
+        # standing block: a palm rest hanging under the forend (BIONIC style), opened by a window
+        sk = self.sketch("palm_rest")
+        bp, tl, bl = "block_position", "block_top_len", "block_length"
+        self.poly(sk, [(f"{bp} - {tl} / 2", "-forend_depth + edge_chamfer"), (f"{bp} + {tl} / 2", "-forend_depth + edge_chamfer"),
+                       (f"{bp} + {bl} / 2", "-block_height + tip_round"), (f"{bp} + {bl} / 2 - tip_round", "-block_height"),
+                       (f"{bp} - {bl} / 2 + tip_round", "-block_height"), (f"{bp} - {bl} / 2", "-block_height + tip_round")])
+        self.done(sk)
+        self.extrude(occs["main"], sk.profiles.item(0), JOIN, sym="block_width", name="palm_rest")
+        sk = self.sketch("palm_rest_window")
+        self.poly(sk, [(f"{bp} - {tl} / 2 + frame_web", "-forend_depth - frame_web"),
+                       (f"{bp} + {tl} / 2 - frame_web", "-forend_depth - frame_web"),
+                       (f"{bp} + {bl} / 2 - 1.5 * frame_web", "-block_height + frame_web"),
+                       (f"{bp} - {bl} / 2 + 1.5 * frame_web", "-block_height + frame_web")])
+        self.done(sk)
+        self.extrude(occs["main"], sk.profiles.item(0), CUT, sym="2 * body_width", name="palm_rest_window")
 
         # action inlet, mag well, bolt notch (hardware side), barrel channel
         sk = self.sketch("action_inlet")

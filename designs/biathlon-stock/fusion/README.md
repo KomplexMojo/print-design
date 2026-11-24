@@ -259,6 +259,13 @@ parity check tolerates that only for parts that are fit-tested in Fusion first, 
       outside the marking surface (150–200 mm, on the main body). The bolt is 57 mm (M6 × 55 or 60).
     - Not yet done: teardrop roofs on the horizontal bolt holes, bolt-length rounding to stock sizes, and covers
       (not needed while the slots open under the action and barrel).
+  - **Main body closer to the Anschütz BIONIC** (Darren 2026-11-24: too square, too much material at
+    the magazine). The solid shelf under the action is gone. Now the forend is a constant `forend_depth` beam,
+    the magazine well opens through its bottom, and a small trigger-guard loop (`guard_front_x`, `guard_bar`,
+    `guard_rake`, `guard_bottom`) leaves open space in front of the grip. The standing block is a separate
+    palm rest hanging under the forend (`block_position`, `block_top_len`, `block_length`, `block_height`)
+    with a window through it. Side edges of every part are rounded (`body_round`; `chk_mark_round`
+    keeps the marking surface ≥ 40 mm flat). Main body went from 1399 to 903 cm³.
   - Demo shortcuts: no chamfers or grip rounding, no tie rods, no harness inserts, no mag window or
     finger scallops, and no teardrop holes.
 
