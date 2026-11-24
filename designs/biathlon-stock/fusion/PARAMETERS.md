@@ -125,7 +125,7 @@ One parameter per numeric value in the JSON. S and T (sides) are not parameters;
 | Fusion name | JSON `cad_parameters` key | Unit | Expression | Sample | Status | IBU | Note |
 |---|---|---|---|---|---|---|---|
 | `action_rear` |  | mm | `-105 mm` | -105 | action |  |  |
-| `action_front` |  | mm | `125 mm` | 125 | action |  |  |
+| `action_front` |  | mm | `128 mm` | 128 | action |  |  |
 | `action_width` |  | mm | `32 mm` | 32 | action |  |  |
 | `bore_above_inlet_floor` |  | mm | `20 mm` | 20 | fixed |  |  |
 | `sight_line_above_bore` |  | mm | `37 mm` | 37 | fixed |  | diopter + front globe |
@@ -139,9 +139,9 @@ One parameter per numeric value in the JSON. S and T (sides) are not parameters;
 | `finger_hole_x1` |  | mm | `38 mm` | 38 | fixed |  |  |
 | `finger_hole_y0` |  | mm | `-82 mm` | -82 | fixed |  |  |
 | `finger_hole_y1` |  | mm | `-45 mm` | -45 | fixed |  |  |
-| `mag_well_x0` |  | mm | `50 mm` | 50 | action |  |  |
-| `mag_well_x1` |  | mm | `100 mm` | 100 | action |  |  |
-| `mag_well_width` |  | mm | `22 mm` | 22 | action |  |  |
+| `mag_well_x0` |  | mm | `74 mm` | 74 | action |  |  |
+| `mag_well_x1` |  | mm | `114 mm` | 114 | action |  |  |
+| `mag_well_width` |  | mm | `16 mm` | 16 | action |  |  |
 | `spare_mag_t` |  | mm | `14 mm` | 14 | fixed |  | spare mag thickness (along X) |
 | `spare_mag_l` |  | mm | `32 mm` | 32 | fixed |  | spare mag length (lateral) |
 | `spare_mag_h` |  | mm | `50 mm` | 50 | fixed |  | spare mag height |

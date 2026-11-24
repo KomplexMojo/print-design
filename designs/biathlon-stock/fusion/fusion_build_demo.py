@@ -38,6 +38,8 @@ import adsk.core
 import adsk.fusion
 
 DATUM = 1000.0  # mm
+OBSOLETE_PARAMS = ("chk_pillar_mag", "chk_pillar_front", "act_receiver_d", "sling_tab_r", "rel_len", "guard_div",
+                   "block_top_len", "grip_toe", "rs_rib_x")
 FUSE_ACTION = False  # True joins the action cradle into the main body (the printed part); False keeps it apart for review
 
 # r2 values (PR 3) that differ from the r1 registry defaults: written as [manual] so the
@@ -193,10 +195,14 @@ DEMO_PARAMS = [
     ("cap_screw_d", "mm", "5.5 mm", "[demo] M5 clearance hole in the cap"),
     ("cradle_w", "mm", "action_width + 2 * cradle_wall", "[demo] derived: width of the action cradle and of its pocket in the main body"),
     ("cradle_y", "mm", "-(bore_above_inlet_floor + cradle_floor)", "[demo] derived: underside of the action cradle"),
-    ("act_bed_r", "mm", "act_receiver_d / 2 + fit_loose", "[demo] derived: bed radius, with room for bedding compound"),
+    ("act_bed_r", "mm", "act_bed_w / 2", "[demo] derived: bed radius, copied from the measured inlet of the existing stock"),
+    ("barrel_r", "mm", "barrel_d / 2 + barrel_float", "[demo] derived: half-round barrel channel radius"),
     ("chk_cradle_side", "mm", "(body_width - cradle_w) / 2 - 3 mm", "[demo] main-body wall beside the cradle"),
-    ("chk_pillar_mag", "mm", "act_screw_front_x - act_pillar_d / 2 - (mag_well_x1 + fit_slide) - 4 mm", "[demo] front pillar clear of the magazine well"),
-    ("chk_pillar_front", "mm", "action_front - (act_screw_front_x + act_pillar_d / 2)", "[demo] front pillar inside the cradle"),
+    ("chk_pillar_guard", "mm", "act_screw_front_x - act_pillar_d / 2 - guard_front_x", "[demo] front screw pillar ahead of the trigger guard leg"),
+    ("chk_slot_pillar", "mm", "act_slot_x0 - (act_screw_front_x + act_pillar_d / 2)", "[demo] through-slot ahead of the front pillar"),
+    ("chk_key_slot", "mm", "act_key_x - act_slot_x1 - 2 mm", "[demo] cross key ahead of the through-slot"),
+    ("chk_mag_key", "mm", "mag_well_x0 - fit_slide - (act_key_x + act_key_w) - 2 mm", "[demo] magazine well ahead of the cross key"),
+    ("chk_trig_floor", "mm", "-finger_hole_y1 - act_trig_depth - min_wall", "[demo] floor under the trigger pocket"),
     ("pad_t", "mm", "3 mm", "[demo] prone hand pad thickness"),
     ("pad_wrap", "mm", "14 mm", "[demo] the pad wraps this far up each side of the forend"),
     ("pad_x0", "mm", "handstop_position - prone_hand_length", "[demo] derived: the pad covers the prone hand (J) behind the hand stop"),
@@ -577,6 +583,10 @@ class Builder:
                 up.add(name, self.vi(expr), unit, comment)
             elif not p.comment.startswith("[manual]") or comment.startswith("[manual]") or p.comment.startswith(comment[:8]):
                 p.expression, p.comment = expr, comment
+        for name in OBSOLETE_PARAMS:          # left behind by earlier versions of this script
+            q = up.itemByName(name)
+            if q is not None:
+                q.deleteMe()  # after the loop above, so nothing still refers to it
 
     def clear(self):
         tl = self.d.timeline
@@ -719,21 +729,30 @@ class Builder:
         self.done(sk)
         self.extrude(act, sk.profiles.item(0), CUT, dist="action_front - action_rear", name="receiver_bed")
 
-        def through(name, x0, x1, y0, y1, width, dist=None):
+        def through(name, x0, x1, y0, y1, width, dist=None, comps=None):
             sk = self.sketch(name)
             self.rect(sk, x0, x1, y0, y1)
             self.done(sk)
-            for occ in both:
+            for occ in comps or both:
                 if dist:
                     self.extrude(occ, sk.profiles.item(0), CUT, dist=dist, name=name)
                 else:
                     self.extrude(occ, sk.profiles.item(0), CUT, sym=width, name=name)
 
-        through("trigger_slot", "trigger_slot_x0", "trigger_slot_x1", "finger_hole_y1 - 1 mm", "0 mm", "trigger_slot_width")
+        # 1827 F layout, muzzle to butt: receiver front step (action_front), locating pin, magazine well,
+        # steel cross key, narrow through-slot, front screw, deeper trigger pocket, rear screw
         through("mag_well", "mag_well_x0 - fit_slide", "mag_well_x1 + fit_slide", f"{fd} - 1 mm", "0 mm",
                 "mag_well_width + 2 * fit_slide")
+        through("release_slot", "act_slot_x0", "act_slot_x1", f"{fd} - 1 mm", "0 mm", "act_slot_w")
+        through("trigger_pocket", "act_trig_x0", "act_trig_x1", "-act_trig_depth", "0 mm", "act_trig_w")
+        through("trigger_slot", "trigger_slot_x0", "trigger_slot_x1", "finger_hole_y1 - 1 mm", "-act_trig_depth + 1 mm", "trigger_slot_width",
+                comps=(main,))
         through("bolt_notch", "bolt_notch_x - bolt_notch_length / 2", "bolt_notch_x + bolt_notch_length / 2",
                 "-bolt_notch_depth", "sight_line_above_bore", None, dist="bolt_dir * body_width")
+        sk = self.sketch("cross_key_seat")
+        self.rect(sk, "act_key_x", "act_key_x + act_key_w", "-act_bed_r - act_key_d", "-act_bed_r + 4 mm")
+        self.done(sk)
+        self.extrude(act, sk.profiles.item(0), CUT, sym="act_key_len", name="cross_key_seat")
 
         # bedding screws: vertical pillar bores from the bed to the underside, counterbored for the heads
         def xz_sketch(name, y_expr):
@@ -755,8 +774,9 @@ class Builder:
                 self.extrude(occ, sk.profiles.item(0), CUT, dist=depth if down > 0 else f"-({depth})", name=name)
 
         for nm, x, under in (("front", "act_screw_front_x", fd), ("rear", "act_screw_rear_x", "finger_hole_y1")):
-            drill(f"{nm}_pillar_bore", "0 mm", x, "act_pillar_d", "ibu_depth_max", both)
+            drill(f"{nm}_pillar_bore", "0 mm", x, "act_pillar_d", "ibu_depth_max", both if nm == "front" else (main,))
             drill(f"{nm}_screw_counterbore", f"{under} + act_cbore", x, "act_head_d + 3 mm", "act_cbore + 2 mm", (main,))
+        drill("locating_pin", "-act_bed_r + 1 mm", "act_pin_x", "act_pin_d", "7 mm", (act,))
 
         # sling seat (Biatar / Larsen type sling): the flat end tab nests in a pocket under the hand stop that
         # is as wide as the tab, with a semicircular end for its round tip. It is open to the rear, where the
@@ -775,11 +795,12 @@ class Builder:
         drill("block_bolt_hole", gbm, "block_bolt_x", "cap_screw_d", "block_height", (blk,))
         drill("block_mount_insert", f"{gbm} + block_insert_depth", "block_bolt_x", "insert_hole_d", "block_insert_depth + 1 mm", (main,))
 
-        sk = self.sketch("barrel_channel")
-        self.rect(sk, "action_front", "forend_tip + tip_round", "-(barrel_d / 2 + barrel_float)", "sight_line_above_bore")
+        sk = self.yz_sketch("barrel_channel", "action_front")   # half-round, like the receiver bed
+        self.poly(sk, [("-barrel_r", "5 mm"), ("-barrel_r", "0 mm"), ("barrel_r", "0 mm"), ("barrel_r", "5 mm")],
+                  arcs={1: "barrel_r"})
         self.done(sk)
         for occ in (main, fore):
-            self.extrude(occ, sk.profiles.item(0), CUT, sym="barrel_d + 2 * barrel_float", name="barrel_channel")
+            self.extrude(occ, sk.profiles.item(0), CUT, dist="forend_tip + tip_round - action_front", name="barrel_channel")
 
         # ---- joints (Darren 2026-11-23): each joint is a tongue that overlaps into a socket, locked
         # by two fasteners running along the stock (X). Hex nuts sit in printed slots in the main body
@@ -820,7 +841,7 @@ class Builder:
                       "rear_tongue_height", "rear_tongue_width",
                       "rear_split - fit_loose", "rear_split + rear_tongue_length + fit_snug", "rear")
         rz = ("rj_bolt_z", "-rj_bolt_z")
-        nut_slots("rear", "rj_nut_x0", "rear_tongue_y", rz, "-act_bed_r + 3 mm", both)
+        nut_slots("rear", "rj_nut_x0", "rear_tongue_y", rz, "-act_bed_r + 5 mm", both)
         bolt_holes("rear", "rs_win_front_x - 1 mm", "rj_bolt_len + 1 mm", "rear_tongue_y", rz, (rear, main))
 
         # front: forestock tongue into the main body; heads in a pocket under the forestock,
@@ -829,7 +850,7 @@ class Builder:
                       "front_tongue_height", "front_tongue_width",
                       "front_split - front_tongue_length - fit_snug", "front_split + fit_loose", "front")
         fz = ("fj_bolt_z", "-fj_bolt_z")
-        nut_slots("front", "fj_nut_x0", "front_tongue_y", fz, "-(barrel_d / 2 + barrel_float) + 1 mm")
+        nut_slots("front", "fj_nut_x0", "front_tongue_y", fz, "-barrel_r + 4 mm")
         bolt_holes("front", "fj_nut_x0 - bolt_tail", "fj_bolt_len", "front_tongue_y", fz, (main, fore))
 
         # hardware bodies so the joints read in the model; not printed
@@ -1060,7 +1081,7 @@ def report(design, occs, problems=(), log=print):
     bad = [up.item(i).name for i in range(up.count)
            if up.item(i).name.startswith("chk_") and up.item(i).value < -1e-7]
     log("chk_* below zero: " + (", ".join(bad) if bad else "none"))
-    for n in ("action_type", "act_receiver_d", "act_screw_front_x", "act_screw_rear_x", "cradle_w",
+    for n in ("action_type", "act_bed_w", "act_screw_front_x", "act_screw_rear_x", "cradle_w",
               "rj_bolt_len", "fj_bolt_len", "block_length", "block_position", "grip_round"):
         log(f"{n} = {up.itemByName(n).value * 10:.1f} mm")
     tl = design.timeline

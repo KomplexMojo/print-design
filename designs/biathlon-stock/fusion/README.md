@@ -333,13 +333,16 @@ not mean redoing the design. Everything that depends on the action now lives in 
 - **Interface.** The main body has a pocket of fixed section, `cradle_w` wide and down to `cradle_y`, from `action_rear`
   to `action_front`. The cradle fills it exactly and is fused to the main body for printing (`FUSE_ACTION = True` in
   `fusion_build_demo.py`; the default keeps it apart so it can be reviewed).
-- **Family 1 cradle** (round receiver): a half-round bed of radius `act_bed_r` with straight walls, a trigger slot, the
-  magazine well, the bolt notch, and two vertical pillar bores (`act_pillar_d`) at `act_screw_front_x` and
-  `act_screw_rear_x`, counterbored from the underside for the screw heads. The rear screw is reached inside the trigger guard.
+- **Family 1 cradle** (round receiver), laid out from Darren's own 1827 F stock, muzzle to butt: half-round barrel
+  channel (`barrel_r`), the step at `action_front`, half-round receiver bed (`act_bed_w`), locating pin (`act_pin_x`),
+  magazine well, seat for the steel cross key (`act_key_*`), narrow through-slot (`act_slot_*`), front screw
+  (`act_screw_front_x`), a deeper rectangular trigger pocket (`act_trig_*`) and the rear screw (`act_screw_rear_x`).
+  Both screws run in pillar bores (`act_pillar_d`, bore `act_screw_hole_d`), counterbored from the underside.
+- **Measured (2026-11-24):** bed width 30.19 mm, magazine well width 16.00 mm, action bolt holes 6.84 mm (two bolts),
+  trigger pocket width 26.2 mm. Every position, length and depth is still a placeholder.
 - **Adding an action.** Add a preset. Write a new cradle builder only if the receiver is not a round one on two vertical screws.
-- **Placeholders.** No dimensioned drawing of the 1827 F action is published, so every preset value is a placeholder.
-  Needed from the action out of its stock: receiver diameter and length, both screw positions from the trigger, thread and
-  head size, recoil lug, magazine well and trigger housing outline.
+- **Still needed**, all from the stock that fits the action: see the list in the project thread (positions from the
+  receiver's front step, pocket depths, cross key size, screw head size, barrel channel diameter).
 
 ## Files
 | File | Purpose |
