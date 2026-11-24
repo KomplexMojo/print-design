@@ -80,14 +80,15 @@ ACTIONS = {
         # Layout read from Darren's own 1827 F stock (2026-11-24), muzzle to butt: round barrel channel, step,
         # receiver bed, FRONT mounting bolt, locating pin, magazine well, steel cross key, REAR mounting bolt,
         # trigger pocket. The two bolts straddle the magazine well, centred on it, heads recessed from below
-        # (Darren, 2026-11-24). MEASURED: act_bed_w, mag_well_width, act_screw_hole_d, act_trig_w, trigger opening 20 x 60. Every
+        # (Darren, 2026-11-24). MEASURED: act_bed_w, mag_well_width, act_screw_hole_d, act_trig_w, trigger opening 20 x 60, stock top to pocket floor 43, bed bottom to pocket floor 31. Every
         # position, length and depth is still a placeholder.
         "values": {"act_bed_w": "30.19 mm", "mag_well_width": "16 mm", "act_screw_hole_d": "6.84 mm", "act_trig_w": "26.2 mm",
                    "action_rear": "-105 mm", "action_front": "146 mm", "action_width": "32 mm",
                    "act_screw_front_x": "136 mm", "act_pin_x": "122 mm", "mag_well_x0": "74 mm", "mag_well_x1": "114 mm",
                    "act_key_x": "62 mm", "act_screw_rear_x": "52 mm",
                    # trigger opening: 20 x 60 mm (Darren, measured), ending at the rear of the guard opening by the grip
-                   "act_trig_x0": "-48 mm", "act_trig_x1": "16 mm",
+                   # outer pocket: its front step is 12.5 mm ahead of the opening (Darren's third depth photo, as read)
+                   "act_trig_x0": "-48 mm", "act_trig_x1": "26.5 mm", "act_wall_h": "12 mm", "act_trig_drop": "31 mm",
                    "trigger_slot_x0": "-46 mm", "trigger_slot_x1": "14 mm", "trigger_slot_width": "20 mm",
                    "act_screw_d": "6 mm", "act_head_d": "10 mm"},
     },
@@ -228,7 +229,8 @@ REGISTRY: list[P] = [
     _p("act_trig_x0", "mm", "-42 mm", "action", "trigger to the rear of the trigger pocket"),
     _p("act_trig_x1", "mm", "22 mm", "action", "trigger to the front of the trigger pocket"),
     _p("act_trig_w", "mm", "26.2 mm", "action", "trigger pocket width"),
-    _p("act_trig_depth", "mm", "33 mm", "action", "bore to the trigger pocket floor"),
+    _p("act_wall_h", "mm", "12 mm", "action", "stock top edge down to the bottom of the receiver bed"),
+    _p("act_trig_drop", "mm", "31 mm", "action", "bottom of the receiver bed down to the trigger pocket floor"),
     _p("act_screw_d", "mm", "6 mm", "action", "action screw thread"),
     _p("act_head_d", "mm", "10 mm", "action", "action screw head"),
     _p("act_pillar_d", "mm", "12 mm", "action", "aluminium bedding pillar outside diameter"),

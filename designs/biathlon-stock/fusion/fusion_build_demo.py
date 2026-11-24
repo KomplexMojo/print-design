@@ -60,8 +60,9 @@ DEMO_PARAMS = [
     ("min_wall", "mm", "6 mm", "[demo] thinnest structural web allowed in PAHT-CF"),
     # ---- body section
     ("body_round", "mm", "6 mm", "[demo] edge round on the side faces of every rigid part"),
-    ("belly_w", "mm", "12 mm", "[demo] belly facet under the forend: width taken off the bottom face"),
-    ("belly_h", "mm", "8 mm", "[demo] belly facet: height taken off the side face"),
+    ("belly_w", "mm", "10 mm", "[demo] belly facet under the forend: width taken off the bottom face"),
+    ("belly_h", "mm", "5 mm", "[demo] belly facet: height taken off the side face (must stay under the step up to the wrist: chk_belly_step)"),
+    ("pocket_r", "mm", "5 mm", "[demo] corner radius of the inlet pockets and openings, as on Darren's stock (estimated 4 to 6 mm from photos)"),
     ("chk_mark_round", "mm", "forend_depth - body_round - belly_h - 2 mm - marking_height",
      "[demo] MC 3.1.6.4 l: flat side of the forend stays >= 40 mm high after rounding and the belly facet"),
     ("tip_round", "mm", "8 mm", "[demo] forend nose and hook corner"),
@@ -92,7 +93,7 @@ DEMO_PARAMS = [
     ("chk_depth_grip", "mm", "ibu_depth_max + grip_top_y - grip_length",
      "[demo] MC 3.1.6.4 a read strictly: grip bottom within 140 mm of the bore"),
     # ---- trigger guard and standing block (Darren 2026-11-24: the block is an extension of the guard base)
-    ("guard_bottom", "mm", "83 mm", "[manual] rework: guard raised tight under the body so the hand wraps the grip; IBU MC 3.1.6.4 a"),
+    ("guard_open_h", "mm", "28 mm", "[demo] trigger guard opening height, for a gloved finger"),
     ("guard_front_x", "mm", "34 mm", "[demo] front of the guard's front leg, behind the mag well"),
     ("guard_bar", "mm", "10 mm", "[demo] trigger-guard rail thickness (the standing block hangs from it)"),
     ("guard_rake", "mm", "10 mm", "[demo] guard front leg thickness over the bar"),
@@ -105,7 +106,7 @@ DEMO_PARAMS = [
      "[demo] derived: rear face of the standing block"),
     ("blk_rake", "mm", "10 mm", "[demo] block rear face is undercut by this much, for the fingers"),
     ("blk_front_rake", "mm", "2 mm", "[demo] block and front-leg face lean (near vertical)"),
-    ("block_slot_r", "mm", "10 mm", "[demo] end radius of the oblong slot through the block"),
+    ("block_slot_r", "mm", "8 mm", "[demo] end radius of the oblong slot through the block"),
     ("block_width", "mm", "40 mm", "[demo] standing block width"),
     ("block_round", "mm", "8 mm", "[demo] edge round on the block"),
     ("block_corner_r", "mm", "14 mm", "[demo] round of the block's bottom corners"),
@@ -192,6 +193,8 @@ DEMO_PARAMS = [
     ("tpu_wall", "mm", "4 mm", "[demo] thinnest TPU over the rigid grip core"),
     ("cap_t", "mm", "5 mm", "[demo] rigid cap under the grip that locks the TPU sleeve"),
     ("cap_screw_d", "mm", "5.5 mm", "[demo] M5 clearance hole in the cap"),
+    ("stock_top_y", "mm", "-(act_bed_r - act_wall_h)", "[demo] derived: top edge of the stock beside the action, from the measured bed depth"),
+    ("act_trig_depth", "mm", "act_bed_r + act_trig_drop", "[demo] derived: bore to the trigger pocket floor (measured 31 mm below the bed)"),
     ("cradle_w", "mm", "action_width + 2 * cradle_wall", "[demo] derived: width of the action cradle and of its pocket in the main body"),
     ("cradle_y", "mm", "-(bore_above_inlet_floor + cradle_floor)", "[demo] derived: underside of the action cradle"),
     ("act_bed_r", "mm", "act_bed_w / 2", "[demo] derived: bed radius, copied from the measured inlet of the existing stock"),
@@ -220,6 +223,15 @@ DEMO_PARAMS = [
     ("belly_sweep_r", "mm", "30 mm", "[demo] sweep radius at both ends of the drop-belly ramp"),
     ("wrist_under_y", "mm", "rear_tongue_y - rear_tongue_height / 2 - min_wall - 1 mm", "[demo] derived: wrist underside, min_wall below the rear joint socket"),
     ("grip_top_y", "mm", "wrist_under_y", "[demo] derived: the grip hangs from the wrist underside"),
+    ("finger_hole_y1", "mm", "wrist_under_y", "[manual] guard opening top: level with the wrist underside, which the measured trigger pocket floor sets"),
+    ("guard_bottom", "mm", "-finger_hole_y1 + guard_open_h + guard_bar", "[manual] derived: rail tight under the opening; IBU MC 3.1.6.4 a"),
+    ("finger_hole_y0", "mm", "-guard_bottom + guard_bar", "[manual] guard opening bottom"),
+    ("mag_flare", "mm", "4 mm", "[demo] flare round the magazine well's bottom entry (45 degrees), so magazines guide in"),
+    ("chk_flare_bolts", "mm", "(mag_well_x0 - mag_flare) - (act_screw_rear_x + (act_head_d + 3 mm) / 2) - 2 mm",
+     "[demo] the flare stays clear of the rear bolt counterbore (the front one is the same distance away)"),
+    ("chk_flare_belly", "mm", "body_width / 2 - belly_w - (mag_well_width / 2 + fit_slide + mag_flare) - 1 mm",
+     "[demo] the flare stays on the flat of the belly"),
+    ("chk_belly_step", "mm", "forend_depth + wrist_under_y - belly_h - 1 mm", "[demo] the belly facet ends below the wrist underside"),
     ("spine_d", "mm", "10 mm", "[demo] rigid front strip of the grip above the guard bar, so the TPU edge there is full thickness"),
     ("chk_pad_pocket", "mm", "pad_x0 - (fj_head_x + fj_pocket_len) - 4 mm", "[demo] the pad starts ahead of the joint's head pocket"),
     ("chk_pad_slots", "mm", "(mag_holder_top - mag_slot_h) - (-forend_fore_depth + pad_wrap) - 2 mm", "[demo] the pad stays below the mag slots"),
@@ -517,6 +529,19 @@ class Builder:
         ok, p = e.evaluator.getPointAtParameter((t0 + t1) / 2)
         return p
 
+    def fillet_y_edges(self, occ, feature, r, name):
+        """Round the vertical inside corners of a pocket or opening that a cut feature made."""
+        picked = {}
+        for f in feature.faces:
+            for e in f.edges:
+                g = e.geometry
+                if g.curveType != adsk.core.Curve3DTypes.Line3DCurveType or not self.sharp(e):
+                    continue
+                a, b = g.startPoint, g.endPoint
+                if abs(a.x - b.x) < 1e-4 and abs(a.z - b.z) < 1e-4 and abs(a.y - b.y) > 0.05:
+                    picked[e.tempId] = e
+        return self.fillet(occ.component, [(list(picked.values()), r)], name)
+
     def fillet_z_edges(self, occ, feature, r, name):
         """Round the corners (edges along Z) that a cut feature made: geometric windows with soft corners."""
         picked = {}
@@ -556,7 +581,7 @@ class Builder:
                     break
                 n = next(fc.geometry.normal for fc in f.faces
                          if fc.geometry.surfaceType == adsk.core.SurfaceTypes.PlaneSurfaceType)
-                if abs(n.y) > abs(n.z):       # belly_w lies on the bottom face: correct way round
+                if (abs(n.y) > abs(n.z)) == (self.ev(w) > self.ev(h)):   # w lies on the bottom face: correct way round
                     f.name = f"{label}_belly_{'p' if sign > 0 else 'n'}"
                     break
                 f.deleteMe()
@@ -630,24 +655,22 @@ class Builder:
             ("-lop + comb_nose", "comb_top"),                                     # 1
             ("-lop + comb_length", "comb_top"),                                   # 2 comb front
             ("action_rear - comb_nose", "wrist_top"),                             # 3 wrist low point
-            ("rear_split", "0 mm"),                                               # 4 ramp ends on the joint line
-            ("forend_tip", "0 mm"),                                               # 5 nose top
+            ("rear_split", "stock_top_y"),                                               # 4 ramp ends on the joint line
+            ("forend_tip", "stock_top_y"),                                               # 5 nose top
             ("forend_tip - tip_rake", "-tip_depth"),                              # 6 nose bottom
             ("tip_sweep_x", ffd),                                                 # 7 underside turns up
             ("belly_x1", ffd),                                                    # 8 drop-belly ramp, front
             ("belly_x0", fd),                                                     # 9 drop-belly ramp, rear
             ("rel_front_x", fd),                                                  # 10 step behind the mag well
             ("rel_front_x", "finger_hole_y1"),                                    # 11 release window, top front
-            (gf("finger_hole_y1"), "finger_hole_y1"),                             # 12 guard opening, top rear
-            ("grip_front_x", "wrist_under_y"),                                    # 13 grip front, top
-            (f"{gb('wrist_under_y')} - wrist_ramp", "wrist_under_y"),             # 14 behind the grip
-            ("wrist_heel_x", "wrist_heel_y"),                                     # 15
-            ("-lop + hook_thickness", "hook_tip_y - tip_round"),                  # 16
-            ("-lop - hook_reach + hook_round", "hook_tip_y - hook_round"),        # 17
-            ("-lop - hook_reach", "hook_tip_y"),                                  # 18 hook tip
-            ("-lop", "butt_bot_y"),                                               # 19 toe
+            (f"{gb('wrist_under_y')} - wrist_ramp", "wrist_under_y"),             # 12 behind the grip
+            ("wrist_heel_x", "wrist_heel_y"),                                     # 13
+            ("-lop + hook_thickness", "hook_tip_y - tip_round"),                  # 14
+            ("-lop - hook_reach + hook_round", "hook_tip_y - hook_round"),        # 15
+            ("-lop - hook_reach", "hook_tip_y"),                                  # 16 hook tip
+            ("-lop", "butt_bot_y"),                                               # 17 toe
         ]
-        self.poly(sk, P, arcs={18: "hook_radius", 19: "buttplate_curve_radius"})
+        self.poly(sk, P, arcs={16: "hook_radius", 17: "buttplate_curve_radius"})
         for xs in ("rear_split", "front_split"):
             self.poly(sk, [(xs, "sight_line_above_bore + 50 mm"), (xs, "-ibu_depth_max - 60 mm")], closed=False)
         self.done(sk)
@@ -661,7 +684,7 @@ class Builder:
 
         # ---- flowing profile: each outline corner gets its own radius (convex ones >= body_round)
         self.corners(rear, [(*P[1], "comb_nose"), (*P[2], "comb_front_r"), (*P[3], "body_round"),
-                            (*P[15], "wrist_heel_r"), (*P[16], "hook_round + body_round"), (*P[19], "hook_round")], "rear")
+                            (*P[13], "wrist_heel_r"), (*P[14], "hook_round + body_round"), (*P[17], "hook_round")], "rear")
         self.corners(fore, [(*P[5], "tip_round"), (*P[6], "tip_round + body_round"),
                             (*P[8], "belly_sweep_r"), (*P[9], "belly_sweep_r")], "fore")
 
@@ -723,7 +746,7 @@ class Builder:
         self.done(sk)
         self.extrude(main, sk.profiles.item(0), CUT, sym="cradle_w", name="cradle_pocket")
         sk = self.sketch("cradle_block")
-        self.rect(sk, "action_rear", "action_front", "cradle_y", "0 mm")
+        self.rect(sk, "action_rear", "action_front", "cradle_y", "stock_top_y")
         self.done(sk)
         self.extrude(act, sk.profiles.item(0), NEW, sym="cradle_w", name="cradle_block")
 
@@ -733,23 +756,25 @@ class Builder:
         self.done(sk)
         self.extrude(act, sk.profiles.item(0), CUT, dist="action_front - action_rear", name="receiver_bed")
 
-        def through(name, x0, x1, y0, y1, width, dist=None, comps=None):
+        def through(name, x0, x1, y0, y1, width, dist=None, comps=None, corners=False):
             sk = self.sketch(name)
             self.rect(sk, x0, x1, y0, y1)
             self.done(sk)
             for occ in comps or both:
                 if dist:
-                    self.extrude(occ, sk.profiles.item(0), CUT, dist=dist, name=name)
+                    f = self.extrude(occ, sk.profiles.item(0), CUT, dist=dist, name=name)
                 else:
-                    self.extrude(occ, sk.profiles.item(0), CUT, sym=width, name=name)
+                    f = self.extrude(occ, sk.profiles.item(0), CUT, sym=width, name=name)
+                if corners:
+                    self.fillet_y_edges(occ, f, "pocket_r", f"{name}_corners_{occ.component.name}")
 
         # 1827 F layout, muzzle to butt: receiver front step (action_front), front mounting bolt, locating pin,
         # magazine well, steel cross key, rear mounting bolt, deeper trigger pocket
         through("mag_well", "mag_well_x0 - fit_slide", "mag_well_x1 + fit_slide", f"{fd} - 1 mm", "0 mm",
-                "mag_well_width + 2 * fit_slide")
-        through("trigger_pocket", "act_trig_x0", "act_trig_x1", "-act_trig_depth", "0 mm", "act_trig_w")
+                "mag_well_width + 2 * fit_slide", corners=True)
+        through("trigger_pocket", "act_trig_x0", "act_trig_x1", "-act_trig_depth", "0 mm", "act_trig_w", corners=True)
         through("trigger_slot", "trigger_slot_x0", "trigger_slot_x1", "finger_hole_y1 - 1 mm", "-act_trig_depth + 1 mm", "trigger_slot_width",
-                comps=(main,))
+                comps=(main,), corners=True)
         through("bolt_notch", "bolt_notch_x - bolt_notch_length / 2", "bolt_notch_x + bolt_notch_length / 2",
                 "-bolt_notch_depth", "sight_line_above_bore", None, dist="bolt_dir * body_width")
         sk = self.sketch("cross_key_seat")
@@ -779,6 +804,25 @@ class Builder:
         for nm, x, under in (("front", "act_screw_front_x", fd), ("rear", "act_screw_rear_x", fd)):
             drill(f"{nm}_pillar_bore", "0 mm", x, "act_pillar_d", "ibu_depth_max", both)
             drill(f"{nm}_screw_counterbore", f"{under} + act_cbore", x, "act_head_d + 3 mm", "act_cbore + 2 mm", (main,))
+        # flared magazine entry: a 45 degree funnel round the bottom of the well
+        yb, x0, x1 = self.ev(fd), self.ev("mag_well_x0 - fit_slide") - 0.01, self.ev("mag_well_x1 + fit_slide") + 0.01
+        zw = self.ev("mag_well_width / 2 + fit_slide") + 0.01
+        rim = adsk.core.ObjectCollection.create()
+        for e in body("main").edges:
+            bb = e.boundingBox
+            if (abs(bb.minPoint.y - yb) < 1e-3 and abs(bb.maxPoint.y - yb) < 1e-3 and bb.minPoint.x > x0 and bb.maxPoint.x < x1
+                    and bb.minPoint.z > -zw and bb.maxPoint.z < zw):
+                rim.add(e)
+        if rim.count:
+            cf = main.component.features.chamferFeatures
+            inp = cf.createInput2()
+            inp.chamferEdgeSets.addEqualDistanceChamferEdgeSet(rim, self.vi("mag_flare"), True)
+            try:
+                cf.add(inp).name = "mag_well_flare"
+            except Exception as e:
+                self.problems.append(f"mag_well_flare: {str(e).splitlines()[0][:120]}")
+        else:
+            self.problems.append("mag_well_flare: rim not found")
         drill("locating_pin", "-act_bed_r + 1 mm", "act_pin_x", "act_pin_d", "7 mm", (act,))
 
         # sling seat (Biatar / Larsen type sling): the flat end tab nests in a pocket under the hand stop that

@@ -342,6 +342,18 @@ not mean redoing the design. Everything that depends on the action now lives in 
 - **Measured (2026-11-24):** bed width 30.19 mm, magazine well width 16.00 mm, action bolt holes 6.84 mm (two bolts),
   trigger pocket width 26.2 mm, and the trigger opening inside it, 20 × 60 mm. The opening goes through to the guard and
   ends at the rear of the guard opening by the grip (`chk_trig_rear`). Other positions, lengths and depths are placeholders.
+- **Depths (measured 2026-11-24).** Stock top edge to the trigger pocket floor is 43 mm and bed bottom to that floor is
+  31 mm (`act_trig_drop`), so the bed bottom is 12 mm below the stock top (`act_wall_h`). From these, `stock_top_y` puts
+  the stock's top edge 3.1 mm below the bore, and `act_trig_depth` puts the pocket floor 46.1 mm below it. The pocket's
+  front step is 12.5 mm ahead of the 20 × 60 opening (as read from the third photo).
+- **Consequence for the body.** The real pocket is deeper than the earlier underside, so the guard opening's ceiling is
+  now level with the wrist underside (`finger_hole_y1 = wrist_under_y`, 55 mm below the bore), which leaves 8.9 mm of
+  floor under the pocket (`chk_trig_floor`). `guard_bottom` is derived from a 28 mm opening (`guard_open_h`) and is 93 mm.
+- **Rounded corners.** The vertical corners of the trigger pocket, the trigger opening and the magazine well are rounded
+  by `pocket_r` (5 mm, estimated from photos).
+- **Flared magazine entry.** The bottom of the magazine well has a 45 degree funnel, `mag_flare` wide, clear of both bolt
+  counterbores (`chk_flare_bolts`) and inside the flat of the belly (`chk_flare_belly`).
+- **Scan to come.** Darren will supply a 3D scan of the inlet; it then becomes the primary source for the cradle.
 - **Adding an action.** Add a preset. Write a new cradle builder only if the receiver is not a round one on two vertical screws.
 - **Still needed**, all from the stock that fits the action: see the list in the project thread (positions from the
   receiver's front step, pocket depths, cross key size, screw head size, barrel channel diameter).
