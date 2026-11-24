@@ -208,8 +208,8 @@ DEMO_PARAMS = [
     ("chk_bolt_clamp", "mm", "forend_depth - act_cbore - act_bed_r - 15 mm", "[demo] at least 15 mm of solid stock between the bolt head seat and the bed"),
     ("chk_head_action", "mm", "act_cbore - act_head_h", "[demo] no-snag: action bolt heads below the underside"),
     ("chk_head_rear_joint", "mm", "joint_cbore - joint_head_h", "[demo] no-snag: rear joint heads inside their counterbores"),
-    ("chk_head_front_joint", "mm", "forend_depth - 2 mm + front_tongue_y - joint_head_d / 2 - joint_head_clear",
-     "[demo] no-snag: front joint heads above the underside, inside their pocket"),
+    ("joint_cbore_d", "mm", "13.5 mm", "[demo] counterbore diameter for the joint fasteners: an M6 nut or head plus a thin-wall socket"),
+    ("chk_head_front_joint", "mm", "joint_cbore - joint_head_h", "[demo] no-snag: front joint heads inside their counterbores"),
     ("cap_head_d", "mm", "8.5 mm", "[demo] M5 low-head cap screw: head diameter"),
     ("cap_head_h", "mm", "3.5 mm", "[demo] M5 low-head cap screw: head height"),
     ("cap_cbore", "mm", "4 mm", "[demo] counterbore depth for the grip cap screw"),
@@ -225,14 +225,17 @@ DEMO_PARAMS = [
     ("chk_depth_clamp", "mm", "ibu_depth_max - (forend_fore_depth + handstop_height + clamp_t)", "[demo] MC 3.1.6.4 a: hand stop with the clamp plate"),
     ("front_tongue_height", "mm", "20 mm", "[manual] restyle: bolted joint"),
     ("front_tongue_y", "mm", "-46 mm", "[manual] restyle: head pocket leaves min_wall under the mag slots"),
-    ("fj_bolt_z", "mm", "8 mm", "[demo] front bolts at +/- this"),
+    ("fj_bolt_z", "mm", "10 mm", "[demo] front fasteners at +/- this (room for a counterbore each)"),
     ("fj_engage", "mm", "6 mm", "[demo] main-body material between the tongue tip and the nuts"),
-    ("fj_head_wall", "mm", "8 mm", "[demo] forestock material between the tongue root and the head pocket"),
-    ("fj_pocket_len", "mm", "40 mm", "[demo] head pocket length (socket room)"),
+    ("fj_head_wall", "mm", "14 mm", "[demo] forestock material between the tongue root and the head pocket (takes the counterbores)"),
+    ("front_tongue_width", "mm", "34 mm", "[manual] bolted joint: both fasteners inside the tongue"),
+    ("fj_pocket_len", "mm", "34 mm", "[demo] head pocket length (socket room)"),
     ("fj_nut_x0", "mm", "front_split - front_tongue_length - fj_engage - nut_slot_len", "[demo] derived"),
     ("fj_head_x", "mm", "front_split + fj_head_wall", "[demo] derived: head seat face"),
-    ("fj_bolt_len", "mm", "fj_head_x - (fj_nut_x0 - bolt_tail)", "[demo] derived: front fastener length under the head"),
-    ("chk_fj_pocket_slots", "mm", "(mag_holder_top - mag_slot_h) - (front_tongue_y + joint_head_d / 2 + joint_head_clear) - min_wall",
+    ("fj_seat_x", "mm", "fj_head_x - joint_cbore", "[demo] derived: front fastener seat, at the bottom of its counterbore"),
+    ("fj_bolt_len", "mm", "fj_seat_x - (fj_nut_x0 - bolt_tail)", "[demo] derived: front fastener length under the head"),
+    ("chk_fj_seat_wall", "mm", "fj_head_wall - joint_cbore - min_wall", "[demo] forestock left between the front counterbores and the tongue root"),
+    ("chk_fj_pocket_slots", "mm", "(mag_holder_top - mag_slot_h) - (front_tongue_y + joint_cbore_d / 2 + joint_head_clear) - min_wall",
      "[demo] head pocket keeps >= min_wall under the mag slots"),
     ("chk_fj_tongue_floor", "mm", "forend_depth + front_tongue_y - front_tongue_height / 2 - min_wall",
      "[demo] socket floor under the front tongue >= min_wall"),
@@ -1034,11 +1037,11 @@ class Builder:
                       "rear_tongue_height", "rear_tongue_width",
                       "rear_split - fit_loose", "rear_split + rear_tongue_length + fit_snug", "rear")
         rz = ("rj_bolt_z", "-rj_bolt_z")
-        nut_slots("rear", "rj_nut_x0", "rear_tongue_y", rz, "-act_bed_r + 5 mm", both)
+        nut_slots("rear", "rj_nut_x0", "rear_tongue_y", rz, "5 mm", both)       # open right up through the bed, so the nut drops in
         bolt_holes("rear", "rs_win_front_x - 1 mm", "rj_bolt_len + joint_cbore + 1 mm", "rear_tongue_y", rz, (rear, main))
         sk = self.yz_sketch("rear_head_counterbores", "rs_win_front_x - 1 mm")
         for z in rz:
-            self.circle(sk, f"-({z})", "rear_tongue_y", "joint_head_d + 2 * joint_head_clear")
+            self.circle(sk, f"-({z})", "rear_tongue_y", "joint_cbore_d")
         self.done(sk)
         self.extrude(rear, self.profiles(sk), CUT, dist="joint_cbore + 1 mm", name="rear_head_counterbores")
 
@@ -1048,8 +1051,13 @@ class Builder:
                       "front_tongue_height", "front_tongue_width",
                       "front_split - front_tongue_length - fit_snug", "front_split + fit_loose", "front")
         fz = ("fj_bolt_z", "-fj_bolt_z")
-        nut_slots("front", "fj_nut_x0", "front_tongue_y", fz, "-barrel_r + 4 mm")
-        bolt_holes("front", "fj_nut_x0 - bolt_tail", "fj_bolt_len", "front_tongue_y", fz, (main, fore))
+        nut_slots("front", "fj_nut_x0", "front_tongue_y", fz, "5 mm")           # open right up through the channel wall
+        bolt_holes("front", "fj_nut_x0 - bolt_tail", "fj_bolt_len + joint_cbore + 1 mm", "front_tongue_y", fz, (main, fore))
+        sk = self.yz_sketch("front_head_counterbores", "fj_seat_x")       # the fasteners sit below the pocket wall: nothing proud
+        for z in fz:
+            self.circle(sk, f"-({z})", "front_tongue_y", "joint_cbore_d")
+        self.done(sk)
+        self.extrude(fore, self.profiles(sk), CUT, dist="joint_cbore + 1 mm", name="front_head_counterbores")
 
         # hardware bodies so the joints read in the model; not printed
         hw = root.occurrences.addNewComponent(adsk.core.Matrix3D.create())
@@ -1090,14 +1098,14 @@ class Builder:
 
         bolt("rear", "rj_seat_x", 1, "rj_bolt_len", "rear_tongue_y", rz)
         nuts("rear", "rj_nut_x0", "rear_tongue_y", rz)
-        bolt("front", "fj_head_x", -1, "fj_bolt_len", "front_tongue_y", fz)
+        bolt("front", "fj_seat_x", -1, "fj_bolt_len", "front_tongue_y", fz)
         nuts("front", "fj_nut_x0", "front_tongue_y", fz)
 
         sk = self.sketch("front_head_pocket")
         self.rect(sk, "fj_head_x", "fj_head_x + fj_pocket_len", f"{fd} - 1 mm",
-                  "front_tongue_y + joint_head_d / 2 + joint_head_clear")
+                  "front_tongue_y + joint_cbore_d / 2 + joint_head_clear")
         self.done(sk)
-        self.extrude(fore, sk.profiles.item(0), CUT, sym="2 * (fj_bolt_z + joint_head_d / 2 + joint_head_clear)",
+        self.extrude(fore, sk.profiles.item(0), CUT, sym="2 * (fj_bolt_z + joint_cbore_d / 2 + joint_head_clear)",
                      name="front_head_pocket")
 
         # ---- rear stock: comb beam and plate post stay at full width; the frame between them is

@@ -338,7 +338,7 @@ Nothing on the stock may catch clothing, so every fastener head is recessed and 
 |---|---|---|
 | Action bolts (2) | counterbores `act_cbore` deep in the underside | `chk_head_action` |
 | Rear joint (2) | counterbores `joint_cbore` deep in the butt window's front wall | `chk_head_rear_joint` |
-| Front joint (2) | inside the head pocket under the forestock | `chk_head_front_joint` |
+| Front joint (2) | counterbores `joint_cbore` deep in the wall of the pocket under the forestock | `chk_head_front_joint` |
 | Grip cap screw | low-head M5 in a `cap_cbore` counterbore; the cap is 7 mm thick to take it | `chk_head_cap` |
 | Sling bolt | low-head M5 in a `clamp_cbore` counterbore in the sling clamp plate | `chk_head_sling` |
 
@@ -347,7 +347,10 @@ Nothing on the stock may catch clothing, so every fastener head is recessed and 
 through the plate and the tab's eyelet into a captive hex nut that slides into a slot in the side of the hand stop
 (`sling_nut_y`, `m5_nut_af`, `m5_nut_m`). The plate carries the hand stop's shape on down, with rounded corners and edges.
 
-**Joint nut slots.** Each slot is `nut_slot_af` (10.3 mm) across the flats, so the nut cannot turn, and `nut_slot_len`
+Both joints' counterbores are `joint_cbore_d` (13.5 mm) wide, room for an M6 nut or head and a thin-wall socket.
+
+**Joint nut slots.** They are open right up through the receiver bed (rear) and the barrel channel wall (front), so a
+nut drops straight in; the action and barrel then cover them. Each slot is `nut_slot_af` (10.3 mm) across the flats, so the nut cannot turn, and `nut_slot_len`
 (5.5 mm) along the bolt, a slide fit so an M6 nut (10 mm across flats, 5 mm thick) drops down it edge-on.
 
 ### Balance at the standing block (Darren, 2026-11-24)
