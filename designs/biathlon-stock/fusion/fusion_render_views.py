@@ -25,8 +25,9 @@ VIEWS = {
 }
 # exploded offsets in mm, by component name
 EXPLODE = {
-    "rear_stock": (-70, 0, 0), "forestock": (70, 0, 0), "tpu_grip": (-12, -55, 0), "grip_cap": (-22, -95, 0),
-    "tpu_prone_pad": (70, -45, 0), "action_cradle": (0, 60, 0), "guard_block": (0, -40, 0), "tpu_block_cover": (0, -85, 0), "sling_clamp": (70, -30, 0),
+    "rear_stock": (-70, 0, 0), "forestock": (70, 0, 0), "tpu_grip": (-25, -110, 0), "grip_cap": (-35, -150, 0),
+    "tpu_prone_pad": (70, -45, 0), "action_cradle": (0, 60, 0), "lower_unit": (0, -45, 0), "tpu_block_cover": (50, -45, 0),
+    "sling_clamp": (70, -30, 0),
 }
 EXPLODED_VIEWS = {"08_exploded_left": VIEWS["05_iso_left_front"], "09_exploded_right_below": ((-0.7, -0.4, 1), (0, 1, 0)),
                   "10_exploded_left_side": VIEWS["01_left_side"]}

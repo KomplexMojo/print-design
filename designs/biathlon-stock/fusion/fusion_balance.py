@@ -19,7 +19,7 @@ PRINTED = {
     "main_body": (1.06, 0.70),
     "forestock": (1.06, 0.60),
     "action_cradle": (1.06, 0.90),
-    "guard_block": (1.06, 0.70),
+    "lower_unit": (1.06, 0.70),
     "sling_clamp": (1.05, 0.90),       # ASA
     "grip_cap": (1.05, 0.90),
     "tpu_grip": (1.22, 0.80),          # TPU

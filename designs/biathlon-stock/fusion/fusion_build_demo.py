@@ -56,7 +56,7 @@ DEMO_PARAMS = [
     ("grip_length", "mm", "80 mm", "[manual] Darren 2026-11-24: 5 mm of margin to the 140 mm line (chk_depth_grip)"),
     ("grip_angle_deg", "deg", "78 deg", "[manual] restyle: raked like current biathlon grips"),
     ("mag_holder_start", "mm", "222 mm", "[manual] r2 flush slots"),
-    ("mag_holder_wall", "mm", "3.5 mm", "[manual] r2 web between slots"),
+    ("mag_holder_wall", "mm", "8 mm", "[manual] web between the spare-mag slots, re-spaced for the 36 mm slots"),
     ("mag_holder_top", "mm", "-19 mm", "[manual] restyle: 6 mm web under the barrel channel"),
     ("min_wall", "mm", "6 mm", "[demo] thinnest structural web allowed in PAHT-CF"),
     # ---- body section
@@ -94,8 +94,8 @@ DEMO_PARAMS = [
      "[demo] MC 3.1.6.4 a read strictly: grip bottom within 140 mm of the bore"),
     # ---- trigger guard and standing block (Darren 2026-11-24: the block is an extension of the guard base)
     ("guard_open_h", "mm", "24 mm", "[demo] trigger guard opening height: compact, close under the action"),
-    ("guard_front_x", "mm", "26 mm", "[demo] front of the guard's front leg"),
-    ("guard_bar", "mm", "8 mm", "[demo] trigger-guard rail thickness; the rail is the top of the standing block"),
+    ("guard_front_x", "mm", "27 mm", "[demo] front of the guard's front leg"),
+    ("guard_bar", "mm", "9 mm", "[demo] trigger-guard rail thickness; the rail is the top of the standing block"),
     ("guard_rake", "mm", "4 mm", "[demo] guard front leg thickness over the bar"),
     ("guard_width", "mm", "32 mm", "[demo] trigger-guard width: about midway between the old 18 mm guard and the block, so the two read as one form"),
     ("guard_rear_r", "mm", "10 mm", "[demo] large radius where the guard rail flows into the grip front"),
@@ -105,17 +105,28 @@ DEMO_PARAMS = [
     ("block_drop", "mm", "28 mm", "[demo] thickness of the standing block below the guard rail (compact, Darren 2026-11-24)"),
     ("block_height", "mm", "guard_bottom + block_drop", "[manual] derived: bore to the bottom of the standing block; IBU MC 3.1.6.4 a"),
     ("block_top_r", "mm", "8 mm", "[demo] round of the block's top front corner (must exceed block_round)"),
+    ("plug_h", "mm", "5 mm", "[demo] lower unit: height of the plate that plugs into the stock underside"),
+    ("plug_w", "mm", "30 mm", "[demo] lower unit: width of that plate (inside the flat of the underside)"),
+    ("plug_x0", "mm", "rear_split + rear_tongue_length + 2 mm", "[demo] derived: the plate starts ahead of the rear joint socket"),
+    ("heel_len", "mm", "14 mm", "[demo] rigid heel at the rear of the standing block (carries the finger scoop; the cover slides up to it)"),
+    ("blk_heel_x", "mm", "blk_rear_x + heel_len", "[demo] derived: front face of the heel, where the TPU cover stops"),
+    ("core_neck", "mm", "3 mm", "[demo] dovetail of the block frame: this much narrower per side at the top than at the bottom, so the cover cannot pull off downward"),
+    ("detent_w", "mm", "4 mm", "[demo] cross groove under the block frame; a rib inside the cover snaps into it"),
+    ("detent_d", "mm", "1.5 mm", "[demo] depth of that groove"),
+    ("rail_taper_len", "mm", "18 mm", "[demo] the guard rail narrows over this length before it meets the grip"),
+    ("rail_taper_w", "mm", "4 mm", "[demo] half-width the rail narrows to inside the grip"),
+    ("chk_plug_floor", "mm", "-act_trig_depth - (finger_hole_y1 + plug_h) - 1.5 mm", "[demo] stock left between the trigger pocket floor and the lower unit's plate"),
     ("guard_blend_r", "mm", "14 mm", "[demo] radius that blends the guard rail into the block's rear face"),
     ("guard_gusset_r", "mm", "18 mm", "[demo] radius that carries the guard's front leg down into the top of the block"),
     ("collar_h", "mm", "block_top_r", "[demo] derived: rigid band round the top of the block, as deep as the top corner's round; the TPU cover butts against it"),
-    ("guard_round", "mm", "3 mm", "[demo] edge round on the guard"),
+    ("guard_round", "mm", "4 mm", "[demo] edge round on the guard and on the standing block (one radius, so their surfaces line up)"),
     ("rel_front_x", "mm", "guard_front_x - guard_rake - guard_bar", "[demo] derived: front of the trigger opening"),
     ("finger_hole_x1", "mm", "rel_front_x", "[manual] trigger opening front"),
     ("blk_rear_x", "mm", "rel_front_x - blk_tuck", "[demo] derived: rear face of the standing block, under the front of the trigger opening"),
     ("blk_rake", "mm", "10 mm", "[demo] block rear face is undercut by this much, for the fingers"),
     ("blk_front_rake", "mm", "2 mm", "[demo] block and front-leg face lean (near vertical)"),
     ("block_width", "mm", "guard_width", "[demo] derived: the block is exactly as wide as the guard, so their sides are one flush surface with no ledge"),
-    ("block_round", "mm", "6 mm", "[demo] edge round on the block's TPU cover"),
+    ("block_round", "mm", "guard_round", "[demo] derived: the cover's edge round equals the rigid frame's, so cover and frame are flush everywhere"),
     ("block_corner_r", "mm", "14 mm", "[demo] round of the block's bottom corners"),
     ("block_length", "mm", "blk_front_x - blk_rear_x",
      "[manual] restyle: derived, the block spans from the finger clearance to the guard front"),
@@ -137,8 +148,10 @@ DEMO_PARAMS = [
     ("hs_round", "mm", "4 mm", "[demo]"),
     ("tip_sweep_x", "mm", "handstop_position + handstop_length + hs_rake + 14 mm", "[demo] derived: where the forend underside turns up to the nose"),
     # ---- spare-mag slots
-    ("mag_slot_len", "mm", "spare_mag_h + 2 * fit_snug", "[demo] slot along X (mags lie horizontally)"),
-    ("mag_slot_h", "mm", "spare_mag_t + 2 * fit_snug", "[demo] slot height"),
+    ("mag_slot_len", "mm", "36 mm", "[demo] spare-mag holder slot length along the forestock (Darren, measured 2026-11-24)"),
+    ("mag_slot_h", "mm", "9.5 mm", "[demo] spare-mag holder slot height (Darren, measured 2026-11-24)"),
+    ("mag_slot_r", "mm", "3 mm", "[demo] PLACEHOLDER: corner radius of the spare-mag slots"),
+    ("chk_slots_handstop", "mm", "forend_tip - tip_rake - 8 mm - (mag_holder_start + mag_holder_count * mag_slot_len + (mag_holder_count - 1) * mag_holder_wall)", "[demo] the row of slots ends before the forend nose"),
     ("mag_slot_depth", "mm", "spare_mag_l + fit_snug", "[demo] lateral insertion depth"),
     ("chk_slot_channel", "mm", "-(barrel_d / 2 + barrel_float) - mag_holder_top - min_wall",
      "[demo] web between the barrel channel and the mag slots >= min_wall"),
@@ -684,7 +697,7 @@ class Builder:
 
         occs = {}
         for key, label in (("rear", "rear_stock"), ("main", "main_body"), ("fore", "forestock"),
-                           ("action", "action_cradle"), ("block", "guard_block"), ("bcover", "tpu_block_cover"), ("clamp", "sling_clamp"), ("grip", "tpu_grip"), ("pad", "tpu_prone_pad"), ("cap", "grip_cap")):
+                           ("action", "action_cradle"), ("block", "lower_unit"), ("bcover", "tpu_block_cover"), ("clamp", "sling_clamp"), ("grip", "tpu_grip"), ("pad", "tpu_prone_pad"), ("cap", "grip_cap")):
             occ = root.occurrences.addNewComponent(adsk.core.Matrix3D.create())
             occ.component.name = label
             occs[key] = occ
@@ -774,7 +787,7 @@ class Builder:
         self.poly(sk, [(f"{rf} - {rc}", top_e), ("guard_front_x", top_e),
                        (lf(f"{gbm} + {rg}"), f"{gbm} + {rg}"), (f"{lf(gbm)} + {rg}", gbm),          # 2 -> 3: leg flows into the block top
                        (f"blk_front_x - {tr}", gbm), ("blk_front_x", f"{gbm} - {tr}"),             # 4 -> 5: rounded top front corner
-                       ("blk_rear_x + 5 mm", shoulder), (f"blk_rear_x - {rb}", gbm),               # 6 -> 7: rail flows into the block's rear
+                       ("blk_rear_x + 6 mm", shoulder), (f"blk_rear_x - {rb}", gbm),               # 6 -> 7: rail flows into the block's rear
                        (f"{gf(gbm)} - 6 mm", gbm), (f"{gf(f'{fh0} + {rr}')} - 6 mm", f"{fh0} + {rr}"),
                        (gf(f"{fh0} + {rr}"), f"{fh0} + {rr}"), (f"{gf(fh0)} + {rr}", fh0),          # 10 -> 11: rail into grip
                        (f"{rf} - {rc}", fh0), (rf, f"{fh0} + {rc}"),                               # 12 -> 13: front lower corner
@@ -806,24 +819,42 @@ class Builder:
                 self.round_faces(occ, f"({width}) / 2", edge_r, f"{name}_round", skip_y=(btop,), body=b)
             return b
 
-        block_solid(bcov, "block_cover", "0 mm", "block_width", "block_corner_r", "block_round", top_corner=False)
-        block_solid(blk, "block_core", ct, f"block_width - 2 * {ct}", f"block_corner_r - {ct}", f"block_round - {ct}",
-                    top_corner=False)
-        self.combine((blk, body("block")), [(blk, body("block", 1))], JOIN, "guard_block_join", keep=False)
-        # trim the cover to below the collar with a plain cut first, so the boolean below meets no near-coincident rounds
-        sk = self.sketch("block_cover_top")
-        self.rect(sk, "blk_rear_x - 10 mm", "blk_front_x + 10 mm", f"{btop} - collar_h", f"{btop} + 5 mm")
+        # plate that plugs into the stock underside (the stock gets the matching pocket at the end)
+        sk = self.sketch("lower_plug")
+        self.rect(sk, "plug_x0", "guard_front_x", y1, f"{y1} + plug_h")
         self.done(sk)
-        self.extrude(bcov, sk.profiles.item(0), CUT, sym="2 * body_width", name="block_cover_top")
-        self.combine((bcov, body("bcover")), [(blk, body("block"))], CUT, "block_cover_boot")
-        sk = self.yz_sketch("block_keel", f"blk_rear_x + blk_rake + {ct} + block_corner_r")
+        self.extrude(blk, sk.profiles.item(0), JOIN, sym="plug_w", name="lower_plug")
+
+        # standing block frame. Rear: a rigid heel with the finger scoop, cut from the same rounded shape as the
+        # cover, so the two are flush. Ahead of it: a dovetail rail (wider at the bottom) for the cover to slide on.
         lo = f"{bh} + {ct}"
-        kn, kw = "keel_w / 2", "keel_w / 2 + keel_flare"
-        self.poly(sk, [(f"-({kn})", lo), (kn, lo), (kw, f"{lo} + keel_h"), (f"-({kw})", f"{lo} + keel_h")])
+
+        def cut_box(occ, name, x0, x1, y0, y1_, bodies=None):
+            sk = self.sketch(name)
+            self.rect(sk, x0, x1, y0, y1_)
+            self.done(sk)
+            return self.extrude(occ, sk.profiles.item(0), CUT, sym="2 * body_width", name=name, bodies=bodies)
+
+        heel = block_solid(blk, "block_heel", "0 mm", "block_width", "block_corner_r", "block_round", top_corner=False)
+        cut_box(blk, "block_heel_front", "blk_heel_x", "blk_front_x + 10 mm", f"{bh} - 5 mm", f"{btop} + 5 mm", [heel])
+        cut_box(blk, "block_heel_top", "blk_rear_x - 10 mm", "blk_front_x + 10 mm", shoulder, f"{btop} + 5 mm", [heel])
+        sk = self.yz_sketch("block_frame", "blk_heel_x")
+        cw = f"(block_width / 2 - {ct})"
+        self.poly(sk, [(f"-({cw} - core_neck)", shoulder), (f"{cw} - core_neck", shoulder), (cw, lo), (f"-{cw}", lo)])
         self.done(sk)
-        klen = f"blk_front_x - blk_rear_x - blk_rake - blk_front_rake - 2 * {ct} - 2 * block_corner_r"
-        self.extrude(blk, sk.profiles.item(0), CUT, dist=klen, name="block_keel_groove")
-        self.extrude(bcov, sk.profiles.item(0), JOIN, dist=klen, name="block_keel")
+        self.extrude(blk, sk.profiles.item(0), NEW, dist=f"blk_front_x - blk_front_rake - {ct} - blk_heel_x", name="block_frame")
+        frame = blk.component.bRepBodies.item(blk.component.bRepBodies.count - 1)
+        cut_box(blk, "block_detent", "blk_heel_x + 8 mm", "blk_heel_x + 8 mm + detent_w", f"{lo} - 1 mm", f"{lo} + detent_d", [frame])
+        extra = [(blk, blk.component.bRepBodies.item(i)) for i in range(1, blk.component.bRepBodies.count)]
+        self.combine((blk, body("block")), extra, JOIN, "lower_unit_join", keep=False)
+
+        # TPU cover: its own part, customised per athlete. It slides on from the front over the dovetail frame
+        # until it meets the heel, and the rib inside it snaps into the frame's groove. It is closed at the front
+        # and underneath, so it hides the hole for the rear mounting bolt.
+        block_solid(bcov, "block_cover", "0 mm", "block_width", "block_corner_r", "block_round", top_corner=False)
+        cut_box(bcov, "block_cover_top", "blk_rear_x - 10 mm", "blk_front_x + 10 mm", shoulder, f"{btop} + 5 mm")
+        cut_box(bcov, "block_cover_rear", "blk_rear_x - 10 mm", "blk_heel_x", f"{bh} - 5 mm", f"{btop} + 5 mm")
+        self.combine((bcov, body("bcover")), [(blk, body("block"))], CUT, "block_cover_sleeve")
 
         # ---- action cradle: everything that depends on the action type lives in this one component.
         # The main body only has a pocket of fixed section (cradle_w wide, down to cradle_y).
@@ -845,6 +876,7 @@ class Builder:
         self.extrude(act, sk.profiles.item(0), CUT, dist="action_front - action_rear", name="receiver_bed")
 
         def through(name, x0, x1, y0, y1, width, dist=None, comps=None, corners=False):
+            corner_r = corners if isinstance(corners, str) else "pocket_r"
             sk = self.sketch(name)
             self.rect(sk, x0, x1, y0, y1)
             self.done(sk)
@@ -854,15 +886,16 @@ class Builder:
                 else:
                     f = self.extrude(occ, sk.profiles.item(0), CUT, sym=width, name=name)
                 if corners:
-                    self.fillet_y_edges(occ, f, "pocket_r", f"{name}_corners_{occ.component.name}")
+                    self.fillet_y_edges(occ, f, corner_r, f"{name}_corners_{occ.component.name}")
 
         # 1827 F layout, muzzle to butt: receiver front step (action_front), front mounting bolt, locating pin,
         # magazine well, steel cross key, rear mounting bolt, deeper trigger pocket
         through("mag_well", "mag_well_x0 - fit_slide", "mag_well_x1 + fit_slide", f"{fd} - 1 mm", "0 mm",
                 "mag_well_width + 2 * fit_slide", corners=True)
-        through("trigger_pocket", "act_trig_x0", "act_trig_x1", "-act_trig_depth", "0 mm", "act_trig_w", corners=True)
+        through("trigger_pocket", "act_trig_x0", "act_trig_x1", "-act_trig_depth", "0 mm", "act_trig_w",
+                corners="pocket_r + (act_trig_w - trigger_slot_width) / 2")     # concentric with the opening's corners
         through("trigger_slot", "trigger_slot_x0", "trigger_slot_x1", "finger_hole_y1 - 1 mm", "-act_trig_depth + 1 mm", "trigger_slot_width",
-                comps=(main,), corners=True)
+                comps=(main, blk), corners=True)
         through("bolt_notch", "bolt_notch_x - bolt_notch_length / 2", "bolt_notch_x + bolt_notch_length / 2",
                 "-bolt_notch_depth", "sight_line_above_bore", None, dist="bolt_dir * body_width")
         if self.ev("act_bolt_step_len") > 0.01:     # deeper step at the rear of the notch, for the handle's lever
@@ -923,8 +956,8 @@ class Builder:
             self.poly(sk, [("mag_well_x0 - fit_slide", fd), ("mag_well_x0 - fit_slide - act_rel_len", fd)], arcs={0: "rel_scoop_r"})
             self.done(sk)
             self.extrude(main, sk.profiles.item(0), CUT, sym="mag_well_width + 2 * fit_slide + 2 * mag_flare", name="release_scoop")
-        # the block runs under the rear mounting bolt: an access hole through the core and its cover for the key
-        drill("rear_bolt_access", gbm, "act_screw_rear_x", "act_head_d + 3 mm", "block_height", (blk, bcov))
+        # the block runs under the rear mounting bolt: a hole through the frame for the bolt and key; the TPU cover hides it
+        drill("rear_bolt_access", gbm, "act_screw_rear_x", "act_head_d + 3 mm", "block_height", (blk,))
         drill("locating_pin", "-act_bed_r + 1 mm", "act_pin_x", "act_pin_d", "7 mm", (act,))
 
         # sling seat (Biatar / Larsen type sling): the flat end tab nests in a pocket under the hand stop that
@@ -1109,6 +1142,9 @@ class Builder:
         forec = fore.component
         ents = adsk.core.ObjectCollection.create()
         ents.add(slot)
+        rounded = self.fillet_z_edges(fore, slot, "mag_slot_r", "mag_slot_corners")     # every corner rounded
+        if rounded:
+            ents.add(rounded)
         pin = forec.features.rectangularPatternFeatures.createInput(
             ents, forec.xConstructionAxis, self.vi("mag_holder_count"), self.vi("mag_slot_len + mag_holder_wall"),
             adsk.fusion.PatternDistanceType.SpacingPatternDistanceType)
@@ -1175,33 +1211,50 @@ class Builder:
 
         # no thumb shelf: Darren chose a clean grip (2026-11-24)
 
-        # rigid core and front spine, trimmed to the grip's outer shape and joined to the main body
+        # rigid core and front spine: part of the lower unit, trimmed to the grip's outer shape
+        def last():
+            return blk.component.bRepBodies.item(blk.component.bRepBodies.count - 1)
+
         sk = self.sketch("grip_core")
         ov = f"{gtop} + 3 mm"
         self.poly(sk, [(f"{gf(ov)} - tpu_wall", ov), (f"{gf(gb2)} - tpu_wall", gb2),
                        (f"{gb(gb2)} + tpu_wall", gb2), (f"{gb(ov)} + tpu_wall", ov)])
         self.done(sk)
-        self.extrude(main, sk.profiles.item(0), NEW, start="grip_z0 + face_side * tpu_wall",
+        self.extrude(blk, sk.profiles.item(0), NEW, start="grip_z0 + face_side * tpu_wall",
                      dist="face_side * (grip_width - 2 * tpu_wall)", name="grip_core")
-        core = body("main", 1)
         long_edges = {}
-        for f in core.faces:
+        for f in last().faces:
             g = f.geometry
             if g.surfaceType == adsk.core.SurfaceTypes.PlaneSurfaceType and abs(g.normal.z) > 0.99:
                 for e in f.edges:
                     if abs(e.startVertex.geometry.y - e.endVertex.geometry.y) > 0.1:
                         long_edges[e.tempId] = e
-        self.fillet(main.component, [(list(long_edges.values()), "grip_round - tpu_wall")], "grip_core_girth")
+        self.fillet(blk.component, [(list(long_edges.values()), "grip_round - tpu_wall")], "grip_core_girth")
         sk = self.sketch("grip_spine")
         self.poly(sk, [(gf(ov), ov), (gf(gbm), gbm), (f"{gf(gbm)} - spine_d", gbm), (f"{gf(ov)} - spine_d", ov)])
         self.done(sk)
-        self.extrude(main, sk.profiles.item(0), JOIN, start="grip_z0", dist="face_side * grip_width",
-                     name="grip_spine", bodies=[body("main", 1)])
-        self.combine((main, body("main", 1)), [(grip, body("grip"))], INTERSECT, "grip_core_trim")
-        self.combine((main, body("main")), [(main, body("main", 1))], JOIN, "grip_core_join", keep=False)
-        self.combine((grip, body("grip")), [(main, body("main")), (blk, body("block"))], CUT, "grip_sleeve")
-        # the guard's buried ends: trim the guard-and-block component to the main body, so the two only touch
-        self.combine((blk, body("block")), [(main, body("main"))], CUT, "guard_block_trim")
+        self.extrude(blk, sk.profiles.item(0), JOIN, start="grip_z0", dist="face_side * grip_width",
+                     name="grip_spine", bodies=[last()])
+        self.combine((blk, last()), [(grip, body("grip"))], INTERSECT, "grip_core_trim")
+        extra = [(blk, blk.component.bRepBodies.item(i)) for i in range(1, blk.component.bRepBodies.count)]
+        self.combine((blk, body("block")), extra, JOIN, "grip_core_join", keep=False)
+        # the rail narrows toward the grip, so it runs into the grip's rounded front without shoulders. The wedges
+        # are trimmed to the grip's outer shape first, so they only take rail that stands outside the grip.
+        sk, fx, down = xz_sketch("rail_taper", f"{fh0} + guard_rear_r")
+        xa, xe = f"({gf(fh0)} + guard_rear_r + rail_taper_len)", f"({gf(gbm)} - 6 mm)"
+        for sgn in ("", "-"):
+            self.poly(sk, [(fx(xa), f"{sgn}(guard_width / 2 + 1 mm)"), (fx(xe), f"{sgn}(guard_width / 2 + 1 mm)"),
+                           (fx(xe), f"{sgn}(rail_taper_w)")])
+        self.done(sk)
+        depth = "guard_rear_r + guard_bar + 1 mm"
+        self.extrude(blk, self.profiles(sk), NEW, dist=depth if down > 0 else f"-({depth})", name="rail_taper")
+        for i in range(1, blk.component.bRepBodies.count):
+            self.combine((blk, blk.component.bRepBodies.item(i)), [(grip, body("grip"))], CUT, "rail_taper_trim")
+        wedges = [(blk, blk.component.bRepBodies.item(i)) for i in range(1, blk.component.bRepBodies.count)]
+        self.combine((blk, body("block")), wedges, CUT, "rail_taper_cut", keep=False)
+        self.combine((grip, body("grip")), [(blk, body("block"))], CUT, "grip_sleeve")
+        # the stock gets a pocket that matches everything the lower unit pushes up into it (plate, guard leg, grip top)
+        self.combine((main, body("main")), [(blk, body("block"))], CUT, "lower_pocket")
 
         # cap screw: M5 through the cap into a heat-set insert in the core
         ybot = self.ev(gbot)
@@ -1221,10 +1274,10 @@ class Builder:
         prs = sorted(self.profiles(sk), key=lambda pr: pr.areaProperties().area)
         self.extrude(cap, prs[-1], CUT, sym="2 * cap_t + 2 mm", name="cap_screw_hole")
         drill("cap_screw_counterbore", f"{gbot} + cap_cbore", cx, "cap_head_d + 1 mm", "cap_cbore + 1 mm", (cap,))
-        self.extrude(main, prs, CUT, sym="2 * (cap_t + insert_depth)", name="cap_insert_hole")
+        self.extrude(blk, prs, CUT, sym="2 * (cap_t + insert_depth)", name="cap_insert_hole")
 
         if FUSE_BLOCK:
-            self.combine((main, body("main")), [(blk, body("block"))], JOIN, "standing_block_fused", keep=False)
+            self.combine((main, body("main")), [(blk, body("block"))], JOIN, "lower_unit_fused", keep=False)
         if FUSE_ACTION:
             self.combine((main, body("main")), [(act, body("action"))], JOIN, "action_cradle_fused", keep=False)
         self.colour(occs)

@@ -299,26 +299,27 @@ now builds it, still entirely from User Parameters. Review images come from `fus
   the bolts), so the plan is M6 studs threaded into the captive nuts with nuts on the outer ends. `chk_holder_joint`,
   `chk_holder_hand` and `chk_rail_handstop` still use r1's upright-holder rules.
 
-### Trigger guard and standing block: one component (Darren, 2026-11-24)
-- **One form.** `guard_block` holds the trigger guard and the standing block core as a single body; the guard's bottom
-  rail is the top of the block. It is its own component and is joined to the main body before printing
-  (`FUSE_BLOCK = True`). No fasteners.
-- **Guard.** 32 mm wide (`guard_width`), and the block is exactly the same width (`block_width = guard_width`), so
-  their sides are one flush surface with no ledge. The opening is 24 mm high (`guard_open_h`) with rounded corners
-  (`guard_corner_r`) and a large radius where the rail flows into the grip front (`guard_rear_r`). Its length (about
-  62 mm) cannot go below the measured 60 mm trigger opening above it.
-- **Block.** A compact solid slab, `block_drop` (28 mm) deep below the rail, with no slot. Its rear starts `blk_tuck`
-  behind the front of the trigger opening, with a finger scoop (`blk_scoop_r`), so the hand wraps the grip freely. It
-  runs forward under the release lever to `blk_front_x`, 2 mm short of the magazine (`act_rel_zone` pending
-  measurement), so the magazine drops free (`chk_block_mag`). A hole through it gives a key access to the rear
-  mounting bolt. `block_height` is derived: `guard_bottom + block_drop`.
+### Lower unit: grip, trigger guard and standing block as one insert (Darren, 2026-11-24)
+- **One component.** `lower_unit` holds the rigid grip core and front spine, the trigger guard and the standing block
+  frame as a single body. Like the action cradle, it plugs into the stock: a plate (`plug_w` × `plug_h`, from `plug_x0`
+  to the guard's front leg), the leg's top and the grip's top push up into a matching pocket that is cut from the main
+  body (`lower_pocket`). It is joined to the main body before printing (`FUSE_BLOCK = True`). No fasteners.
+- **Guard.** 32 mm wide (`guard_width`), the same as the block. The opening is 24 mm high (`guard_open_h`) with rounded
+  corners (`guard_corner_r`) and a large radius into the grip front (`guard_rear_r`); its length (about 62 mm) cannot go
+  below the measured 60 mm trigger opening above it. Toward the grip the rail narrows (`rail_taper_len`,
+  `rail_taper_w`), so it runs into the grip's rounded front without shoulders.
 - **One profile.** The guard's side profile includes the block's top band (`collar_h`), the rounded top front corner
   (`block_top_r`), the sweep from the front leg into the block (`guard_gusset_r`) and the blend from the rail into the
-  block's rear (`guard_blend_r`). It is one extrusion rounded in one pass, so nothing meets at a right angle and the
-  leg carries load straight into the block.
-- **Block cover.** `tpu_block_cover` is a removable TPU boot, `cover_t` thick, that slips over the block from below and
-  wraps its bottom, sides and ends up to the square shoulder under the top band. A dovetail keel under the core holds
-  it on (the TPU rule). Its outer shape is the athlete-specific hold surface.
+  block's rear (`guard_blend_r`). It is one extrusion rounded in one pass.
+- **Block frame.** Compact, `block_drop` (28 mm) deep below the rail, no slot. Rear: a rigid heel (`heel_len`) with the
+  finger scoop (`blk_scoop_r`). Ahead of the heel: a dovetail rail, `core_neck` narrower per side at the top than at
+  the bottom, with a cross groove (`detent_w`, `detent_d`). The hole for the rear mounting bolt goes through the frame.
+  The block starts `blk_tuck` behind the front of the trigger opening and stops 2 mm short of the magazine
+  (`act_rel_zone` pending measurement), so the magazine drops free (`chk_block_mag`).
+- **Block cover.** `tpu_block_cover` is its own part, customised and printed per athlete. It slides on from the front
+  over the dovetail rail until it meets the heel, and a rib inside it snaps into the frame's groove (the TPU rule). It
+  is closed at the front and underneath, so it hides the bolt hole. The heel and the cover are cut from the same
+  rounded shape and use the same edge radius as the guard (`block_round = guard_round`), so they are flush.
 - **IBU.** The assembled block counts toward MC 3.1.6.4 a: `chk_depth_block` and the build report's lowest point of
   `standing_block` both check it. Any replacement block must keep `block_height` at or under 140 mm.
 
@@ -358,6 +359,10 @@ density and solid fraction per part, adds the non-printed masses (barrelled acti
 ballast) and reports the centre of gravity against `BALANCE_POINT` (`block_position` until the thumb point is measured).
 First run, all masses placeholders: 3.79 kg, centre of gravity 121 mm ahead of the trigger, 101 mm ahead of the block's
 middle and 35 mm ahead of its front end. The barrelled action (1880 g, own balance point guessed) decides the result.
+
+### Spare-magazine slots (Darren, 2026-11-24)
+Each of the four holder slots is 36 × 9.5 mm (`mag_slot_len`, `mag_slot_h`, measured) with rounded corners
+(`mag_slot_r`, placeholder), spaced `mag_holder_wall` apart. The slot depth into the forestock is still a placeholder.
 
 ## 11. Action cradle (2026-11-24)
 Darren's requirement: the stock must take a real barrelled action on its mounting screws, and a different action must
