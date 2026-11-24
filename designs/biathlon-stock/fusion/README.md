@@ -303,10 +303,14 @@ now builds it, still entirely from User Parameters. Review images come from `fus
 - **Guard.** One closed loop sized like a real guard: the opening runs from the grip front to `rel_front_x` (about 62 mm)
   and is 28 mm high. `guard_bottom` is 83 mm, so the rail sits tight under the body and the hand wraps the grip below it.
   There is no divider bar and no separate release window.
-- **Block.** `standing_block` is its own component, so its design can be changed without touching the main body. It
-  sits under the guard rail and is joined to the main body before printing, as one print (`FUSE_BLOCK = True`). There
-  are no fasteners or attachment features (Darren, 2026-11-24). The default block spans `finger_clear` ahead of the
-  grip to the guard front.
+- **Block.** After the 1827 F Comfort: a long slab under the guard rail with an oblong slot. It starts `finger_clear`
+  ahead of the grip front and runs forward under the release lever to `blk_front_x`, which stops 2 mm short of the
+  magazine (`act_rel_zone` is the lever's share of the well, pending measurement), so the magazine drops free
+  (`chk_block_mag`). `standing_block` is the rigid core, its own component, joined to the main body before printing
+  (`FUSE_BLOCK = True`). A hole through it gives a key access to the rear mounting bolt.
+- **Block cover.** `tpu_block_cover` is a removable TPU boot, `cover_t` thick, that slips over the core from below and
+  wraps its bottom, sides and ends. A dovetail keel under the core holds it on (the TPU rule). Its outer shape is the
+  athlete-specific hold surface: `block_width`, `block_height`, `block_corner_r`, `block_round`.
 - **IBU.** The assembled block counts toward MC 3.1.6.4 a: `chk_depth_block` and the build report's lowest point of
   `standing_block` both check it. Any replacement block must keep `block_height` at or under 140 mm.
 

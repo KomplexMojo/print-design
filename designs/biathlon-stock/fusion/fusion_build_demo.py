@@ -101,21 +101,23 @@ DEMO_PARAMS = [
     ("guard_round", "mm", "3 mm", "[demo] edge round on the guard"),
     ("rel_front_x", "mm", "guard_front_x - guard_rake - guard_bar", "[demo] derived: front of the trigger opening"),
     ("finger_hole_x1", "mm", "rel_front_x", "[manual] trigger opening front"),
-    ("finger_clear", "mm", "28 mm", "[demo] room for the gloved fingers between the grip front and the default block"),
+    ("finger_clear", "mm", "10 mm", "[demo] grip front to the rear of the standing block (it starts just ahead of the grip, as on the 1827 F Comfort)"),
+    ("blk_front_x", "mm", "mag_well_x0 + act_rel_zone - 2 mm", "[demo] derived: the block runs forward under the release lever and stops behind the magazine, which must drop free"),
+    ("cover_t", "mm", "4 mm", "[demo] thickness of the TPU cover over the standing block core (the athlete-specific hold surface)"),
     ("blk_rear_x", "mm", "grip_front_x - grip_lean * (grip_top_y + guard_bottom) + finger_clear",
      "[demo] derived: rear face of the standing block"),
     ("blk_rake", "mm", "10 mm", "[demo] block rear face is undercut by this much, for the fingers"),
     ("blk_front_rake", "mm", "2 mm", "[demo] block and front-leg face lean (near vertical)"),
-    ("block_slot_r", "mm", "8 mm", "[demo] end radius of the oblong slot through the block"),
+    ("block_slot_r", "mm", "6 mm", "[demo] end radius of the oblong slot through the block"),
     ("block_width", "mm", "40 mm", "[demo] standing block width"),
     ("block_round", "mm", "8 mm", "[demo] edge round on the block"),
     ("block_corner_r", "mm", "14 mm", "[demo] round of the block's bottom corners"),
-    ("blk_win_web", "mm", "9 mm", "[demo] material round the block window"),
-    ("block_length", "mm", "guard_front_x - blk_rear_x",
+    ("blk_win_web", "mm", "8 mm", "[demo] material round the block slot"),
+    ("block_length", "mm", "blk_front_x - blk_rear_x",
      "[manual] restyle: derived, the block spans from the finger clearance to the guard front"),
-    ("block_position", "mm", "(guard_front_x + blk_rear_x) / 2",
+    ("block_position", "mm", "(blk_front_x + blk_rear_x) / 2",
      "[manual] restyle: derived, the block sits under the trigger guard (m_AJ is kept for reference only)"),
-    ("chk_block_mag", "mm", "mag_well_x0 - fit_slide - guard_front_x - 2 mm",
+    ("chk_block_mag", "mm", "mag_well_x0 + act_rel_zone - blk_front_x - 2 mm",
      "[demo] the block and guard stay behind the magazine well, so the magazine drops free"),
     # ---- hand stop
     ("hs_rake", "mm", "14 mm", "[demo] hand-stop front face leans by this much"),
@@ -667,7 +669,7 @@ class Builder:
 
         occs = {}
         for key, label in (("rear", "rear_stock"), ("main", "main_body"), ("fore", "forestock"),
-                           ("action", "action_cradle"), ("block", "standing_block"), ("clamp", "sling_clamp"), ("grip", "tpu_grip"), ("pad", "tpu_prone_pad"), ("cap", "grip_cap")):
+                           ("action", "action_cradle"), ("block", "standing_block"), ("bcover", "tpu_block_cover"), ("clamp", "sling_clamp"), ("grip", "tpu_grip"), ("pad", "tpu_prone_pad"), ("cap", "grip_cap")):
             occ = root.occurrences.addNewComponent(adsk.core.Matrix3D.create())
             occ.component.name = label
             occs[key] = occ
@@ -753,23 +755,43 @@ class Builder:
         self.round_faces(main, "guard_width / 2", "guard_round", "guard_round", body=body("main", 1))
         self.combine((main, body("main")), [(main, body("main", 1))], JOIN, "trigger_guard_join", keep=False)
 
-        # ---- standing block: its own component, so the block design can be changed or swapped in CAD without
-        # touching the main body. It sits under the guard rail and is joined to the main body before printing
-        # (FUSE_BLOCK), as one print. No fasteners (Darren 2026-11-24).
-        blk = occs["block"]
-        bh, btop = "-block_height", gbm
-        sk = self.sketch("standing_block")
-        self.poly(sk, [("blk_rear_x", btop), (lf(btop), btop), ("guard_front_x - blk_front_rake", bh), ("blk_rear_x + blk_rake", bh)])
+        # ---- standing block (1827 F Comfort layout): a long slab under the guard rail, from just ahead of the
+        # grip to just behind the magazine well. The rigid core is its own component, joined to the main body
+        # before printing (FUSE_BLOCK). A removable TPU cover, shaped to the athlete's hold, slips over it from
+        # below like a boot: it wraps the bottom, both sides and both ends, and a dovetail keel under the core
+        # holds it on. No fasteners.
+        blk, bcov = occs["block"], occs["bcover"]
+        bh, btop, ct = "-block_height", gbm, "cover_t"
+
+        def block_solid(occ, name, inset, width, corner_r, edge_r):
+            lo = f"{bh} + {inset}"
+            sk = self.sketch(name)
+            self.poly(sk, [(f"blk_rear_x + {inset}", btop), (f"blk_front_x - {inset}", btop),
+                           (f"blk_front_x - blk_front_rake - {inset}", lo), (f"blk_rear_x + blk_rake + {inset}", lo)])
+            self.done(sk)
+            self.extrude(occ, sk.profiles.item(0), NEW, sym=width, name=name)
+            self.corners(occ, [(f"blk_front_x - blk_front_rake - {inset}", lo, corner_r),
+                               (f"blk_rear_x + blk_rake + {inset}", lo, corner_r)], name)
+            self.round_faces(occ, f"({width}) / 2", edge_r, f"{name}_round", skip_y=(btop,))
+
+        block_solid(bcov, "block_cover", "0 mm", "block_width", "block_corner_r", "block_round")
+        block_solid(blk, "block_core", ct, f"block_width - 2 * {ct}", f"block_corner_r - {ct}", f"block_round - {ct}")
+        self.combine((bcov, body("bcover")), [(blk, body("block"))], CUT, "block_cover_boot")
+        sk = self.yz_sketch("block_keel", f"blk_rear_x + blk_rake + {ct} + block_corner_r")
+        lo = f"{bh} + {ct}"
+        kn, kw = "keel_w / 2", "keel_w / 2 + keel_flare"
+        self.poly(sk, [(f"-({kn})", lo), (kn, lo), (kw, f"{lo} + keel_h"), (f"-({kw})", f"{lo} + keel_h")])
         self.done(sk)
-        self.extrude(blk, sk.profiles.item(0), NEW, sym="block_width", name="standing_block")
-        self.corners(blk, [("guard_front_x - blk_front_rake", bh, "block_corner_r"), ("blk_rear_x + blk_rake", bh, "block_corner_r")], "block")
-        self.round_faces(blk, "block_width / 2", "block_round", "block_round")
-        sk = self.sketch("block_window")
-        self.rect(sk, "blk_rear_x + blk_rake + blk_win_web", "guard_front_x - blk_front_rake - blk_win_web",
-                  f"{bh} + blk_win_web", f"{gbm} - blk_win_web")
+        klen = f"blk_front_x - blk_rear_x - blk_rake - blk_front_rake - 2 * {ct} - 2 * block_corner_r"
+        self.extrude(blk, sk.profiles.item(0), CUT, dist=klen, name="block_keel_groove")
+        self.extrude(bcov, sk.profiles.item(0), JOIN, dist=klen, name="block_keel")
+        sk = self.sketch("block_slot")          # the long oblong slot through the slab
+        self.rect(sk, f"blk_rear_x + blk_rake + {ct} + blk_win_web", f"blk_front_x - blk_front_rake - {ct} - blk_win_web",
+                  f"{lo} + keel_h + 5 mm", f"{gbm} - blk_win_web")
         self.done(sk)
-        f = self.extrude(blk, sk.profiles.item(0), CUT, sym="2 * body_width", name="block_window")
-        self.fillet_z_edges(blk, f, "block_slot_r", "block_window_round")
+        for occ, nm in ((blk, "core"), (bcov, "cover")):
+            f = self.extrude(occ, sk.profiles.item(0), CUT, sym="2 * body_width", name=f"block_slot_{nm}")
+            self.fillet_z_edges(occ, f, "block_slot_r", f"block_slot_round_{nm}")
 
         # ---- action cradle: everything that depends on the action type lives in this one component.
         # The main body only has a pocket of fixed section (cradle_w wide, down to cradle_y).
@@ -867,6 +889,8 @@ class Builder:
             self.poly(sk, [("mag_well_x0 - fit_slide", fd), ("mag_well_x0 - fit_slide - act_rel_len", fd)], arcs={0: "rel_scoop_r"})
             self.done(sk)
             self.extrude(main, sk.profiles.item(0), CUT, sym="mag_well_width + 2 * fit_slide + 2 * mag_flare", name="release_scoop")
+        # the block runs under the rear mounting bolt: an access hole through the core and its cover for the key
+        drill("rear_bolt_access", gbm, "act_screw_rear_x", "act_head_d + 3 mm", "block_height", (blk, bcov))
         drill("locating_pin", "-act_bed_r + 1 mm", "act_pin_x", "act_pin_d", "7 mm", (act,))
 
         # sling seat (Biatar / Larsen type sling): the flat end tab nests in a pocket under the hand stop that
@@ -1166,7 +1190,7 @@ class Builder:
         app = adsk.core.Application.get()
         lib = app.materialLibraries.itemByName("Fusion Appearance Library")
         names = {"rear": "Plastic - Matte (White)", "main": "Plastic - Matte (Gray)", "fore": "Plastic - Matte (White)",
-                 "action": "Plastic - Matte (Blue)", "block": "Plastic - Matte (Black)", "clamp": "Plastic - Matte (Black)", "grip": "Plastic - Matte (Yellow)", "pad": "Plastic - Matte (Yellow)", "cap": "Plastic - Matte (Black)"}
+                 "action": "Plastic - Matte (Blue)", "block": "Plastic - Matte (Black)", "clamp": "Plastic - Matte (Black)", "bcover": "Plastic - Matte (Yellow)", "grip": "Plastic - Matte (Yellow)", "pad": "Plastic - Matte (Yellow)", "cap": "Plastic - Matte (Black)"}
         for key, name in names.items():
             a = lib.appearances.itemByName(name) if lib else None
             if a:
@@ -1185,7 +1209,7 @@ def report(design, occs, problems=(), log=print):
             size = [round((getattr(bb.maxPoint, a) - getattr(bb.minPoint, a)) * 10, 1) for a in "xyz"]
             log(f"{occ.component.name}: {b.name} valid={b.isValid} lumps={b.lumps.count} size_mm={size} "
                 f"vol_cm3={b.volume:.0f} faces={b.faces.count}")
-    for key in ("rear", "main", "fore", "block", "clamp", "pad", "grip", "cap"):
+    for key in ("rear", "main", "fore", "block", "bcover", "clamp", "pad", "grip", "cap"):
         occ = occs[key]
         if not occ.component.bRepBodies.count:
             continue

@@ -240,6 +240,7 @@ REGISTRY: list[P] = [
     _p("act_bolt_step_depth", "mm", "18 mm", "action", "bore to the floor of that step"),
     _p("act_rel_len", "mm", "0 mm", "action", "length of the magazine-release scoop behind the magazine well (0 = none)"),
     _p("act_rel_depth", "mm", "6 mm", "action", "depth of the scoop into the underside"),
+    _p("act_rel_zone", "mm", "14 mm", "action", "PENDING MEASUREMENT: length of the rear part of the magazine well that holds the release lever; the magazine sits ahead of it"),
     _p("act_rel_travel", "mm", "8 mm", "action", "fore-aft travel of the magazine-release lever (it moves back to front)"),
     _p("act_rel_lever", "mm", "4 mm", "action", "size of the release lever along the bore"),
     _p("act_wall_h", "mm", "12 mm", "action", "stock top edge down to the bottom of the receiver bed"),
