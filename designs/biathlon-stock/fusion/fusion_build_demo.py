@@ -227,6 +227,12 @@ DEMO_PARAMS = [
     ("guard_bottom", "mm", "-finger_hole_y1 + guard_open_h + guard_bar", "[manual] derived: rail tight under the opening; IBU MC 3.1.6.4 a"),
     ("finger_hole_y0", "mm", "-guard_bottom + guard_bar", "[manual] guard opening bottom"),
     ("mag_flare", "mm", "4 mm", "[demo] flare round the magazine well's bottom entry (45 degrees), so magazines guide in"),
+    ("rel_scoop_r", "mm", "(act_rel_len * act_rel_len / 4 + act_rel_depth * act_rel_depth) / (2 * act_rel_depth)",
+     "[demo] derived: radius of the release-lever scoop from its length and depth"),
+    ("chk_rel_bolt", "mm", "act_screw_front_x - (act_head_d + 3 mm) / 2 - (mag_well_x1 + fit_slide + act_rel_len) - 2 mm",
+     "[demo] the release scoop stays clear of the front bolt counterbore"),
+    ("chk_bolt_step_socket", "mm", "-(rear_tongue_y + rear_tongue_height / 2) - act_bolt_step_depth - 2 mm",
+     "[demo] the bolt-handle step stays above the rear joint socket"),
     ("chk_flare_bolts", "mm", "(mag_well_x0 - mag_flare) - (act_screw_rear_x + (act_head_d + 3 mm) / 2) - 2 mm",
      "[demo] the flare stays clear of the rear bolt counterbore (the front one is the same distance away)"),
     ("chk_flare_belly", "mm", "body_width / 2 - belly_w - (mag_well_width / 2 + fit_slide + mag_flare) - 1 mm",
@@ -784,6 +790,9 @@ class Builder:
                 comps=(main,), corners=True)
         through("bolt_notch", "bolt_notch_x - bolt_notch_length / 2", "bolt_notch_x + bolt_notch_length / 2",
                 "-bolt_notch_depth", "sight_line_above_bore", None, dist="bolt_dir * body_width")
+        if self.ev("act_bolt_step_len") > 0.01:     # deeper step at the rear of the notch, for the handle's lever
+            through("bolt_step", "bolt_notch_x - bolt_notch_length / 2", "bolt_notch_x - bolt_notch_length / 2 + act_bolt_step_len",
+                    "-act_bolt_step_depth", "sight_line_above_bore", None, dist="bolt_dir * body_width")
         sk = self.sketch("cross_key_seat")
         self.rect(sk, "act_key_x", "act_key_x + act_key_w", "-act_bed_r - act_key_d", "-act_bed_r + 4 mm")
         self.done(sk)
@@ -830,6 +839,12 @@ class Builder:
                 self.problems.append(f"mag_well_flare: {str(e).splitlines()[0][:120]}")
         else:
             self.problems.append("mag_well_flare: rim not found")
+        if self.ev("act_rel_len") > 0.01:
+            # scoop for the magazine-release lever: a rounded relief in the underside just ahead of the well
+            sk = self.sketch("release_scoop")
+            self.poly(sk, [("mag_well_x1 + fit_slide + act_rel_len", fd), ("mag_well_x1 + fit_slide", fd)], arcs={0: "rel_scoop_r"})
+            self.done(sk)
+            self.extrude(main, sk.profiles.item(0), CUT, sym="mag_well_width + 2 * fit_slide + 2 * mag_flare", name="release_scoop")
         drill("locating_pin", "-act_bed_r + 1 mm", "act_pin_x", "act_pin_d", "7 mm", (act,))
 
         # sling seat (Biatar / Larsen type sling): the flat end tab nests in a pocket under the hand stop that

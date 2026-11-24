@@ -145,9 +145,9 @@ One parameter per numeric value in the JSON. S and T (sides) are not parameters;
 | `spare_mag_t` |  | mm | `14 mm` | 14 | fixed |  | spare mag thickness (along X) |
 | `spare_mag_l` |  | mm | `32 mm` | 32 | fixed |  | spare mag length (lateral) |
 | `spare_mag_h` |  | mm | `50 mm` | 50 | fixed |  | spare mag height |
-| `bolt_notch_x` |  | mm | `-62 mm` | -62 | fixed |  | bolt-handle notch centre; side from bolt_dir |
-| `bolt_notch_length` |  | mm | `26 mm` | 26 | fixed |  |  |
-| `bolt_notch_depth` |  | mm | `12 mm` | 12 | fixed |  |  |
+| `bolt_notch_x` |  | mm | `-50 mm` | -50 | action |  | bolt-handle notch centre; side from bolt_dir |
+| `bolt_notch_length` |  | mm | `70 mm` | 70 | action |  |  |
+| `bolt_notch_depth` |  | mm | `14 mm` | 14 | action |  |  |
 
 ## 7. Spare-magazine holder
 

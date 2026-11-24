@@ -90,7 +90,12 @@ ACTIONS = {
                    # outer pocket: its front step is 12.5 mm ahead of the opening (Darren's third depth photo, as read)
                    "act_trig_x0": "-48 mm", "act_trig_x1": "26.5 mm", "act_wall_h": "12 mm", "act_trig_drop": "31 mm",
                    "trigger_slot_x0": "-46 mm", "trigger_slot_x1": "14 mm", "trigger_slot_width": "20 mm",
-                   "act_screw_d": "6 mm", "act_head_d": "10 mm"},
+                   "act_screw_d": "6 mm", "act_head_d": "10 mm",
+                   # Fortner straight-pull handle: long notch in the bolt-side wall, deeper step for the lever (placeholders)
+                   "bolt_notch_x": "-50 mm", "bolt_notch_length": "70 mm", "bolt_notch_depth": "14 mm",
+                   "act_bolt_step_len": "25 mm", "act_bolt_step_depth": "18 mm",
+                   # scoop ahead of the magazine well for the release lever (placeholders)
+                   "act_rel_len": "12 mm", "act_rel_depth": "5 mm"},
     },
     "izhmash_7_4": {
         "label": "Izhmash BI-7-4", "code": 2, "family": 1,
@@ -229,6 +234,10 @@ REGISTRY: list[P] = [
     _p("act_trig_x0", "mm", "-42 mm", "action", "trigger to the rear of the trigger pocket"),
     _p("act_trig_x1", "mm", "22 mm", "action", "trigger to the front of the trigger pocket"),
     _p("act_trig_w", "mm", "26.2 mm", "action", "trigger pocket width"),
+    _p("act_bolt_step_len", "mm", "0 mm", "action", "length of the deeper step at the rear of the bolt-handle notch (0 = none)"),
+    _p("act_bolt_step_depth", "mm", "18 mm", "action", "bore to the floor of that step"),
+    _p("act_rel_len", "mm", "0 mm", "action", "length of the magazine-release scoop ahead of the magazine well (0 = none)"),
+    _p("act_rel_depth", "mm", "6 mm", "action", "depth of the scoop into the underside"),
     _p("act_wall_h", "mm", "12 mm", "action", "stock top edge down to the bottom of the receiver bed"),
     _p("act_trig_drop", "mm", "31 mm", "action", "bottom of the receiver bed down to the trigger pocket floor"),
     _p("act_screw_d", "mm", "6 mm", "action", "action screw thread"),
