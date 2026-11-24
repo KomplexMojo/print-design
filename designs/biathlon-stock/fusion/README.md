@@ -366,6 +366,18 @@ Each of the four holder slots is 36 × 9.5 mm (`mag_slot_len`, `mag_slot_h`, mea
 (`mag_slot_r`, placeholder), spaced `mag_holder_wall` apart. The slots are 42 mm deep (`mag_slot_depth`, measured), which leaves 8 mm of wall on
 the face side (`chk_slot_wall`); the harness rail inserts moved above the slots (`harness_rail_y`, `chk_rail_slots`).
 
+### One design, not three (Darren, 2026-11-24)
+The butt, main body and forestock are separate prints, but they should read as one stock:
+- **Rear joint.** The butt is built at `body_width` and narrows to `comb_width` over `butt_flare_len`, so both parts are
+  the same width at the joint. The cheek stays at `comb_width` (IBU MC 3.1.6.4 b).
+- **One edge radius.** Every rigid part uses `body_round` up to both joints; the larger wrist round is gone.
+- **One line.** The butt windows start at the height of the top of the spare-mag slots (`comb_beam_h` is derived from
+  `mag_holder_top`). Shallow flutes (`flute_d`) carry the slot line along both sides of the main body (`flute_x0` to
+  `flute_x1`) and mirror the slots on the forestock's face side. The flutes stop short of the IBU marking surface
+  (`chk_flute_mark`).
+- **One colour.** All rigid printed parts share one appearance; TPU parts and the two small ASA parts differ.
+Fixed features did not move: the action cradle, bolt positions, magazine well, trigger pocket, joints and marking surface.
+
 ## 11. Action cradle (2026-11-24)
 Darren's requirement: the stock must take a real barrelled action on its mounting screws, and a different action must
 not mean redoing the design. Everything that depends on the action now lives in one component, `action_cradle`.

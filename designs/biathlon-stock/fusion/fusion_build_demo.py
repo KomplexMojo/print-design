@@ -41,7 +41,7 @@ DATUM = 1000.0  # mm
 OBSOLETE_PARAMS = ("chk_pillar_mag", "act_receiver_d", "sling_tab_r", "rel_len", "guard_div",
                    "block_top_len", "grip_toe", "rs_rib_x", "saddle_h", "block_bolt_x", "block_insert_depth",
                    "chk_slot_pillar", "chk_key_slot", "act_slot_x0", "act_slot_x1", "act_slot_w",
-                   "wrist_facet_w", "wrist_facet_h", "chk_belly_step", "chk_rel_travel", "chk_bolts_centred", "sling_head_h", "finger_clear", "blk_scoop_d", "blk_win_web", "block_slot_r", "chk_block_top_flat", "collar_round", "rear_cap", "core_neck", "guard_gusset_r", "collar_h",
+                   "wrist_facet_w", "wrist_facet_h", "chk_belly_step", "chk_rel_travel", "chk_bolts_centred", "sling_head_h", "finger_clear", "blk_scoop_d", "blk_win_web", "block_slot_r", "chk_block_top_flat", "collar_round", "rear_cap", "core_neck", "guard_gusset_r", "collar_h", "wrist_round",
                    "chk_gusset_bolt")
 FUSE_BLOCK = False   # True joins the standing block into the main body (the printed part)
 FUSE_ACTION = False  # True joins the action cradle into the main body (the printed part); False keeps it apart for review
@@ -85,7 +85,12 @@ DEMO_PARAMS = [
     ("grip_lean", "", "tan(90 deg - grip_angle_deg)", "[demo] grip lean per mm of height"),
     ("grip_front_x", "mm", "-trigger_reach + grip_depth / 2", "[demo] derived: grip front at its top"),
     ("grip_offset", "mm", "0 mm", "[demo] grip centre offset toward the away (palm) side"),
-    ("wrist_round", "mm", "(body_width - grip_width) / 2 + 2 mm", "[demo] derived: round on the wrist underside edges that narrows the body to the grip width"),
+    ("butt_flare_len", "mm", "45 mm", "[demo] the butt is as wide as the main body at the rear joint and narrows to comb_width over this length, so there is no step at the joint"),
+    ("butt_flare_x", "mm", "rear_split - butt_flare_len", "[demo] derived: where the butt reaches comb_width"),
+    ("flute_d", "mm", "1.5 mm", "[demo] depth of the side flutes that carry the spare-mag slot line along the main body and the forestock's face side"),
+    ("flute_x0", "mm", "0 mm", "[demo] rear end of the main body's flutes (ahead of the bolt-handle notch)"),
+    ("flute_x1", "mm", "marking_start - 10 mm", "[demo] derived: front end of the main body's flutes, short of the IBU marking surface"),
+    ("chk_flute_mark", "mm", "marking_start - flute_x1 - 5 mm", "[demo] MC 3.1.6.4 l: the flutes stop before the marking surface"),
     ("grip_z0", "mm", "-face_side * (grip_offset + grip_width / 2)", "[demo] derived: away-side skin of the grip"),
     ("grip_round", "mm", "(2 * (grip_depth + grip_width) - grip_circumference) / (8 - 2 * PI)",
      "[demo] derived: corner round that makes the grip girth equal grip_circumference (PI * M)"),
@@ -158,7 +163,7 @@ DEMO_PARAMS = [
      "[demo] web between the barrel channel and the mag slots >= min_wall"),
     # ---- skeleton butt: full-width comb beam and plate post, slim frame between, truss windows
     ("plate_thickness", "mm", "14 mm", "[demo] butt-plate post, measured from the deepest point of the concave face"),
-    ("comb_beam_h", "mm", "28 mm", "[demo] top beam that carries the cheek (full comb_width)"),
+    ("comb_beam_h", "mm", "comb_top - mag_holder_top", "[demo] derived: the butt windows start on the same line as the top of the spare-mag slots, one line through the whole stock"),
     ("frame_web", "mm", "12 mm", "[demo] lower strut and window margins"),
     ("frame_rib", "mm", "10 mm", "[demo] rib width between the windows (measured along X)"),
     ("frame_width", "mm", "24 mm", "[demo] thickness of the slim frame between the comb beam and the plate post"),
@@ -535,7 +540,8 @@ class Builder:
                     edges.append(e)
             self.fillet(comp, [(edges, r)], f"{label}_corner_{i}")
 
-    def round_faces(self, occ, half, r, name, zc="0 mm", facets=False, skip_x=(), skip_y=(), body=None, skip=None):
+    def round_faces(self, occ, half, r, name, zc="0 mm", facets=False, skip_x=(), skip_y=(), body=None, skip=None,
+                    half_max=None):
         """Round the sharp edges of the side faces (normal along Z) that sit `half` from the
         centre plane zc. facets=True also takes the inclined belly-facet faces."""
         comp = occ.component
@@ -552,6 +558,10 @@ class Builder:
                     continue
             elif facets and 0.2 < abs(g.normal.z) < 0.95:
                 pass
+            elif half_max:      # side faces that lean (a taper): anywhere between half and half_max from the centre
+                off = abs(f.pointOnFace.z - zc_v)
+                if not (abs(g.normal.z) > 0.9 and half_v - 0.01 <= off <= self.ev(half_max) + 0.01):
+                    continue
             elif not (abs(g.normal.z) > 0.99 and abs(abs(f.pointOnFace.z - zc_v) - half_v) < 0.01):
                 continue
             for e in f.edges:
@@ -706,6 +716,21 @@ class Builder:
             occs[key] = occ
         rear, main, fore = occs["rear"], occs["main"], occs["fore"]
 
+        def xz_sketch(name, y_expr):
+            """Sketch on a plane parallel to XZ at height y. Returns the sketch, a function that maps a model X
+            expression to the sketch's first axis, and +1 / -1 for whether a positive extrude goes down. The
+            sketch's _fz maps a model Z expression to its second axis."""
+            y = self.ev(y_expr)
+            pl = self.offset_plane(f"{name}_plane", y_expr, root.xZConstructionPlane)
+            if abs(pl.geometry.origin.y - y) > 0.01:
+                pl.deleteMe()
+                pl = self.offset_plane(f"{name}_plane", f"-({y_expr})", root.xZConstructionPlane)
+            sk = self.sketch(name, pl)
+            q = sk.modelToSketchSpace(adsk.core.Point3D.create(1, y, 1))
+            down = -1 if sk.xDirection.crossProduct(sk.yDirection).y > 0 else 1
+            sk._fz = (lambda z: z) if q.y > 0 else (lambda z: f"-({z})")
+            return sk, (lambda x: x if q.x > 0 else f"-({x})"), down
+
         def body(key, i=0):
             return occs[key].component.bRepBodies.item(i)
 
@@ -740,7 +765,18 @@ class Builder:
         assert len(regions) == 3, f"expected 3 outline regions, got {len(regions)}"
         rear_pr, main_pr, fore_pr = regions
 
-        self.extrude(rear, rear_pr, NEW, start="cast_z - comb_width / 2", dist="comb_width", name="rear_blank")
+        self.extrude(rear, rear_pr, NEW, sym="body_width", name="rear_blank")
+        # the butt leaves the joint at the main body's width and narrows to the comb: no step between the parts
+        sk, fx, down = xz_sketch("butt_flare", "sight_line_above_bore + 20 mm")
+        far = "-lop - hook_reach - 20 mm"
+        for op in ("+", "-"):
+            edge = f"cast_z {op} comb_width / 2"
+            out = f"0 mm {op} (body_width / 2 + 2 mm)"
+            self.poly(sk, [(fx("rear_split"), sk._fz(out)), (fx("rear_split"), sk._fz(f"0 mm {op} body_width / 2")),
+                           (fx("butt_flare_x"), sk._fz(edge)), (fx(far), sk._fz(edge)), (fx(far), sk._fz(out))])
+        self.done(sk)
+        depth = "sight_line_above_bore + ibu_depth_max + 80 mm"
+        self.extrude(rear, self.profiles(sk), CUT, dist=depth if down > 0 else f"-({depth})", name="butt_flare")
         self.extrude(main, main_pr, NEW, sym="body_width", name="main_blank")
         self.extrude(fore, fore_pr, NEW, sym="body_width", name="fore_blank")
 
@@ -752,16 +788,10 @@ class Builder:
 
         # ---- faceted belly under the forend, then the hand stop, then the side rounds
         self.belly(main, "main")
-        # blend the body into the grip: a large round on the two wrist underside edges (a facet here would
-        # collide with the belly facet at the step and leave edges that cannot be rounded)
-        yw, zh = self.ev("wrist_under_y"), self.ev("body_width / 2")
-        wrist = [e for e in body("main").edges
-                 if e.geometry.curveType == adsk.core.Curve3DTypes.Line3DCurveType and e.length > 2
-                 and all(abs(q.y - yw) < 1e-3 and abs(abs(q.z) - zh) < 1e-3 for q in (e.geometry.startPoint, e.geometry.endPoint))]
-        self.fillet(main.component, [(wrist, "wrist_round")], "wrist_round")
         self.belly(fore, "fore")
 
-        self.round_faces(rear, "comb_width / 2", "body_round", "rear_round", zc="cast_z", skip_x=("rear_split",))
+        self.round_faces(rear, "comb_width / 2", "body_round", "rear_round", zc="cast_z", skip_x=("rear_split",),
+                         half_max="body_width / 2 + comb_cast")
         self.round_faces(main, "body_width / 2", "body_round", "main_round", facets=True, skip_x=("rear_split", "front_split"))
         self.round_faces(fore, "body_width / 2", "body_round", "fore_round", facets=True, skip_x=("front_split",))
         hp = "handstop_position"
@@ -907,17 +937,6 @@ class Builder:
         # mounting bolts: a stepped hole each. A bore for an aluminium bedding pillar runs from the bed down to
         # the head seat, and only the bottom act_cbore is opened to head size. The bolt head bears on the
         # pillar and the pillar on the receiver, metal to metal (Darren 2026-11-24)
-        def xz_sketch(name, y_expr):
-            y = self.ev(y_expr)
-            pl = self.offset_plane(f"{name}_plane", y_expr, root.xZConstructionPlane)
-            if abs(pl.geometry.origin.y - y) > 0.01:
-                pl.deleteMe()
-                pl = self.offset_plane(f"{name}_plane", f"-({y_expr})", root.xZConstructionPlane)
-            sk = self.sketch(name, pl)
-            q = sk.modelToSketchSpace(adsk.core.Point3D.create(1, y, 1))
-            down = -1 if sk.xDirection.crossProduct(sk.yDirection).y > 0 else 1
-            return sk, (lambda x: x if q.x > 0 else f"-({x})"), down
-
         def drill(name, y_expr, x_expr, d_expr, depth, comps):
             sk, fx, down = xz_sketch(name, y_expr)
             self.circle(sk, fx(x_expr), "0 mm", d_expr)
@@ -1153,8 +1172,31 @@ class Builder:
             adsk.fusion.PatternDistanceType.SpacingPatternDistanceType)
         forec.features.rectangularPatternFeatures.add(pin).name = "mag_slots"
 
-        # harness rail on the face side: two heat-set inserts, opposite the mag slots
         face = self.offset_plane("face_side_plane", "face_z")
+        # flutes: shallow recesses on the line of the spare-mag slots. On the forestock's face side they mirror the
+        # slots; on both sides of the main body they carry the line back toward the grip. They stop short of the
+        # IBU marking surface. One line then runs from the butt windows through the main body to the forend.
+        sk = self.sketch("mag_flute", face)
+        self.rect(sk, "mag_holder_start", "mag_holder_start + mag_slot_len", "mag_holder_top - mag_slot_h", "mag_holder_top")
+        self.done(sk)
+        fl = self.extrude(fore, sk.profiles.item(0), CUT, dist="-face_side * flute_d", name="mag_flute")
+        ents = adsk.core.ObjectCollection.create()
+        ents.add(fl)
+        rounded = self.fillet_z_edges(fore, fl, "mag_slot_r", "mag_flute_corners")
+        if rounded:
+            ents.add(rounded)
+        pin = forec.features.rectangularPatternFeatures.createInput(
+            ents, forec.xConstructionAxis, self.vi("mag_holder_count"), self.vi("mag_slot_len + mag_holder_wall"),
+            adsk.fusion.PatternDistanceType.SpacingPatternDistanceType)
+        forec.features.rectangularPatternFeatures.add(pin).name = "mag_flutes"
+        sk = self.sketch("body_flute")
+        self.rect(sk, "flute_x0", "flute_x1", "mag_holder_top - mag_slot_h", "mag_holder_top")
+        self.done(sk)
+        for nm, start in (("p", "body_width / 2 - flute_d"), ("n", "-(body_width / 2) - 1 mm")):
+            fl = self.extrude(main, sk.profiles.item(0), CUT, start=start, dist="flute_d + 1 mm", name=f"body_flute_{nm}")
+            self.fillet_z_edges(main, fl, "mag_slot_r", f"body_flute_corners_{nm}")
+
+        # harness rail on the face side: two heat-set inserts, opposite the mag slots
         sk = self.sketch("harness_rail_inserts", face)
         for h in ("harness_rail_hole_1", "harness_rail_hole_2"):
             self.circle(sk, h, "harness_rail_y", "insert_hole_d")
@@ -1289,8 +1331,10 @@ class Builder:
     def colour(self, occs):
         app = adsk.core.Application.get()
         lib = app.materialLibraries.itemByName("Fusion Appearance Library")
-        names = {"rear": "Plastic - Matte (White)", "main": "Plastic - Matte (Gray)", "fore": "Plastic - Matte (White)",
-                 "action": "Plastic - Matte (Blue)", "block": "Plastic - Matte (Black)", "clamp": "Plastic - Matte (Black)", "bcover": "Plastic - Matte (Yellow)", "grip": "Plastic - Matte (Yellow)", "pad": "Plastic - Matte (Yellow)", "cap": "Plastic - Matte (Black)"}
+        rigid, soft, dark = "Plastic - Matte (Gray)", "Plastic - Matte (Yellow)", "Plastic - Matte (Black)"
+        # one colour for every rigid printed part, so the stock reads as one design; TPU and the small ASA parts differ
+        names = {"rear": rigid, "main": rigid, "fore": rigid, "action": rigid, "block": rigid,
+                 "grip": soft, "pad": soft, "bcover": soft, "cap": dark, "clamp": dark}
         for key, name in names.items():
             a = lib.appearances.itemByName(name) if lib else None
             if a:
