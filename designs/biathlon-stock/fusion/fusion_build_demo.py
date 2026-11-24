@@ -86,17 +86,15 @@ DEMO_PARAMS = [
     ("chk_depth_grip", "mm", "ibu_depth_max + grip_top_y - grip_length",
      "[demo] MC 3.1.6.4 a read strictly: grip bottom within 140 mm of the bore"),
     # ---- trigger guard and standing block (Darren 2026-11-24: the block is an extension of the guard base)
-    ("guard_front_x", "mm", "78 mm", "[demo] front of the guard's front leg, behind the mag well"),
-    ("guard_bar", "mm", "8 mm", "[demo] trigger-guard bar thickness"),
+    ("guard_bottom", "mm", "83 mm", "[manual] rework: guard raised tight under the body so the hand wraps the grip; IBU MC 3.1.6.4 a"),
+    ("guard_front_x", "mm", "34 mm", "[demo] front of the guard's front leg, behind the mag well"),
+    ("guard_bar", "mm", "10 mm", "[demo] trigger-guard rail thickness (carries the block mount insert)"),
     ("guard_rake", "mm", "10 mm", "[demo] guard front leg thickness over the bar"),
     ("guard_width", "mm", "18 mm", "[demo] trigger-guard width"),
     ("guard_round", "mm", "3 mm", "[demo] edge round on the guard"),
-    ("rel_len", "mm", "22 mm", "[demo] magazine-release window length (second loop, ahead of the trigger guard)"),
-    ("guard_div", "mm", "8 mm", "[demo] divider between the trigger opening and the release window"),
-    ("rel_front_x", "mm", "guard_front_x - guard_rake - guard_bar", "[demo] derived: front of the release window"),
-    ("finger_hole_x1", "mm", "rel_front_x - rel_len - guard_div", "[manual] trigger opening front"),
-    ("finger_hole_y0", "mm", "-guard_bottom + guard_bar", "[manual] guard opening bottom"),
-    ("finger_clear", "mm", "12 mm", "[demo] grip front to the block's rear top edge (1827 F Comfort layout: the block starts under the grip front)"),
+    ("rel_front_x", "mm", "guard_front_x - guard_rake - guard_bar", "[demo] derived: front of the trigger opening"),
+    ("finger_hole_x1", "mm", "rel_front_x", "[manual] trigger opening front"),
+    ("finger_clear", "mm", "28 mm", "[demo] room for the gloved fingers between the grip front and the default block"),
     ("blk_rear_x", "mm", "grip_front_x - grip_lean * (grip_top_y + guard_bottom) + finger_clear",
      "[demo] derived: rear face of the standing block"),
     ("blk_rake", "mm", "10 mm", "[demo] block rear face is undercut by this much, for the fingers"),
@@ -110,6 +108,9 @@ DEMO_PARAMS = [
      "[manual] restyle: derived, the block spans from the finger clearance to the guard front"),
     ("block_position", "mm", "(guard_front_x + blk_rear_x) / 2",
      "[manual] restyle: derived, the block sits under the trigger guard (m_AJ is kept for reference only)"),
+    ("saddle_h", "mm", "4 mm", "[demo] the block's saddle wraps this far up the guard rail (locates it and stops it turning)"),
+    ("block_bolt_x", "mm", "block_position", "[demo] derived: the single M5 block bolt, into a heat-set insert in the rail"),
+    ("block_insert_depth", "mm", "guard_bar - 2 mm", "[demo] derived: insert hole depth in the rail"),
     ("chk_block_mag", "mm", "mag_well_x0 - fit_slide - guard_front_x - 2 mm",
      "[demo] the block and guard stay behind the magazine well, so the magazine drops free"),
     # ---- hand stop
@@ -585,7 +586,7 @@ class Builder:
 
         occs = {}
         for key, label in (("rear", "rear_stock"), ("main", "main_body"), ("fore", "forestock"),
-                           ("action", "action_cradle"), ("grip", "tpu_grip"), ("pad", "tpu_prone_pad"), ("cap", "grip_cap")):
+                           ("action", "action_cradle"), ("block", "standing_block"), ("grip", "tpu_grip"), ("pad", "tpu_prone_pad"), ("cap", "grip_cap")):
             occ = root.occurrences.addNewComponent(adsk.core.Matrix3D.create())
             occ.component.name = label
             occs[key] = occ
@@ -669,29 +670,27 @@ class Builder:
                        (f"{gf(gbm)} - 3 mm", gbm), (f"{gf(fh0)} - 3 mm", fh0), ("rel_front_x", fh0)])
         self.done(sk)
         self.extrude(main, sk.profiles.item(0), JOIN, sym="guard_width", name="trigger_guard")
-        # two closed loops on one bottom rail (1827 F Comfort layout): the trigger guard, and ahead of it
-        # the window the magazine release hangs in
-        sk = self.sketch("guard_divider")
-        self.rect(sk, "finger_hole_x1", "finger_hole_x1 + guard_div", f"{fh0} - 1 mm", "finger_hole_y1 + 3 mm")
-        self.done(sk)
-        self.extrude(main, sk.profiles.item(0), JOIN, sym="guard_width", name="guard_divider")
         self.corners(main, [("rel_front_x", fh0, "guard_round + guard_round")], "guard")
         self.round_faces(main, "guard_width / 2", "guard_round", "guard_round", skip_y=(fd,))
 
+        # ---- standing block: the stock only carries a mount point (the flat underside of the guard rail
+        # with one M5 heat-set insert). The block is a separate printed part the athlete can swap: its
+        # saddle straddles the rail, so it cannot turn or slide sideways, and one bolt holds it.
+        blk = occs["block"]
+        bh, btop = "-block_height", f"{gbm} + saddle_h"
         sk = self.sketch("standing_block")
-        bh = "-block_height"
-        self.poly(sk, [("blk_rear_x", fh0), (lf(fh0), fh0), ("guard_front_x - blk_front_rake", bh), ("blk_rear_x + blk_rake", bh)])
+        self.poly(sk, [("blk_rear_x", btop), (lf(btop), btop), ("guard_front_x - blk_front_rake", bh), ("blk_rear_x + blk_rake", bh)])
         self.done(sk)
-        self.extrude(main, sk.profiles.item(0), JOIN, sym="block_width", name="standing_block")
-        self.corners(main, [("guard_front_x - blk_front_rake", bh, "block_corner_r"), ("blk_rear_x + blk_rake", bh, "block_corner_r")], "block")
-        self.round_faces(main, "block_width / 2", "block_round", "block_round")
-
+        self.extrude(blk, sk.profiles.item(0), NEW, sym="block_width", name="standing_block")
+        self.corners(blk, [("guard_front_x - blk_front_rake", bh, "block_corner_r"), ("blk_rear_x + blk_rake", bh, "block_corner_r")], "block")
+        self.round_faces(blk, "block_width / 2", "block_round", "block_round")
+        self.combine((blk, body("block")), [(main, body("main"))], CUT, "block_saddle")
         sk = self.sketch("block_window")
         self.rect(sk, "blk_rear_x + blk_rake + blk_win_web", "guard_front_x - blk_front_rake - blk_win_web",
                   f"{bh} + blk_win_web", f"{gbm} - blk_win_web")
         self.done(sk)
-        f = self.extrude(main, sk.profiles.item(0), CUT, sym="2 * body_width", name="block_window")
-        self.fillet_z_edges(main, f, "block_slot_r", "block_window_round")
+        f = self.extrude(blk, sk.profiles.item(0), CUT, sym="2 * body_width", name="block_window")
+        self.fillet_z_edges(blk, f, "block_slot_r", "block_window_round")
 
         # ---- action cradle: everything that depends on the action type lives in this one component.
         # The main body only has a pocket of fixed section (cradle_w wide, down to cradle_y).
@@ -750,6 +749,10 @@ class Builder:
         for nm, x, under in (("front", "act_screw_front_x", fd), ("rear", "act_screw_rear_x", "wrist_under_y")):
             drill(f"{nm}_pillar_bore", "0 mm", x, "act_pillar_d", "ibu_depth_max", both)
             drill(f"{nm}_screw_counterbore", f"{under} + act_cbore", x, "act_head_d + 3 mm", "act_cbore + 2 mm", (main,))
+
+        # block bolt: the head sits inside the block's slot and is tightened through the hole in the slot floor
+        drill("block_bolt_hole", gbm, "block_bolt_x", "cap_screw_d", "block_height", (blk,))
+        drill("block_mount_insert", f"{gbm} + block_insert_depth", "block_bolt_x", "insert_hole_d", "block_insert_depth + 1 mm", (main,))
 
         sk = self.sketch("barrel_channel")
         self.rect(sk, "action_front", "forend_tip + tip_round", "-(barrel_d / 2 + barrel_float)", "sight_line_above_bore")
@@ -1006,7 +1009,7 @@ class Builder:
         app = adsk.core.Application.get()
         lib = app.materialLibraries.itemByName("Fusion Appearance Library")
         names = {"rear": "Plastic - Matte (White)", "main": "Plastic - Matte (Gray)", "fore": "Plastic - Matte (White)",
-                 "action": "Plastic - Matte (Blue)", "grip": "Plastic - Matte (Yellow)", "pad": "Plastic - Matte (Yellow)", "cap": "Plastic - Matte (Black)"}
+                 "action": "Plastic - Matte (Blue)", "block": "Plastic - Matte (Black)", "grip": "Plastic - Matte (Yellow)", "pad": "Plastic - Matte (Yellow)", "cap": "Plastic - Matte (Black)"}
         for key, name in names.items():
             a = lib.appearances.itemByName(name) if lib else None
             if a:
@@ -1025,7 +1028,7 @@ def report(design, occs, problems=(), log=print):
             size = [round((getattr(bb.maxPoint, a) - getattr(bb.minPoint, a)) * 10, 1) for a in "xyz"]
             log(f"{occ.component.name}: {b.name} valid={b.isValid} lumps={b.lumps.count} size_mm={size} "
                 f"vol_cm3={b.volume:.0f} faces={b.faces.count}")
-    for key in ("rear", "main", "fore", "pad", "grip", "cap"):
+    for key in ("rear", "main", "fore", "block", "pad", "grip", "cap"):
         occ = occs[key]
         if not occ.component.bRepBodies.count:
             continue

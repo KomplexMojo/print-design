@@ -125,22 +125,22 @@ One parameter per numeric value in the JSON. S and T (sides) are not parameters;
 | Fusion name | JSON `cad_parameters` key | Unit | Expression | Sample | Status | IBU | Note |
 |---|---|---|---|---|---|---|---|
 | `action_rear` |  | mm | `-105 mm` | -105 | action |  |  |
-| `action_front` |  | mm | `156 mm` | 156 | action |  |  |
+| `action_front` |  | mm | `125 mm` | 125 | action |  |  |
 | `action_width` |  | mm | `32 mm` | 32 | action |  |  |
 | `bore_above_inlet_floor` |  | mm | `20 mm` | 20 | fixed |  |  |
 | `sight_line_above_bore` |  | mm | `37 mm` | 37 | fixed |  | diopter + front globe |
 | `barrel_d` | `barrel_d` | mm | `r_barrel_d_action` | 22 | measured |  | barrel at the action Sources: rifle.barrel_diameter_action_mm. |
 | `barrel_float` |  | mm | `2 mm` | 2 | fixed |  | free-float clearance |
 | `guard_bottom` |  | mm | `90 mm` | 90 | fixed | MC 3.1.6.4 a | bore to bottom of the trigger guard |
-| `trigger_slot_x0` |  | mm | `-8 mm` | -8 | fixed |  |  |
-| `trigger_slot_x1` |  | mm | `28 mm` | 28 | fixed |  |  |
+| `trigger_slot_x0` |  | mm | `-8 mm` | -8 | action |  |  |
+| `trigger_slot_x1` |  | mm | `12 mm` | 12 | action |  |  |
 | `trigger_slot_width` |  | mm | `12 mm` | 12 | fixed |  |  |
 | `finger_hole_x0` |  | mm | `-42 mm` | -42 | fixed |  |  |
 | `finger_hole_x1` |  | mm | `38 mm` | 38 | fixed |  |  |
 | `finger_hole_y0` |  | mm | `-82 mm` | -82 | fixed |  |  |
 | `finger_hole_y1` |  | mm | `-45 mm` | -45 | fixed |  |  |
-| `mag_well_x0` |  | mm | `82 mm` | 82 | action |  |  |
-| `mag_well_x1` |  | mm | `132 mm` | 132 | action |  |  |
+| `mag_well_x0` |  | mm | `50 mm` | 50 | action |  |  |
+| `mag_well_x1` |  | mm | `100 mm` | 100 | action |  |  |
 | `mag_well_width` |  | mm | `22 mm` | 22 | action |  |  |
 | `spare_mag_t` |  | mm | `14 mm` | 14 | fixed |  | spare mag thickness (along X) |
 | `spare_mag_l` |  | mm | `32 mm` | 32 | fixed |  | spare mag length (lateral) |

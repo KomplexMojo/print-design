@@ -299,12 +299,17 @@ now builds it, still entirely from User Parameters. Review images come from `fus
   the bolts), so the plan is M6 studs threaded into the captive nuts with nuts on the outer ends. `chk_holder_joint`,
   `chk_holder_hand` and `chk_rail_handstop` still use r1's upright-holder rules. Some trigger-guard edges are left square.
 
-### Standing block after the 1827 F Comfort (Darren, 2026-11-24)
-The guard is now two closed loops on one bottom rail: the trigger guard, then the window the magazine release hangs in
-(`rel_len`, split off by `guard_div`), with the magazine well ahead of the front leg. The block is a slab under the whole
-rail, from `finger_clear` ahead of the grip front to `guard_front_x`, with a near-vertical front (`blk_front_rake`), an
-undercut rear (`blk_rake`) and an oblong slot (`block_slot_r`). The 1827 F preset moves the magazine well to 82–132 mm and
-the front screw to 143 mm to make room for the release window; all still placeholders.
+### Trigger guard and bolt-on standing block (Darren, 2026-11-24)
+- **Guard.** One closed loop sized like a real guard: the opening runs from the grip front to `rel_front_x` (about 62 mm)
+  and is 28 mm high. `guard_bottom` is 83 mm, so the rail sits tight under the body and the hand wraps the grip below it.
+  There is no divider bar and no separate release window.
+- **Mount point.** The stock carries only the flat underside of the guard rail with one M5 heat-set insert
+  (`block_bolt_x`, `block_insert_depth`).
+- **Block.** `standing_block` is its own component and print, so an athlete can swap designs. Its saddle wraps `saddle_h`
+  up the rail, which locates it and stops it turning; one M5 bolt holds it. The bolt head sits inside the block's slot and
+  is tightened through the hole in the slot floor. The default block spans `finger_clear` ahead of the grip to the guard front.
+- **IBU.** The assembled block counts toward MC 3.1.6.4 a: `chk_depth_block` and the build report's lowest point of
+  `standing_block` both check it. Any replacement block must keep `block_height` at or under 140 mm.
 
 ## 11. Action cradle (2026-11-24)
 Darren's requirement: the stock must take a real barrelled action on its mounting screws, and a different action must
