@@ -362,7 +362,8 @@ middle and 35 mm ahead of its front end. The barrelled action (1880 g, own balan
 
 ### Spare-magazine slots (Darren, 2026-11-24)
 Each of the four holder slots is 36 × 9.5 mm (`mag_slot_len`, `mag_slot_h`, measured) with rounded corners
-(`mag_slot_r`, placeholder), spaced `mag_holder_wall` apart. The slot depth into the forestock is still a placeholder.
+(`mag_slot_r`, placeholder), spaced `mag_holder_wall` apart. The slots are 42 mm deep (`mag_slot_depth`, measured), which leaves 8 mm of wall on
+the face side (`chk_slot_wall`); the harness rail inserts moved above the slots (`harness_rail_y`, `chk_rail_slots`).
 
 ## 11. Action cradle (2026-11-24)
 Darren's requirement: the stock must take a real barrelled action on its mounting screws, and a different action must

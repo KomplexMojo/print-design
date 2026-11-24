@@ -152,7 +152,10 @@ DEMO_PARAMS = [
     ("mag_slot_h", "mm", "9.5 mm", "[demo] spare-mag holder slot height (Darren, measured 2026-11-24)"),
     ("mag_slot_r", "mm", "3 mm", "[demo] PLACEHOLDER: corner radius of the spare-mag slots"),
     ("chk_slots_handstop", "mm", "forend_tip - tip_rake - 8 mm - (mag_holder_start + mag_holder_count * mag_slot_len + (mag_holder_count - 1) * mag_holder_wall)", "[demo] the row of slots ends before the forend nose"),
-    ("mag_slot_depth", "mm", "spare_mag_l + fit_snug", "[demo] lateral insertion depth"),
+    ("mag_slot_depth", "mm", "42 mm", "[demo] spare-mag holder slot depth into the forestock (Darren, measured 2026-11-24)"),
+    ("harness_rail_y", "mm", "-10 mm", "[manual] harness rail inserts moved above the mag slots, which now reach to within 8 mm of the face side"),
+    ("chk_slot_wall", "mm", "body_width - mag_slot_depth - min_wall", "[demo] wall left on the face side behind the mag slots"),
+    ("chk_rail_slots", "mm", "(harness_rail_y - insert_hole_d / 2) - mag_holder_top - 3 mm", "[demo] harness inserts clear above the mag slots"),
     ("chk_slot_channel", "mm", "-(barrel_d / 2 + barrel_float) - mag_holder_top - min_wall",
      "[demo] web between the barrel channel and the mag slots >= min_wall"),
     # ---- skeleton butt: full-width comb beam and plate post, slim frame between, truss windows
