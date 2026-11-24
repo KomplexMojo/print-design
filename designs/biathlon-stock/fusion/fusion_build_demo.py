@@ -229,8 +229,9 @@ DEMO_PARAMS = [
     ("mag_flare", "mm", "4 mm", "[demo] flare round the magazine well's bottom entry (45 degrees), so magazines guide in"),
     ("rel_scoop_r", "mm", "(act_rel_len * act_rel_len / 4 + act_rel_depth * act_rel_depth) / (2 * act_rel_depth)",
      "[demo] derived: radius of the release-lever scoop from its length and depth"),
-    ("chk_rel_bolt", "mm", "act_screw_front_x - (act_head_d + 3 mm) / 2 - (mag_well_x1 + fit_slide + act_rel_len) - 2 mm",
-     "[demo] the release scoop stays clear of the front bolt counterbore"),
+    ("chk_rel_travel", "mm", "act_rel_len - act_rel_travel - act_rel_lever", "[demo] the release scoop covers the lever and its full fore-aft travel"),
+    ("chk_rel_bolt", "mm", "(mag_well_x0 - fit_slide - act_rel_len) - (act_screw_rear_x + (act_head_d + 3 mm) / 2) - 2 mm",
+     "[demo] the release scoop stays clear of the rear bolt counterbore"),
     ("chk_bolt_step_socket", "mm", "-(rear_tongue_y + rear_tongue_height / 2) - act_bolt_step_depth - 2 mm",
      "[demo] the bolt-handle step stays above the rear joint socket"),
     ("chk_flare_bolts", "mm", "(mag_well_x0 - mag_flare) - (act_screw_rear_x + (act_head_d + 3 mm) / 2) - 2 mm",
@@ -840,9 +841,10 @@ class Builder:
         else:
             self.problems.append("mag_well_flare: rim not found")
         if self.ev("act_rel_len") > 0.01:
-            # scoop for the magazine-release lever: a rounded relief in the underside just ahead of the well
+            # scoop for the magazine-release lever: a rounded relief in the underside just behind the well,
+            # toward the trigger (Darren 2026-11-24)
             sk = self.sketch("release_scoop")
-            self.poly(sk, [("mag_well_x1 + fit_slide + act_rel_len", fd), ("mag_well_x1 + fit_slide", fd)], arcs={0: "rel_scoop_r"})
+            self.poly(sk, [("mag_well_x0 - fit_slide", fd), ("mag_well_x0 - fit_slide - act_rel_len", fd)], arcs={0: "rel_scoop_r"})
             self.done(sk)
             self.extrude(main, sk.profiles.item(0), CUT, sym="mag_well_width + 2 * fit_slide + 2 * mag_flare", name="release_scoop")
         drill("locating_pin", "-act_bed_r + 1 mm", "act_pin_x", "act_pin_d", "7 mm", (act,))

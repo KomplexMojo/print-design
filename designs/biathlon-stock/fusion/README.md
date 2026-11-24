@@ -356,8 +356,9 @@ not mean redoing the design. Everything that depends on the action now lives in 
   by `pocket_r` (5 mm, estimated from photos).
 - **Flared magazine entry.** The bottom of the magazine well has a 45 degree funnel, `mag_flare` wide, clear of both bolt
   counterbores (`chk_flare_bolts`) and inside the flat of the belly (`chk_flare_belly`).
-- **Magazine-release scoop.** A rounded relief in the underside just ahead of the magazine well (`act_rel_len`,
-  `act_rel_depth`, radius `rel_scoop_r`), as wide as the flared entry, clear of the front bolt counterbore (`chk_rel_bolt`).
+- **Magazine-release scoop.** A rounded relief in the underside just behind the magazine well, toward the trigger (`act_rel_len`,
+  `act_rel_depth`, radius `rel_scoop_r`), as wide as the flared entry, clear of the rear bolt counterbore (`chk_rel_bolt`). The lever moves fore-aft, so the scoop must
+  cover the lever plus its travel (`act_rel_travel`, `act_rel_lever`, `chk_rel_travel`); the rear bolt limits it to about 13 mm.
 - **Fortner bolt-handle notch.** A long notch in the bolt-side wall (`bolt_notch_x`, `bolt_notch_length`,
   `bolt_notch_depth`) with a deeper step at its rear for the lever (`act_bolt_step_len`, `act_bolt_step_depth`). It is cut
   on the side given by `bolt_dir`, which comes from the rifle's bolt side in the fit record and is not a mirror of the
