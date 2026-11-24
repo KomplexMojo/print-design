@@ -41,8 +41,7 @@ DATUM = 1000.0  # mm
 OBSOLETE_PARAMS = ("chk_pillar_mag", "act_receiver_d", "sling_tab_r", "rel_len", "guard_div",
                    "block_top_len", "grip_toe", "rs_rib_x", "saddle_h", "block_bolt_x", "block_insert_depth",
                    "chk_slot_pillar", "chk_key_slot", "act_slot_x0", "act_slot_x1", "act_slot_w",
-                   "wrist_facet_w", "wrist_facet_h", "chk_belly_step", "chk_rel_travel", "chk_bolts_centred", "sling_head_h", "finger_clear", "blk_scoop_d", "chk_comb_length", "chk_pad_pocket", "blk_win_web", "block_slot_r", "chk_block_top_flat", "collar_round", "rear_cap", "core_neck", "guard_gusset_r", "collar_h", "wrist_round",
-                   "chk_gusset_bolt")
+                   "wrist_facet_w", "wrist_facet_h", "chk_belly_step", "chk_rel_travel", "chk_bolts_centred", "sling_head_h", "finger_clear", "blk_scoop_d", "chk_comb_length", "chk_pad_pocket", "blk_win_web", "block_slot_r", "chk_block_top_flat", "collar_round", "rear_cap", "wrist_round")
 FUSE_BLOCK = False   # True joins the standing block into the main body (the printed part)
 FUSE_ACTION = False  # True joins the action cradle into the main body (the printed part); False keeps it apart for review
 
@@ -125,7 +124,7 @@ DEMO_PARAMS = [
     ("guard_rear_r", "mm", "10 mm", "[demo] large radius where the guard rail flows into the grip front"),
     ("guard_corner_r", "mm", "8 mm", "[demo] radius of the other corners of the trigger opening"),
     ("blk_tuck", "mm", "12 mm", "[demo] the block starts this far behind the front of the trigger opening, clear of the hand on the grip"),
-    ("blk_scoop_r", "mm", "30 mm", "[demo] radius of the finger scoop on the block's rear face"),
+    ("blk_scoop_r", "mm", "400 mm", "[demo] the block's rear face is near flat; the rail's quarter-round carries the curve"),
     ("block_drop", "mm", "28 mm", "[demo] thickness of the standing block below the guard rail (compact, Darren 2026-11-24)"),
     ("block_height", "mm", "guard_bottom + block_drop", "[manual] derived: bore to the bottom of the standing block; IBU MC 3.1.6.4 a"),
     ("block_top_r", "mm", "8 mm", "[demo] round of the block's top front corner (must exceed block_round)"),
@@ -139,12 +138,17 @@ DEMO_PARAMS = [
     ("rail_taper_len", "mm", "18 mm", "[demo] the guard rail narrows over this length before it meets the grip"),
     ("rail_taper_w", "mm", "4 mm", "[demo] half-width the rail narrows to inside the grip"),
     ("chk_plug_floor", "mm", "-act_trig_depth - (finger_hole_y1 + plug_h) - 1.5 mm", "[demo] stock left between the trigger pocket floor and the lower unit's plate"),
+    ("guard_gusset_r", "mm", "18 mm", "[demo] quarter-round that carries the guard's front leg forward into the top of the block (tangent at both ends)"),
+    ("collar_h", "mm", "5 mm", "[demo] rigid skin (1 mm more than guard_round, so it can carry its edge round): skin along the top of the block, part of the guard's outline, just thick enough to carry its edge round; the TPU cover fits up under it"),
+    ("nose_cap", "mm", "4 mm", "[demo] the rigid skin wraps this far round the block's rounded top front corner"),
+    ("core_neck", "mm", "3 mm", "[demo] dovetail of the block's rib: this much narrower per side at the top than at the bottom, so the cover cannot pull off downward"),
+    ("chk_gusset_bolt", "mm", "act_screw_rear_x - (act_head_d + 3 mm) / 2 - (guard_front_x + guard_gusset_r)", "[demo] the leg's sweep stays clear of the rear mounting bolt's hole"),
     ("guard_blend_r", "mm", "14 mm", "[demo] radius that blends the guard rail into the block's rear face"),
     ("guard_round", "mm", "4 mm", "[demo] edge round on the guard and on the standing block (one radius, so their surfaces line up)"),
     ("rel_front_x", "mm", "guard_front_x - guard_rake - guard_bar", "[demo] derived: front of the trigger opening"),
     ("finger_hole_x1", "mm", "rel_front_x", "[manual] trigger opening front"),
     ("blk_rear_x", "mm", "rel_front_x - blk_tuck", "[demo] derived: rear face of the standing block, under the front of the trigger opening"),
-    ("blk_rake", "mm", "10 mm", "[demo] block rear face is undercut by this much, for the fingers"),
+    ("blk_rake", "mm", "0 mm", "[demo] the block's rear face is vertical, so the rail's quarter-round meets it tangentially"),
     ("blk_front_rake", "mm", "2 mm", "[demo] block and front-leg face lean (near vertical)"),
     ("block_width", "mm", "guard_width", "[demo] derived: the block is exactly as wide as the guard, so their sides are one flush surface with no ledge"),
     ("block_round", "mm", "guard_round", "[demo] derived: the cover's edge round equals the rigid frame's, so cover and frame are flush everywhere"),
@@ -862,20 +866,35 @@ class Builder:
         top_e = f"{y1} + 6 mm"                      # the leg's top is buried in the body
         rr, rc = "guard_rear_r", "guard_corner_r"
         sk = self.sketch("trigger_guard")
-        rb = "guard_blend_r"
-        land = f"{gbm} - block_top_r"               # where the rail's blend lands on the heel's finger scoop
+        rg, rb, tr = "guard_gusset_r", "guard_blend_r", "block_top_r"
+        shoulder = f"{gbm} - collar_h"              # underside of the rigid skin; the TPU cover fits up to it
+        nose_y, nose_x = f"{gbm} - {tr}", "blk_front_x - nose_cap"
+        # One flowing outline. Every transition is a true tangent arc: the front leg sweeps forward into the top
+        # of the block, the top rolls over the front corner, and the rail's underside rolls down into the
+        # block's vertical rear face. The TPU cover fits whatever is left underneath.
         self.poly(sk, [(f"{rf} - {rc}", top_e), ("guard_front_x", top_e),
-                       (lf(f"{gbm} + {rc}"), f"{gbm} + {rc}"), (f"{lf(gbm)} - {rc}", gbm),          # 2 -> 3: rounded front lower corner of the loop
-                       ("blk_rear_x + 6 mm", gbm), ("blk_rear_x + 6 mm", land),
-                       (f"blk_rear_x - {rb}", gbm),                                                # 5 -> 6: rail flows into the heel's rear
+                       (lf(f"{gbm} + {rg}"), f"{gbm} + {rg}"), (f"{lf(gbm)} + {rg}", gbm),          # 2 -> 3: leg into block top
+                       (f"blk_front_x - {tr}", gbm), ("blk_front_x", nose_y),                      # 4 -> 5: top front corner
+                       (nose_x, nose_y), (f"{nose_x} - ({tr} - collar_h)", shoulder),              # underside of the nose cap
+                       ("blk_rear_x + 6 mm", shoulder), ("blk_rear_x + 6 mm", f"{gbm} - {rb}"),
+                       ("blk_rear_x", f"{gbm} - {rb}"), (f"blk_rear_x - {rb}", gbm),               # 10 -> 11: rail into the block's rear
                        (f"{gf(gbm)} - 6 mm", gbm), (f"{gf(f'{fh0} + {rr}')} - 6 mm", f"{fh0} + {rr}"),
-                       (gf(f"{fh0} + {rr}"), f"{fh0} + {rr}"), (f"{gf(fh0)} + {rr}", fh0),          # 9 -> 10: rail into grip
-                       (f"{rf} - {rc}", fh0), (rf, f"{fh0} + {rc}"),                               # 11 -> 12: front lower corner
-                       (rf, f"{y1} - {rc}"), (f"{rf} - {rc}", y1)],                                # 13 -> 14: front upper corner
-                  arcs={2: (rc, -1), 5: f"2 * {rb}", 9: rr, 11: rc, 13: rc})
+                       (gf(f"{fh0} + {rr}"), f"{fh0} + {rr}"), (f"{gf(fh0)} + {rr}", fh0),          # 14 -> 15: rail into grip
+                       (f"{rf} - {rc}", fh0), (rf, f"{fh0} + {rc}"),                               # 16 -> 17: opening, front lower corner
+                       (rf, f"{y1} - {rc}"), (f"{rf} - {rc}", y1)],                                # 18 -> 19: opening, front upper corner
+                  arcs={2: rg, 4: (tr, -1), 10: rb, 14: rr, 16: rc, 18: rc})
         self.done(sk)
         self.extrude(blk, sk.profiles.item(0), NEW, sym="guard_width", name="trigger_guard")
-        self.round_faces(blk, "guard_width / 2", "guard_round", "guard_round", skip_y=(top_e,))
+        y_sh, y_nose, x_heel, x_rear = self.ev(shoulder), self.ev(nose_y), self.ev("blk_heel_x"), self.ev("blk_rear_x")
+
+        def under_skin(e):      # edges on the underside of the rigid skin: the cover butts against them, keep them square
+            a_, b_ = e.startVertex.geometry, e.endVertex.geometry
+            if abs(a_.z - b_.z) > 1e-4:
+                return False
+            buried = (min(a_.x, b_.x) > x_rear - 0.01 and max(a_.x, b_.x) < x_heel + 0.01 and max(a_.y, b_.y) < y_sh + 0.01)
+            return buried or (min(a_.x, b_.x) > x_heel - 0.9 and max(a_.y, b_.y) < y_sh + 0.01 and min(a_.y, b_.y) > y_nose - 0.01)
+
+        self.round_faces(blk, "guard_width / 2", "guard_round", "guard_round", skip_y=(top_e,), skip=under_skin)
 
         def block_profile(sk, inset, x_shift="0 mm", y_top=None, y_low=None):
             lo = y_low or f"{bh} + {inset}"
@@ -894,7 +913,7 @@ class Builder:
                                (f"blk_rear_x + blk_rake + {inset}", lo, corner_r)]
                          + ([(f"blk_front_x - {inset}", btop, "block_top_r")] if top_corner else []), name, body=b)
             if edge_r:
-                self.round_faces(occ, f"({width}) / 2", edge_r, f"{name}_round", body=b)     # top edges too
+                self.round_faces(occ, f"({width}) / 2", edge_r, f"{name}_round", skip_y=(btop,), body=b)
             return b
 
         # plate that plugs into the stock underside (the stock gets the matching pocket at the end)
@@ -903,32 +922,44 @@ class Builder:
         self.done(sk)
         self.extrude(blk, sk.profiles.item(0), JOIN, sym="plug_w", name="lower_plug")
 
-        # standing block (Darren 2026-11-24). The rigid part is not block-shaped: it is a heel at the rear, with
-        # the finger scoop, and a plain tongue that sticks forward from it under the guard. The TPU cover is the
-        # whole block, top and bottom: a sleeve that slides over the tongue from the front until it meets the heel.
+        # standing block. Rigid: the skin on top (in the guard outline above), a heel at the rear, and a dovetail
+        # rib under the skin. The TPU cover is the hold surface: it slides on from the front, under the skin and
+        # over the rib, until it meets the heel.
         def cut_box(occ, name, x0, x1, y0, y1_, bodies=None):
             sk = self.sketch(name)
             self.rect(sk, x0, x1, y0, y1_)
             self.done(sk)
             return self.extrude(occ, sk.profiles.item(0), CUT, sym="2 * body_width", name=name, bodies=bodies)
 
+        def cut_above_skin(occ, name, bodies=None):
+            """Remove everything from the rigid skin's underside upward (the skin and nose cap own that space)."""
+            sk = self.sketch(name)
+            self.poly(sk, [("blk_rear_x - 10 mm", f"{btop} + 5 mm"), ("blk_front_x + 10 mm", f"{btop} + 5 mm"),
+                           ("blk_front_x + 10 mm", nose_y), (nose_x, nose_y),
+                           (f"{nose_x} - ({tr} - collar_h)", shoulder), ("blk_rear_x - 10 mm", shoulder)])
+            self.done(sk)
+            return self.extrude(occ, sk.profiles.item(0), CUT, sym="2 * body_width", name=name, bodies=bodies)
+
         # heel and cover are cut from the same rounded shape, so they are flush where they meet
-        heel = block_solid(blk, "block_heel", "0 mm", "block_width", "block_corner_r", "block_round")
+        heel = block_solid(blk, "block_heel", "0 mm", "block_width", "block_corner_r", "block_round", top_corner=False)
         cut_box(blk, "block_heel_front", "blk_heel_x", "blk_front_x + 10 mm", f"{bh} - 5 mm", f"{btop} + 5 mm", [heel])
-        sk = self.yz_sketch("block_tongue", "blk_heel_x")
-        tw, t_hi, t_lo = f"(block_width / 2 - {ct})", f"{btop} - {ct}", f"{bh} + {ct}"
-        self.rect(sk, f"-{tw}", tw, t_lo, t_hi)
+        cut_above_skin(blk, "block_heel_top", [heel])
+        sk = self.yz_sketch("block_rib", "blk_heel_x")
+        cw, t_lo = f"(block_width / 2 - {ct})", f"{bh} + {ct}"
+        self.poly(sk, [(f"-({cw} - core_neck)", shoulder), (f"{cw} - core_neck", shoulder), (cw, t_lo), (f"-{cw}", t_lo)])
         self.done(sk)
-        self.extrude(blk, sk.profiles.item(0), NEW, dist=f"blk_front_x - blk_front_rake - {ct} - blk_heel_x", name="block_tongue")
-        tongue = blk.component.bRepBodies.item(blk.component.bRepBodies.count - 1)
-        cut_box(blk, "block_detent", "blk_heel_x + 8 mm", "blk_heel_x + 8 mm + detent_w", f"{t_lo} - 1 mm", f"{t_lo} + detent_d", [tongue])
+        self.extrude(blk, sk.profiles.item(0), NEW, dist=f"blk_front_x - blk_front_rake - {ct} - blk_heel_x", name="block_rib")
+        rib = blk.component.bRepBodies.item(blk.component.bRepBodies.count - 1)
+        cut_box(blk, "block_detent", "blk_heel_x + 8 mm", "blk_heel_x + 8 mm + detent_w", f"{t_lo} - 1 mm", f"{t_lo} + detent_d", [rib])
+        cut_above_skin(blk, "block_rib_top", [rib])     # the rib stops under the nose cap
         extra = [(blk, blk.component.bRepBodies.item(i)) for i in range(1, blk.component.bRepBodies.count)]
         self.combine((blk, body("block")), extra, JOIN, "lower_unit_join", keep=False)
 
-        # TPU cover: its own part, customised and printed per athlete. Closed at the front, on top and underneath,
-        # so it hides the hole for the rear mounting bolt. A rib inside it snaps into the tongue's groove.
-        block_solid(bcov, "block_cover", "0 mm", "block_width", "block_corner_r", "block_round")
+        # TPU cover: its own part, customised and printed per athlete. Closed at the front and underneath, so it
+        # hides the hole for the rear mounting bolt. A rib inside it snaps into the groove under the rigid rib.
+        block_solid(bcov, "block_cover", "0 mm", "block_width", "block_corner_r", "block_round", top_corner=False)
         cut_box(bcov, "block_cover_rear", "blk_rear_x - 10 mm", "blk_heel_x", f"{bh} - 5 mm", f"{btop} + 5 mm")
+        cut_above_skin(bcov, "block_cover_top")
         self.combine((bcov, body("bcover")), [(blk, body("block"))], CUT, "block_cover_sleeve")
 
         # ---- action cradle: everything that depends on the action type lives in this one component.

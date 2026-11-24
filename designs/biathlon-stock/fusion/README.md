@@ -308,14 +308,20 @@ now builds it, still entirely from User Parameters. Review images come from `fus
   corners (`guard_corner_r`) and a large radius into the grip front (`guard_rear_r`); its length (about 62 mm) cannot go
   below the measured 60 mm trigger opening above it. Toward the grip the rail narrows (`rail_taper_len`,
   `rail_taper_w`), so it runs into the grip's rounded front without shoulders.
-- **Block frame.** The rigid part is not block-shaped (Darren, 2026-11-24). It is a heel at the rear (`heel_len`) with
-  the finger scoop (`blk_scoop_r`), which the rail blends into (`guard_blend_r`), and a plain rectangular tongue that
-  sticks forward from the heel under the guard, `cover_t` inside the block's outer shape all round, with a cross groove
-  (`detent_w`, `detent_d`). The hole for the rear mounting bolt goes through the tongue.
-- **Block cover.** `tpu_block_cover` is the whole standing block, top and bottom: a TPU sleeve, its own part,
-  customised and printed per athlete. It slides over the tongue from the front until it meets the heel, and a rib
-  inside it snaps into the tongue's groove (the TPU rule). It is closed at the front, on top and underneath, so it hides
-  the bolt hole. Heel and cover are cut from the same rounded shape (`block_round = guard_round`), so they are flush.
+- **One flowing outline (Darren, 2026-11-24).** Guard and block are one rigid profile and every transition in it is a
+  true tangent arc: the guard's front leg sweeps forward into the top of the block (`guard_gusset_r`), the top rolls
+  over the front corner (`block_top_r`, wrapped `nose_cap` round it), and the rail's underside rolls down into the
+  block's vertical rear face (`guard_blend_r`; `blk_rake` is 0). The leg carries load into the block again.
+  `chk_gusset_bolt` keeps the sweep clear of the rear mounting bolt.
+- **Block frame.** Under that outline the rigid part is a 5 mm skin along the top of the block (`collar_h`, thicker
+  than `guard_round` so its edges can be rounded), a heel at the rear (`heel_len`) and a dovetail rib under the skin
+  (`core_neck` narrower per side at the top, `cover_t` inside the outer shape) with a cross groove (`detent_w`,
+  `detent_d`). The hole for the rear mounting bolt goes through the rib.
+- **Block cover.** `tpu_block_cover` is its own part, customised and printed per athlete. It fits whatever the rigid
+  shape leaves: bottom, both sides and the front, up to the underside of the skin. It slides on from the front until
+  it meets the heel, the dovetail stops it pulling off downward, and a rib inside it snaps into the groove (the TPU
+  rule). It is closed at the front and underneath, so it hides the bolt hole. Heel and cover are cut from the same
+  rounded shape (`block_round = guard_round`), so they are flush. This replaces the full top-and-bottom sleeve.
   The block is `block_drop` (28 mm) deep, starts `blk_tuck` behind the front of the trigger opening and stops 2 mm short
   of the magazine (`act_rel_zone` pending measurement), so the magazine drops free (`chk_block_mag`).
 - **IBU.** The assembled block counts toward MC 3.1.6.4 a: `chk_depth_block` and the build report's lowest point of
