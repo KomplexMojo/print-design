@@ -349,6 +349,9 @@ not mean redoing the design. Everything that depends on the action now lives in 
 - **Consequence for the body.** The real pocket is deeper than the earlier underside, so the guard opening's ceiling is
   now level with the wrist underside (`finger_hole_y1 = wrist_under_y`, 55 mm below the bore), which leaves 8.9 mm of
   floor under the pocket (`chk_trig_floor`). `guard_bottom` is derived from a 28 mm opening (`guard_open_h`) and is 93 mm.
+- **Underside ramp.** Ahead of the guard opening the underside runs down a ramp (`belly_ramp`) from the wrist level to
+  the belly, instead of a step, and the wrist underside edges carry a large round (`wrist_round`) that narrows the body
+  to the grip. With the step gone every edge rounds; the build reports no skipped rounds.
 - **Rounded corners.** The vertical corners of the trigger pocket, the trigger opening and the magazine well are rounded
   by `pocket_r` (5 mm, estimated from photos).
 - **Flared magazine entry.** The bottom of the magazine well has a 45 degree funnel, `mag_flare` wide, clear of both bolt

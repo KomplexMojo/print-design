@@ -40,7 +40,8 @@ import adsk.fusion
 DATUM = 1000.0  # mm
 OBSOLETE_PARAMS = ("chk_pillar_mag", "chk_pillar_front", "act_receiver_d", "sling_tab_r", "rel_len", "guard_div",
                    "block_top_len", "grip_toe", "rs_rib_x", "saddle_h", "block_bolt_x", "block_insert_depth",
-                   "chk_slot_pillar", "chk_key_slot", "act_slot_x0", "act_slot_x1", "act_slot_w")
+                   "chk_slot_pillar", "chk_key_slot", "act_slot_x0", "act_slot_x1", "act_slot_w",
+                   "wrist_facet_w", "wrist_facet_h", "chk_belly_step")
 FUSE_BLOCK = False   # True joins the standing block into the main body (the printed part)
 FUSE_ACTION = False  # True joins the action cradle into the main body (the printed part); False keeps it apart for review
 
@@ -83,8 +84,7 @@ DEMO_PARAMS = [
     ("grip_lean", "", "tan(90 deg - grip_angle_deg)", "[demo] grip lean per mm of height"),
     ("grip_front_x", "mm", "-trigger_reach + grip_depth / 2", "[demo] derived: grip front at its top"),
     ("grip_offset", "mm", "0 mm", "[demo] grip centre offset toward the away (palm) side"),
-    ("wrist_facet_w", "mm", "(body_width - grip_width) / 2 - 1 mm", "[demo] derived: facet that narrows the wrist underside to the grip width"),
-    ("wrist_facet_h", "mm", "12 mm", "[demo] wrist facet height up the side"),
+    ("wrist_round", "mm", "(body_width - grip_width) / 2 + 2 mm", "[demo] derived: round on the wrist underside edges that narrows the body to the grip width"),
     ("grip_z0", "mm", "-face_side * (grip_offset + grip_width / 2)", "[demo] derived: away-side skin of the grip"),
     ("grip_round", "mm", "(2 * (grip_depth + grip_width) - grip_circumference) / (8 - 2 * PI)",
      "[demo] derived: corner round that makes the grip girth equal grip_circumference (PI * M)"),
@@ -231,7 +231,8 @@ DEMO_PARAMS = [
      "[demo] the flare stays clear of the rear bolt counterbore (the front one is the same distance away)"),
     ("chk_flare_belly", "mm", "body_width / 2 - belly_w - (mag_well_width / 2 + fit_slide + mag_flare) - 1 mm",
      "[demo] the flare stays on the flat of the belly"),
-    ("chk_belly_step", "mm", "forend_depth + wrist_under_y - belly_h - 1 mm", "[demo] the belly facet ends below the wrist underside"),
+    ("belly_ramp", "mm", "30 mm", "[demo] length of the ramp from the wrist underside down to the belly, ahead of the guard opening"),
+    ("chk_ramp_bolt", "mm", "act_screw_rear_x - (act_head_d + 3 mm) / 2 - (rel_front_x + belly_ramp)", "[demo] the rear bolt counterbore sits on the flat belly, ahead of the ramp"),
     ("spine_d", "mm", "10 mm", "[demo] rigid front strip of the grip above the guard bar, so the TPU edge there is full thickness"),
     ("chk_pad_pocket", "mm", "pad_x0 - (fj_head_x + fj_pocket_len) - 4 mm", "[demo] the pad starts ahead of the joint's head pocket"),
     ("chk_pad_slots", "mm", "(mag_holder_top - mag_slot_h) - (-forend_fore_depth + pad_wrap) - 2 mm", "[demo] the pad stays below the mag slots"),
@@ -661,7 +662,7 @@ class Builder:
             ("tip_sweep_x", ffd),                                                 # 7 underside turns up
             ("belly_x1", ffd),                                                    # 8 drop-belly ramp, front
             ("belly_x0", fd),                                                     # 9 drop-belly ramp, rear
-            ("rel_front_x", fd),                                                  # 10 step behind the mag well
+            ("rel_front_x + belly_ramp", fd),                                     # 10 ramp down from the wrist to the belly
             ("rel_front_x", "finger_hole_y1"),                                    # 11 release window, top front
             (f"{gb('wrist_under_y')} - wrist_ramp", "wrist_under_y"),             # 12 behind the grip
             ("wrist_heel_x", "wrist_heel_y"),                                     # 13
@@ -690,7 +691,13 @@ class Builder:
 
         # ---- faceted belly under the forend, then the hand stop, then the side rounds
         self.belly(main, "main")
-        self.belly(main, "wrist", ys=("wrist_under_y",), w="wrist_facet_w", h="wrist_facet_h")   # blends the body into the grip
+        # blend the body into the grip: a large round on the two wrist underside edges (a facet here would
+        # collide with the belly facet at the step and leave edges that cannot be rounded)
+        yw, zh = self.ev("wrist_under_y"), self.ev("body_width / 2")
+        wrist = [e for e in body("main").edges
+                 if e.geometry.curveType == adsk.core.Curve3DTypes.Line3DCurveType and e.length > 2
+                 and all(abs(q.y - yw) < 1e-3 and abs(abs(q.z) - zh) < 1e-3 for q in (e.geometry.startPoint, e.geometry.endPoint))]
+        self.fillet(main.component, [(wrist, "wrist_round")], "wrist_round")
         self.belly(fore, "fore")
 
         self.round_faces(rear, "comb_width / 2", "body_round", "rear_round", zc="cast_z", skip_x=("rear_split",))
@@ -710,7 +717,7 @@ class Builder:
         # ---- main body: trigger guard, and the standing block as an extension of the guard base
         sk = self.sketch("trigger_guard")
         gbm, fh0 = "-guard_bottom", "finger_hole_y0"
-        self.poly(sk, [("rel_front_x", f"{fd} + 6 mm"), ("guard_front_x", f"{fd} + 6 mm"), (lf(gbm), gbm),
+        self.poly(sk, [("rel_front_x", "finger_hole_y1 + 6 mm"), ("guard_front_x", "finger_hole_y1 + 6 mm"), (lf(gbm), gbm),
                        (f"{gf(gbm)} - 6 mm", gbm), (f"{gf(fh0)} - 6 mm", fh0), ("rel_front_x", fh0)])
         self.done(sk)
         # rounded as a body of its own (clean edges), then joined; its ends are buried in the body and the grip spine
