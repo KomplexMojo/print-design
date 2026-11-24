@@ -117,9 +117,13 @@ DEMO_PARAMS = [
      "[demo] the block and guard stay behind the magazine well, so the magazine drops free"),
     # ---- hand stop
     ("hs_rake", "mm", "14 mm", "[demo] hand-stop front face leans by this much"),
-    ("sling_tab_w", "mm", "38 mm", "[demo] PLACEHOLDER: width of the Larsen sling's end tab"),
-    ("sling_tab_r", "mm", "120 mm", "[demo] PLACEHOLDER: radius of the tab's curve along its length"),
-    ("sling_hole_x", "mm", "handstop_position + handstop_length / 2", "[demo] PLACEHOLDER: sling screw position (the tab's eyelet)"),
+    ("sling_tab_w", "mm", "40 mm", "[demo] Biatar sling end tab width (Darren, measured 2026-11-24)"),
+    ("sling_hole_d", "mm", "5.5 mm", "[demo] Biatar sling eyelet (Darren, measured): M5 thumb screw"),
+    ("sling_hole_inset", "mm", "17 mm", "[demo] PLACEHOLDER (estimated from a photo): tab tip to eyelet centre"),
+    ("sling_seat_d", "mm", "2 mm", "[demo] depth of the sling seat"),
+    ("sling_seat_r", "mm", "(sling_tab_w + 1 mm) / 2", "[demo] derived: the seat's semicircular end, matching the tab's round tip"),
+    ("sling_tip_x", "mm", "handstop_position + handstop_length - tip_round - 2 mm", "[demo] derived: where the tab's tip sits"),
+    ("sling_hole_x", "mm", "sling_tip_x - sling_hole_inset", "[demo] derived: sling screw insert"),
     ("hs_width", "mm", "sling_tab_w + 8 mm", "[demo] derived: hand-stop width, 4 mm of shoulder each side of the sling seat"),
     ("chk_hs_width", "mm", "body_width - hs_width", "[demo] the hand stop is no wider than the forend"),
     ("hs_round", "mm", "4 mm", "[demo]"),
@@ -754,14 +758,18 @@ class Builder:
             drill(f"{nm}_pillar_bore", "0 mm", x, "act_pillar_d", "ibu_depth_max", both)
             drill(f"{nm}_screw_counterbore", f"{under} + act_cbore", x, "act_head_d + 3 mm", "act_cbore + 2 mm", (main,))
 
-        # sling seat (Larsen sling): the end tab nests in a seat under the hand stop that is as wide as the
-        # tab and curved to its radius, and is screwed through its eyelet into a heat-set insert
-        sk = self.sketch("sling_seat")
-        sa, sb = f"{hp} + hook_round", f"{hp} + handstop_length - tip_round"
-        self.poly(sk, [(sb, hs_bot), (sa, hs_bot)], arcs={0: "sling_tab_r"})
+        # sling seat (Biatar / Larsen type sling): the flat end tab nests in a pocket under the hand stop that
+        # is as wide as the tab, with a semicircular end for its round tip. It is open to the rear, where the
+        # sling leaves toward the arm, and a thumb screw goes through the eyelet into a heat-set insert.
+        sk, fx, down = xz_sketch("sling_seat", hs_bot)
+        xr, xc, r = f"{hp} - 1 mm", "sling_tip_x - sling_seat_r", "sling_seat_r"
+        ring = [(fx(xr), f"-{r}"), (fx(xc), f"-{r}"), (fx(xc), r), (fx(xr), r)]
+        if fx("1") != "1":
+            ring = [(x, z[1:] if z.startswith("-") else f"-{z}") for x, z in ring]   # keep the arc bulging forward
+        self.poly(sk, ring, arcs={1: r})
         self.done(sk)
-        self.extrude(fore, sk.profiles.item(0), CUT, sym="sling_tab_w + 1 mm", name="sling_seat")
-        drill("sling_insert", f"{hs_bot} + insert_depth + 4 mm", "sling_hole_x", "insert_hole_d", "insert_depth + 5 mm", (fore,))
+        self.extrude(fore, sk.profiles.item(0), CUT, dist="-(sling_seat_d)" if down > 0 else "sling_seat_d", name="sling_seat")
+        drill("sling_insert", f"{hs_bot} + insert_depth + sling_seat_d", "sling_hole_x", "insert_hole_d", "insert_depth + sling_seat_d + 1 mm", (fore,))
 
         # block bolt: the head sits inside the block's slot and is tightened through the hole in the slot floor
         drill("block_bolt_hole", gbm, "block_bolt_x", "cap_screw_d", "block_height", (blk,))
