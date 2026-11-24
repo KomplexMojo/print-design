@@ -132,9 +132,9 @@ One parameter per numeric value in the JSON. S and T (sides) are not parameters;
 | `barrel_d` | `barrel_d` | mm | `r_barrel_d_action` | 22 | measured |  | barrel at the action Sources: rifle.barrel_diameter_action_mm. |
 | `barrel_float` |  | mm | `2 mm` | 2 | fixed |  | free-float clearance |
 | `guard_bottom` |  | mm | `90 mm` | 90 | fixed | MC 3.1.6.4 a | bore to bottom of the trigger guard |
-| `trigger_slot_x0` |  | mm | `-8 mm` | -8 | action |  |  |
-| `trigger_slot_x1` |  | mm | `12 mm` | 12 | action |  |  |
-| `trigger_slot_width` |  | mm | `12 mm` | 12 | fixed |  |  |
+| `trigger_slot_x0` |  | mm | `-46 mm` | -46 | action |  |  |
+| `trigger_slot_x1` |  | mm | `14 mm` | 14 | action |  |  |
+| `trigger_slot_width` |  | mm | `20 mm` | 20 | action |  |  |
 | `finger_hole_x0` |  | mm | `-42 mm` | -42 | fixed |  |  |
 | `finger_hole_x1` |  | mm | `38 mm` | 38 | fixed |  |  |
 | `finger_hole_y0` |  | mm | `-82 mm` | -82 | fixed |  |  |

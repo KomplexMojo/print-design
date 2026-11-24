@@ -340,7 +340,8 @@ not mean redoing the design. Everything that depends on the action now lives in 
   (`act_pillar_d`, bore `act_screw_hole_d`) with recessed heads; the rear one sits ahead of the guard leg and the
   standing block, so a key reaches it (`chk_pillar_guard`).
 - **Measured (2026-11-24):** bed width 30.19 mm, magazine well width 16.00 mm, action bolt holes 6.84 mm (two bolts),
-  trigger pocket width 26.2 mm. Every position, length and depth is still a placeholder.
+  trigger pocket width 26.2 mm, and the trigger opening inside it, 20 × 60 mm. The opening goes through to the guard and
+  ends at the rear of the guard opening by the grip (`chk_trig_rear`). Other positions, lengths and depths are placeholders.
 - **Adding an action.** Add a preset. Write a new cradle builder only if the receiver is not a round one on two vertical screws.
 - **Still needed**, all from the stock that fits the action: see the list in the project thread (positions from the
   receiver's front step, pocket depths, cross key size, screw head size, barrel channel diameter).

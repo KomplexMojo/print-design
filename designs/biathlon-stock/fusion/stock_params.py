@@ -80,13 +80,15 @@ ACTIONS = {
         # Layout read from Darren's own 1827 F stock (2026-11-24), muzzle to butt: round barrel channel, step,
         # receiver bed, FRONT mounting bolt, locating pin, magazine well, steel cross key, REAR mounting bolt,
         # trigger pocket. The two bolts straddle the magazine well, centred on it, heads recessed from below
-        # (Darren, 2026-11-24). MEASURED: act_bed_w, mag_well_width, act_screw_hole_d, act_trig_w. Every
+        # (Darren, 2026-11-24). MEASURED: act_bed_w, mag_well_width, act_screw_hole_d, act_trig_w, trigger opening 20 x 60. Every
         # position, length and depth is still a placeholder.
         "values": {"act_bed_w": "30.19 mm", "mag_well_width": "16 mm", "act_screw_hole_d": "6.84 mm", "act_trig_w": "26.2 mm",
                    "action_rear": "-105 mm", "action_front": "146 mm", "action_width": "32 mm",
                    "act_screw_front_x": "136 mm", "act_pin_x": "122 mm", "mag_well_x0": "74 mm", "mag_well_x1": "114 mm",
                    "act_key_x": "62 mm", "act_screw_rear_x": "52 mm",
-                   "act_trig_x0": "-42 mm", "act_trig_x1": "22 mm", "trigger_slot_x0": "-8 mm", "trigger_slot_x1": "12 mm",
+                   # trigger opening: 20 x 60 mm (Darren, measured), ending at the rear of the guard opening by the grip
+                   "act_trig_x0": "-48 mm", "act_trig_x1": "16 mm",
+                   "trigger_slot_x0": "-46 mm", "trigger_slot_x1": "14 mm", "trigger_slot_width": "20 mm",
                    "act_screw_d": "6 mm", "act_head_d": "10 mm"},
     },
     "izhmash_7_4": {
