@@ -41,7 +41,7 @@ DATUM = 1000.0  # mm
 OBSOLETE_PARAMS = ("chk_pillar_mag", "act_receiver_d", "sling_tab_r", "rel_len", "guard_div",
                    "block_top_len", "grip_toe", "rs_rib_x", "saddle_h", "block_bolt_x", "block_insert_depth",
                    "chk_slot_pillar", "chk_key_slot", "act_slot_x0", "act_slot_x1", "act_slot_w",
-                   "wrist_facet_w", "wrist_facet_h", "chk_belly_step", "chk_rel_travel", "chk_bolts_centred", "sling_head_h", "finger_clear", "blk_scoop_d", "chk_comb_length", "chk_pad_pocket", "rail_w", "rail_h", "rail_y", "chk_rail_barrel", "chk_rail_web", "rail_x0", "rail_len", "rail_screw_inset", "rail_nut_depth", "chk_rail_nose", "blk_win_web", "block_slot_r", "chk_block_top_flat", "collar_round", "rear_cap", "wrist_round")
+                   "wrist_facet_w", "wrist_facet_h", "chk_belly_step", "chk_rel_travel", "chk_bolts_centred", "sling_head_h", "finger_clear", "blk_scoop_d", "chk_comb_length", "chk_pad_pocket", "rail_w", "rail_h", "rail_y", "chk_rail_barrel", "chk_rail_web", "rail_x0", "rail_len", "rail_screw_inset", "rail_nut_depth", "chk_rail_nose", "anchor_y", "anchor_sleeve_d", "anchor_head_d", "anchor_head_h", "anchor_washer_d", "anchor_washer_t", "blk_win_web", "block_slot_r", "chk_block_top_flat", "collar_round", "rear_cap", "wrist_round")
 FUSE_BLOCK = False   # True joins the standing block into the main body (the printed part)
 FUSE_ACTION = False  # True joins the action cradle into the main body (the printed part); False keeps it apart for review
 
@@ -314,16 +314,21 @@ DEMO_PARAMS = [
     ("chk_handstop_max", "mm", "forend_tip - tip_rake - 4 mm - tip_sweep_x", "[demo] USER-FITTED RANGE: furthest forward the hand stop can sit"),
     ("harness_pitch", "mm", "20 mm", "[demo] PLACEHOLDER: spacing of the two inserts of each harness connector"),
     ("harness_rear_y", "mm", "comb_top - 14 mm", "[demo] height of the rear harness connector, in the comb beam"),
-    # ---- harness anchor (Darren 2026-11-24): no rail. One steel sleeve nut at the measured harness position, right
-    # through the forestock; the harness's threaded end screws into it and its own nut locks against a steel washer.
-    ("anchor_y", "mm", "-36 mm", "[demo] height of the harness anchor: below the spare-mag slots and the barrel, above the belly facet"),
-    ("anchor_sleeve_d", "mm", "9 mm", "[demo] PENDING MEASUREMENT: outside diameter of the M6 sleeve nut (set by the harness's thread)"),
-    ("anchor_head_d", "mm", "15 mm", "[demo] PENDING: head diameter of the sleeve nut"),
-    ("anchor_head_h", "mm", "3 mm", "[demo] no-snag: depth of the head's recess on the mag side"),
-    ("anchor_washer_d", "mm", "12 mm", "[demo] M6 washer, ISO 7089, under the harness's lock nut"),
-    ("anchor_washer_t", "mm", "1.6 mm", "[demo] washer thickness; its seat is this deep, so the washer sits flush"),
-    ("chk_harness_front_lo", "mm", "harness_front_position - anchor_head_d / 2 - (mag_holder_start + mag_holder_count * mag_slot_len + (mag_holder_count - 1) * mag_holder_wall) - 2 mm", "[demo] USER-FITTED RANGE: the harness anchor sits ahead of the spare-mag slots"),
-    ("chk_harness_front_hi", "mm", "forend_tip - tip_rake - 20 mm - harness_front_position", "[demo] USER-FITTED RANGE: the harness anchor sits behind the forend's nose"),
+    # ---- harness module (Darren 2026-11-24): a mini-rail built into the forestock's side, opposite the spare mags.
+    # The harness's own sliding block drops in at the front, slides back under two lips to a hard stop at the
+    # measured position, and the harness's nut clamps it on the lips. Nothing passes through the stock.
+    ("mini_block_w", "mm", "13 mm", "[demo] PENDING MEASUREMENT: width of the harness's sliding block"),
+    ("mini_block_len", "mm", "18 mm", "[demo] PENDING MEASUREMENT: length of the sliding block"),
+    ("mini_block_t", "mm", "4 mm", "[demo] PENDING MEASUREMENT: thickness of the sliding block's foot"),
+    ("mini_neck_w", "mm", "10 mm", "[demo] PENDING MEASUREMENT: width of the block's neck (the slot's opening)"),
+    ("mini_lip_t", "mm", "3.5 mm", "[demo] thickness of the two printed lips the nut clamps on (the block's neck must be at least this tall)"),
+    ("mini_y", "mm", "-37.5 mm", "[demo] centre line of the module: below the spare-mag slots, above the belly facet"),
+    ("mini_track_w", "mm", "mini_block_w + 2 * fit_slide", "[demo] derived: width of the track under the lips"),
+    ("mini_track_h", "mm", "mini_block_t + 0.4 mm", "[demo] derived: height of the track under the lips"),
+    ("mini_entry_len", "mm", "mini_block_len + 3 mm", "[demo] derived: the open mouth ahead of the lips, where the block drops in"),
+    ("chk_harness_front_lo", "mm", "harness_front_position - mini_block_len / 2 - 2 mm - handstop_position", "[demo] USER-FITTED RANGE: the harness module sits ahead of the prone pad"),
+    ("chk_harness_front_hi", "mm", "forend_tip - tip_rake - 12 mm - (harness_front_position + mini_block_len / 2 + mini_entry_len)", "[demo] USER-FITTED RANGE: the module's mouth ends behind the forend's nose"),
+    ("chk_mini_lip", "mm", "(mini_track_w - mini_neck_w) / 2 - 1.5 mm", "[demo] each lip overhangs the block by at least 1.5 mm"),
     ("chk_harness_rear_lo", "mm", "harness_rear_position - harness_pitch / 2 - (-lop + 25 mm)", "[demo] USER-FITTED RANGE: rear harness connector ahead of the butt plate"),
     ("chk_harness_rear_hi", "mm", "(-lop + comb_length) - (harness_rear_position + harness_pitch / 2) - 5 mm", "[demo] USER-FITTED RANGE: rear harness connector behind the front of the comb"),
     ("chk_lop_min", "mm", "comb_length - 80 mm", "[demo] USER-FITTED RANGE: shortest stock the butt takes"),
@@ -1308,33 +1313,27 @@ class Builder:
             fl = self.extrude(main, sk.profiles.item(0), CUT, start=start, dist="flute_d + 1 mm", name=f"body_flute_{nm}")
             self.fillet_z_edges(main, fl, "mag_slot_r", f"body_flute_corners_{nm}")
 
-        # harness anchor (Darren 2026-11-24): a measured position, not a rail. The harness carries the whole rifle,
-        # so the load does not go into printed threads or a heat-set insert. A steel sleeve nut goes in from the
-        # mag side, its head recessed, and reaches right through the forestock. The harness's threaded end screws
-        # into it from the other side and its own nut locks against a steel washer in a flush seat.
-        hx = "harness_front_position"
-        sk = self.sketch("harness_anchor_bore", face)
-        self.circle(sk, hx, "anchor_y", "anchor_sleeve_d + 2 * fit_slide")
+        # harness module (Darren 2026-11-24): a mini-rail built into the forestock, not a through-hole and not an
+        # added part. The harness's sliding block drops into the open mouth, slides back under two lips until
+        # its post meets the end of the slot at harness_front_position, and the harness's nut clamps on the lips.
+        hx, hy = "harness_front_position", "mini_y"
+        x_stop = f"{hx} - mini_block_len / 2 - 0.5 mm"
+        x_lips = f"{hx} + mini_block_len / 2 + 1 mm"            # lips end here; the mouth starts
+        x_end = f"{hx} + mini_block_len / 2 + mini_entry_len"
+        sk = self.sketch("harness_track", face)                 # the track under the lips, and the mouth's floor
+        self.rect(sk, x_stop, x_end, f"{hy} - mini_track_w / 2", f"{hy} + mini_track_w / 2")
         self.done(sk)
-        self.extrude(fore, self.profiles(sk), CUT, dist="mag_side * body_width", name="harness_anchor_bore")
-        sk = self.sketch("harness_anchor_washer_seat", face)
-        self.circle(sk, hx, "anchor_y", "anchor_washer_d + 0.5 mm")
+        f = self.extrude(fore, sk.profiles.item(0), CUT, start="mag_side * mini_lip_t", dist="mag_side * mini_track_h",
+                         name="harness_track")
+        sk = self.sketch("harness_neck_slot", face)             # the opening between the lips; its end is the hard stop
+        self.rect(sk, f"{hx} - mini_neck_w / 2", x_end, f"{hy} - mini_neck_w / 2 - fit_slide", f"{hy} + mini_neck_w / 2 + fit_slide")
         self.done(sk)
-        seat = max(self.profiles(sk), key=lambda pr: pr.areaProperties().area)
-        self.extrude(fore, [seat], CUT, dist="mag_side * anchor_washer_t", name="harness_anchor_washer_seat")
-        sk = self.sketch("harness_anchor_head_recess", away)
-        self.circle(sk, hx, "anchor_y", "anchor_head_d + 0.5 mm")
+        f2 = self.extrude(fore, sk.profiles.item(0), CUT, dist="mag_side * (mini_lip_t + 0.1 mm)", name="harness_neck_slot")
+        self.fillet_z_edges(fore, f2, "mini_neck_w / 2 - 0.5 mm", "harness_neck_slot_end")
+        sk = self.sketch("harness_mouth", face)                 # where the block drops in
+        self.rect(sk, x_lips, x_end, f"{hy} - mini_track_w / 2", f"{hy} + mini_track_w / 2")
         self.done(sk)
-        seat = max(self.profiles(sk), key=lambda pr: pr.areaProperties().area)
-        self.extrude(fore, [seat], CUT, dist="-mag_side * anchor_head_h", name="harness_anchor_head_recess")
-        # the sleeve nut, for the picture
-        hw_occ = occs["hw"]
-        sk = self.sketch("harness_anchor_head", away)
-        self.circle(sk, hx, "anchor_y", "anchor_head_d")
-        self.done(sk)
-        self.extrude(hw_occ, [max(self.profiles(sk), key=lambda pr: pr.areaProperties().area)], NEW,
-                     dist="-mag_side * anchor_head_h", name="harness_anchor_head")
-        hw_occ.component.bRepBodies.item(hw_occ.component.bRepBodies.count - 1).name = "harness_anchor"
+        self.extrude(fore, sk.profiles.item(0), CUT, dist="mag_side * (mini_lip_t + 0.1 mm)", name="harness_mouth")
 
         # rear harness connector (user-fitted): two heat-set inserts on the butt's comb beam, PENDING the rear hardware
         rear_face = self.offset_plane("harness_rear_plane", "cast_z - mag_side * comb_width / 2")

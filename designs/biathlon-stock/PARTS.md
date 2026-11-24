@@ -17,8 +17,6 @@ Every fastener is a standard catalogue size. Checked 2026-11-24.
 | 7 | Hex nut | ISO 4032, M5, A2 | 8 mm across flats, 4.7 mm thick | 1 | Captive in the hand stop, for the sling bolt | `m5_nut_af`, `m5_nut_m` |
 | 8 | Heat-set threaded insert, brass | M5, for a 6.4 mm hole, up to 9.5 mm long | | 3 | 1 in the grip core (cap screw), 2 in the butt (harness connectors) | `insert_hole_d`, `insert_depth` |
 | 9 | Aluminium tube | 10 mm outside x 1.5 mm wall (7 mm bore) | cut to 38.4 mm | 2 | Bedding pillars for the action bolts | `act_pillar_d`, `act_pillar_id`, `act_pillar_len` |
-| 10 | Sleeve nut (barrel nut), steel | M6, sleeve 9 mm outside, head 15 mm wide, 45 mm long (PENDING: thread and size follow the harness's threaded end) | | 1 | Harness anchor: in from the mag side, right through the forestock | `anchor_sleeve_d`, `anchor_head_d`, `anchor_head_h` |
-| 11 | Plain washer | ISO 7089, M6, A2 | 12 mm outside, 1.6 mm thick | 1 | Under the harness's lock nut, flush in its seat | `anchor_washer_d`, `anchor_washer_t` |
 
 Notes:
 - **Items 1 and 2 are studs, not bolts.** A bolt that long cannot be inserted: the butt window and the forestock pocket
