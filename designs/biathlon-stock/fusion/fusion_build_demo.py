@@ -1299,22 +1299,8 @@ class Builder:
         self.round_faces(fore, "body_width / 2", "mag_lead_r", "mag_slot_lead_in", skip=not_slot_mouth)
 
         face = self.offset_plane("flute_side_plane", "-mag_side * body_width / 2")     # the side opposite the slots
-        # flutes: shallow recesses on the line of the spare-mag slots. On the forestock's face side they mirror the
-        # slots; on both sides of the main body they carry the line back toward the grip. They stop short of the
-        # IBU marking surface. One line then runs from the butt windows through the main body to the forend.
-        sk = self.sketch("mag_flute", face)
-        self.rect(sk, "mag_holder_start", "mag_holder_start + mag_slot_len", "mag_holder_top - mag_slot_h", "mag_holder_top")
-        self.done(sk)
-        fl = self.extrude(fore, sk.profiles.item(0), CUT, dist="mag_side * flute_d", name="mag_flute")
-        ents = adsk.core.ObjectCollection.create()
-        ents.add(fl)
-        rounded = self.fillet_z_edges(fore, fl, "mag_slot_r", "mag_flute_corners")
-        if rounded:
-            ents.add(rounded)
-        pin = forec.features.rectangularPatternFeatures.createInput(
-            ents, forec.xConstructionAxis, self.vi("mag_holder_count"), self.vi("mag_slot_len + mag_holder_wall"),
-            adsk.fusion.PatternDistanceType.SpacingPatternDistanceType)
-        forec.features.rectangularPatternFeatures.add(pin).name = "mag_flutes"
+        # flutes: shallow recesses on both sides of the main body, on the line of the spare-mag slots. They stop
+        # short of the IBU marking surface. The forestock's harness side is plain (Darren 2026-11-24: no indents).
         sk = self.sketch("body_flute")
         self.rect(sk, "flute_x0", "flute_x1", "mag_holder_top - mag_slot_h", "mag_holder_top")
         self.done(sk)
