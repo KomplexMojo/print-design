@@ -343,6 +343,14 @@ through the plate and the tab's eyelet into a captive hex nut that slides into a
 **Joint nut slots.** Each slot is `nut_slot_af` (10.3 mm) across the flats, so the nut cannot turn, and `nut_slot_len`
 (5.5 mm) along the bolt, a slide fit so an M6 nut (10 mm across flats, 5 mm thick) drops down it edge-on.
 
+### Balance at the standing block (Darren, 2026-11-24)
+Goal: standing, the block is the pivot, so the assembled rifle should balance where the centre of the support-hand thumb
+sits on it. `fusion_balance.py` (read-only) takes each printed body's volume and centroid from the model, applies a
+density and solid fraction per part, adds the non-printed masses (barrelled action, sights, magazines, fasteners,
+ballast) and reports the centre of gravity against `BALANCE_POINT` (`block_position` until the thumb point is measured).
+First run, all masses placeholders: 3.79 kg, centre of gravity 121 mm ahead of the trigger, 101 mm ahead of the block's
+middle and 35 mm ahead of its front end. The barrelled action (1880 g, own balance point guessed) decides the result.
+
 ## 11. Action cradle (2026-11-24)
 Darren's requirement: the stock must take a real barrelled action on its mounting screws, and a different action must
 not mean redoing the design. Everything that depends on the action now lives in one component, `action_cradle`.
@@ -399,6 +407,7 @@ not mean redoing the design. Everything that depends on the action now lives in 
 | `fusion_load_params.py` | Fusion script: create or update User Parameters from a fit record |
 | `fusion_build_demo.py` | Fusion script: skeleton, the three rigid components and the TPU inserts, fully parameter-driven |
 | `fusion_render_views.py` | Fusion script: saves the review images (sides, top, bottom, isos, exploded) |
+| `fusion_balance.py` | Fusion script (read-only): mass and centre of gravity of the assembled rifle against the standing block |
 | `make_param_table.py` | Regenerates `PARAMETERS.md` |
 | `PARAMETERS.md` | JSON field → Fusion name, unit, expression |
 | `test_stock_params.py` | Tests (no Fusion needed) |
