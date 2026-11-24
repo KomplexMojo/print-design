@@ -437,15 +437,17 @@ them with `[manual]` rows at the top of `DEMO_PARAMS`. The TPU covers remain the
 - **Not a rail, not a through-hole, not an added part.** The full-length aluminium rail (r33) and the sleeve-nut
   through-hole (r35) were both rejected. The connector is a short T-slot printed into the forestock's side, opposite
   the spare mags, at `harness_front_position` from the fit record (measurement AH).
-- **How it works.** The harness's own sliding block drops into an open mouth (`mini_entry_len`), slides back under
-  two lips (`mini_lip_t` thick, the track is `mini_track_w` x `mini_track_h`), and its neck meets the rounded end
-  of the slot exactly at the measured position. The harness's nut then clamps on the lips.
+- **How it works (Darren, 2026-11-24: open at the top).** The T-slot stands upright and is open at the top edge
+  of the forestock. The harness's own sliding block goes in from above and slides down under two lips
+  (`mini_lip_t` thick; the track is `mini_track_w` x `mini_track_h`) until its neck meets the rounded end of the
+  slot, with the bolt at `mini_y`. Tightening the harness's nut then locks the block on the lips.
 - **Sizes are PENDING MEASUREMENT** of the harness block: `mini_block_w`, `mini_block_len`, `mini_block_t`,
-  `mini_neck_w`. `chk_mini_lip` keeps at least 1.5 mm of lip over each side of the block.
-- **Strength.** The rifle hangs on the two printed lips. Print the forestock so the layers do not run parallel to
-  the lips' underside, and treat the lip thickness as the parameter to raise if the block's neck allows.
-- **Fitted range.** `chk_harness_front_lo` and `chk_harness_front_hi`: the module sits ahead of the prone pad and
-  its mouth ends behind the nose, 361 to 407 mm ahead of the trigger. Darren's is 400.
+  `mini_neck_w`. `chk_mini_lip` keeps at least 1.5 mm of lip over each side of the block; `chk_mini_wall` keeps 3 mm
+  between the slot and the barrel channel.
+- **Strength.** The rifle hangs on the two printed lips. Treat the lip thickness as the parameter to raise if the
+  block's neck allows. The top 6 mm of the lips is thinned by the side round.
+- **Fitted range.** `chk_harness_front_lo` and `chk_harness_front_hi`: the slot sits ahead of the spare-mag slots and
+  behind the rounded nose, 399 to 430 mm ahead of the trigger. Darren's is 400.
 - **Rear connector.** Still two heat-set inserts on the comb beam, pending how the rear of the harness attaches.
 
 ### Parameter tolerance (checked 2026-11-24)
