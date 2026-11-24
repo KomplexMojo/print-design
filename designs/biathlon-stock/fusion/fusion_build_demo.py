@@ -69,15 +69,16 @@ DEMO_PARAMS = [
     ("butt_bot_y", "mm", "-buttplate_drop - buttplate_length / 2", "[demo] derived: bore to butt-plate toe"),
     ("hook_tip_y", "mm", "butt_bot_y - hook_drop", "[demo] derived"),
     # ---- wrist and grip
-    ("wrist_under_y", "mm", "finger_hole_y1", "[demo] derived: the wrist underside is level with the top of the guard opening"),
     ("wrist_ramp", "mm", "7 mm", "[demo]"),
     ("wrist_heel_x", "mm", "-130 mm", "[demo]"),
     ("wrist_heel_y", "mm", "-52 mm", "[demo]"),
     ("wrist_heel_r", "mm", "40 mm", "[demo] sweep from the wrist into the butt underside"),
-    ("grip_top_y", "mm", "wrist_under_y", "[demo] derived: the grip hangs from the wrist underside"),
+    ("grip_top_y", "mm", "-55 mm", "[demo] derived: the grip hangs from the wrist underside"),
     ("grip_lean", "", "tan(90 deg - grip_angle_deg)", "[demo] grip lean per mm of height"),
     ("grip_front_x", "mm", "-trigger_reach + grip_depth / 2", "[demo] derived: grip front at its top"),
-    ("grip_offset", "mm", "4 mm", "[demo] grip centre sits this far toward the away (palm) side"),
+    ("grip_offset", "mm", "0 mm", "[demo] grip centre offset toward the away (palm) side"),
+    ("wrist_facet_w", "mm", "(body_width - grip_width) / 2 - 1 mm", "[demo] derived: facet that narrows the wrist underside to the grip width"),
+    ("wrist_facet_h", "mm", "12 mm", "[demo] wrist facet height up the side"),
     ("grip_z0", "mm", "-face_side * (grip_offset + grip_width / 2)", "[demo] derived: away-side skin of the grip"),
     ("grip_round", "mm", "(2 * (grip_depth + grip_width) - grip_circumference) / (8 - 2 * PI)",
      "[demo] derived: corner round that makes the grip girth equal grip_circumference (PI * M)"),
@@ -115,7 +116,11 @@ DEMO_PARAMS = [
      "[demo] the block and guard stay behind the magazine well, so the magazine drops free"),
     # ---- hand stop
     ("hs_rake", "mm", "14 mm", "[demo] hand-stop front face leans by this much"),
-    ("hs_width", "mm", "body_width - 2 * belly_w - 4 mm", "[demo] hand-stop width, inside the flat of the belly"),
+    ("sling_tab_w", "mm", "38 mm", "[demo] PLACEHOLDER: width of the Larsen sling's end tab"),
+    ("sling_tab_r", "mm", "120 mm", "[demo] PLACEHOLDER: radius of the tab's curve along its length"),
+    ("sling_hole_x", "mm", "handstop_position + handstop_length / 2", "[demo] PLACEHOLDER: sling screw position (the tab's eyelet)"),
+    ("hs_width", "mm", "sling_tab_w + 8 mm", "[demo] derived: hand-stop width, 4 mm of shoulder each side of the sling seat"),
+    ("chk_hs_width", "mm", "body_width - hs_width", "[demo] the hand stop is no wider than the forend"),
     ("hs_round", "mm", "4 mm", "[demo]"),
     ("tip_sweep_x", "mm", "handstop_position + handstop_length + hs_rake + 14 mm", "[demo] derived: where the forend underside turns up to the nose"),
     # ---- spare-mag slots
@@ -197,6 +202,8 @@ DEMO_PARAMS = [
     ("belly_x0", "mm", "fj_head_x + 2 mm", "[demo] derived: the drop belly starts to rise just ahead of the joint's head seat"),
     ("belly_x1", "mm", "fj_head_x + fj_pocket_len", "[demo] derived: the underside reaches forend_fore_depth at the end of the head pocket"),
     ("belly_sweep_r", "mm", "30 mm", "[demo] sweep radius at both ends of the drop-belly ramp"),
+    ("wrist_under_y", "mm", "rear_tongue_y - rear_tongue_height / 2 - min_wall - 1 mm", "[demo] derived: wrist underside, min_wall below the rear joint socket"),
+    ("grip_top_y", "mm", "wrist_under_y", "[demo] derived: the grip hangs from the wrist underside"),
     ("spine_d", "mm", "10 mm", "[demo] rigid front strip of the grip above the guard bar, so the TPU edge there is full thickness"),
     ("chk_pad_pocket", "mm", "pad_x0 - (fj_head_x + fj_pocket_len) - 4 mm", "[demo] the pad starts ahead of the joint's head pocket"),
     ("chk_pad_slots", "mm", "(mag_holder_top - mag_slot_h) - (-forend_fore_depth + pad_wrap) - 2 mm", "[demo] the pad stays below the mag slots"),
@@ -503,11 +510,11 @@ class Builder:
                     picked[e.tempId] = e
         return self.fillet(occ.component, [(list(picked.values()), r)], name)
 
-    def belly(self, occ, label):
-        """Facet the two bottom edges of the forend (belly_w off the bottom, belly_h off the side)."""
+    def belly(self, occ, label, ys=("-forend_depth", "-forend_fore_depth"), w="belly_w", h="belly_h"):
+        """Facet the two bottom edges at height ys (w off the bottom face, h off the side face)."""
         comp = occ.component
         cf = comp.features.chamferFeatures
-        ys, zh = (self.ev("-forend_depth"), self.ev("-forend_fore_depth")), self.ev("body_width / 2")
+        ys, zh = [self.ev(y) for y in ys], self.ev("body_width / 2")
         for sign in (1, -1):
             for flipped in (False, True):
                 edge = None       # the longest straight underside edge; the chamfer follows its tangent chain
@@ -525,7 +532,7 @@ class Builder:
                 col = adsk.core.ObjectCollection.create()
                 col.add(edge)
                 inp = cf.createInput2()
-                inp.chamferEdgeSets.addTwoDistancesChamferEdgeSet(col, self.vi("belly_w"), self.vi("belly_h"), flipped, True)
+                inp.chamferEdgeSets.addTwoDistancesChamferEdgeSet(col, self.vi(w), self.vi(h), flipped, True)
                 try:
                     f = cf.add(inp)
                 except Exception as e:
@@ -611,14 +618,16 @@ class Builder:
             ("belly_x0", fd),                                                     # 9 drop-belly ramp, rear
             ("rel_front_x", fd),                                                  # 10 step behind the mag well
             ("rel_front_x", "finger_hole_y1"),                                    # 11 release window, top front
-            (f"{gb('wrist_under_y')} - wrist_ramp", "wrist_under_y"),             # 12 behind the grip
-            ("wrist_heel_x", "wrist_heel_y"),                                     # 13
-            ("-lop + hook_thickness", "hook_tip_y - tip_round"),                  # 14
-            ("-lop - hook_reach + hook_round", "hook_tip_y - hook_round"),        # 15
-            ("-lop - hook_reach", "hook_tip_y"),                                  # 16 hook tip
-            ("-lop", "butt_bot_y"),                                               # 17 toe
+            (gf("finger_hole_y1"), "finger_hole_y1"),                             # 12 guard opening, top rear
+            ("grip_front_x", "wrist_under_y"),                                    # 13 grip front, top
+            (f"{gb('wrist_under_y')} - wrist_ramp", "wrist_under_y"),             # 14 behind the grip
+            ("wrist_heel_x", "wrist_heel_y"),                                     # 15
+            ("-lop + hook_thickness", "hook_tip_y - tip_round"),                  # 16
+            ("-lop - hook_reach + hook_round", "hook_tip_y - hook_round"),        # 17
+            ("-lop - hook_reach", "hook_tip_y"),                                  # 18 hook tip
+            ("-lop", "butt_bot_y"),                                               # 19 toe
         ]
-        self.poly(sk, P, arcs={16: "hook_radius", 17: "buttplate_curve_radius"})
+        self.poly(sk, P, arcs={18: "hook_radius", 19: "buttplate_curve_radius"})
         for xs in ("rear_split", "front_split"):
             self.poly(sk, [(xs, "sight_line_above_bore + 50 mm"), (xs, "-ibu_depth_max - 60 mm")], closed=False)
         self.done(sk)
@@ -632,46 +641,40 @@ class Builder:
 
         # ---- flowing profile: each outline corner gets its own radius (convex ones >= body_round)
         self.corners(rear, [(*P[1], "comb_nose"), (*P[2], "comb_front_r"), (*P[3], "body_round"),
-                            (*P[13], "wrist_heel_r"), (*P[14], "hook_round + body_round"), (*P[17], "hook_round")], "rear")
+                            (*P[15], "wrist_heel_r"), (*P[16], "hook_round + body_round"), (*P[19], "hook_round")], "rear")
         self.corners(fore, [(*P[5], "tip_round"), (*P[6], "tip_round + body_round"),
                             (*P[8], "belly_sweep_r"), (*P[9], "belly_sweep_r")], "fore")
 
         # ---- faceted belly under the forend, then the hand stop, then the side rounds
         self.belly(main, "main")
+        self.belly(main, "wrist", ys=("wrist_under_y",), w="wrist_facet_w", h="wrist_facet_h")   # blends the body into the grip
         self.belly(fore, "fore")
-
-        hp = "handstop_position"
-        sk = self.sketch("hand_stop")
-        self.poly(sk, [(hp, ffd), (f"{hp} + handstop_length + hs_rake", ffd),
-                       (f"{hp} + handstop_length", f"{ffd} - handstop_height"), (hp, f"{ffd} - handstop_height")])
-        self.done(sk)
-        self.extrude(fore, sk.profiles.item(0), JOIN, sym="hs_width", name="hand_stop")
-        self.corners(fore, [(f"{hp} + handstop_length", f"{ffd} - handstop_height", "tip_round"),
-                            (hp, f"{ffd} - handstop_height", "hook_round"),
-                            (f"{hp} + handstop_length + hs_rake", ffd, "tip_round")], "hand_stop")
 
         self.round_faces(rear, "comb_width / 2", "body_round", "rear_round", zc="cast_z", skip_x=("rear_split",))
         self.round_faces(main, "body_width / 2", "body_round", "main_round", facets=True, skip_x=("rear_split", "front_split"))
         self.round_faces(fore, "body_width / 2", "body_round", "fore_round", facets=True, skip_x=("front_split",))
-        self.round_faces(fore, "hs_width / 2", "hs_round", "hand_stop_round")
-
-        sk = self.sketch("sling_slot")
-        sx0 = f"{hp} + (handstop_length - sling_slot_width) / 2"
-        sy = f"{ffd} - handstop_height / 2"
-        self.rect(sk, sx0, f"{sx0} + sling_slot_width", f"{sy} - sling_slot_height / 2", f"{sy} + sling_slot_height / 2")
+        hp = "handstop_position"
+        sk = self.sketch("hand_stop")
+        hs_top, hs_bot = f"{ffd} + belly_h + 2 mm", f"{ffd} - handstop_height"
+        self.poly(sk, [(hp, hs_top), (f"{hp} + handstop_length + hs_rake", hs_top), (f"{hp} + handstop_length + hs_rake", ffd),
+                       (f"{hp} + handstop_length", hs_bot), (hp, hs_bot)])
         self.done(sk)
-        f = self.extrude(fore, sk.profiles.item(0), CUT, sym="2 * body_width", name="sling_slot")
-        self.fillet_z_edges(fore, f, "guard_round", "sling_slot_round")
+        self.extrude(fore, sk.profiles.item(0), JOIN, sym="hs_width", name="hand_stop")
+        self.corners(fore, [(f"{hp} + handstop_length", hs_bot, "tip_round"), (hp, hs_bot, "hook_round")], "hand_stop")
+
+        self.round_faces(fore, "hs_width / 2", "hs_round", "hand_stop_round", skip_y=(hs_top,))
 
         # ---- main body: trigger guard, and the standing block as an extension of the guard base
         sk = self.sketch("trigger_guard")
         gbm, fh0 = "-guard_bottom", "finger_hole_y0"
-        self.poly(sk, [("rel_front_x", f"{fd} + 3 mm"), ("guard_front_x", f"{fd} + 3 mm"), (lf(gbm), gbm),
-                       (f"{gf(gbm)} - 3 mm", gbm), (f"{gf(fh0)} - 3 mm", fh0), ("rel_front_x", fh0)])
+        self.poly(sk, [("rel_front_x", f"{fd} + 6 mm"), ("guard_front_x", f"{fd} + 6 mm"), (lf(gbm), gbm),
+                       (f"{gf(gbm)} - 6 mm", gbm), (f"{gf(fh0)} - 6 mm", fh0), ("rel_front_x", fh0)])
         self.done(sk)
-        self.extrude(main, sk.profiles.item(0), JOIN, sym="guard_width", name="trigger_guard")
-        self.corners(main, [("rel_front_x", fh0, "guard_round + guard_round")], "guard")
-        self.round_faces(main, "guard_width / 2", "guard_round", "guard_round", skip_y=(fd,))
+        # rounded as a body of its own (clean edges), then joined; its ends are buried in the body and the grip spine
+        self.extrude(main, sk.profiles.item(0), NEW, sym="guard_width", name="trigger_guard")
+        self.corners(main, [("rel_front_x", fh0, "guard_round + guard_round")], "guard", body=body("main", 1))
+        self.round_faces(main, "guard_width / 2", "guard_round", "guard_round", body=body("main", 1))
+        self.combine((main, body("main")), [(main, body("main", 1))], JOIN, "trigger_guard_join", keep=False)
 
         # ---- standing block: the stock only carries a mount point (the flat underside of the guard rail
         # with one M5 heat-set insert). The block is a separate printed part the athlete can swap: its
@@ -746,9 +749,18 @@ class Builder:
             for occ in comps:
                 self.extrude(occ, sk.profiles.item(0), CUT, dist=depth if down > 0 else f"-({depth})", name=name)
 
-        for nm, x, under in (("front", "act_screw_front_x", fd), ("rear", "act_screw_rear_x", "wrist_under_y")):
+        for nm, x, under in (("front", "act_screw_front_x", fd), ("rear", "act_screw_rear_x", "finger_hole_y1")):
             drill(f"{nm}_pillar_bore", "0 mm", x, "act_pillar_d", "ibu_depth_max", both)
             drill(f"{nm}_screw_counterbore", f"{under} + act_cbore", x, "act_head_d + 3 mm", "act_cbore + 2 mm", (main,))
+
+        # sling seat (Larsen sling): the end tab nests in a seat under the hand stop that is as wide as the
+        # tab and curved to its radius, and is screwed through its eyelet into a heat-set insert
+        sk = self.sketch("sling_seat")
+        sa, sb = f"{hp} + hook_round", f"{hp} + handstop_length - tip_round"
+        self.poly(sk, [(sb, hs_bot), (sa, hs_bot)], arcs={0: "sling_tab_r"})
+        self.done(sk)
+        self.extrude(fore, sk.profiles.item(0), CUT, sym="sling_tab_w + 1 mm", name="sling_seat")
+        drill("sling_insert", f"{hs_bot} + insert_depth + 4 mm", "sling_hole_x", "insert_hole_d", "insert_depth + 5 mm", (fore,))
 
         # block bolt: the head sits inside the block's slot and is tightened through the hole in the slot floor
         drill("block_bolt_hole", gbm, "block_bolt_x", "cap_screw_d", "block_height", (blk,))

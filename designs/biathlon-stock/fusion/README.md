@@ -297,7 +297,7 @@ now builds it, still entirely from User Parameters. Review images come from `fus
   and `belly_h` reduce the flat marking surface (`chk_mark_round`). The block no longer sits in the marking zone.
 - **Open points.** The joint fasteners cannot be inserted as bolts (the butt window and the head pocket are shorter than
   the bolts), so the plan is M6 studs threaded into the captive nuts with nuts on the outer ends. `chk_holder_joint`,
-  `chk_holder_hand` and `chk_rail_handstop` still use r1's upright-holder rules. Some trigger-guard edges are left square.
+  `chk_holder_hand` and `chk_rail_handstop` still use r1's upright-holder rules.
 
 ### Trigger guard and bolt-on standing block (Darren, 2026-11-24)
 - **Guard.** One closed loop sized like a real guard: the opening runs from the grip front to `rel_front_x` (about 62 mm)
@@ -310,6 +310,17 @@ now builds it, still entirely from User Parameters. Review images come from `fus
   is tightened through the hole in the slot floor. The default block spans `finger_clear` ahead of the grip to the guard front.
 - **IBU.** The assembled block counts toward MC 3.1.6.4 a: `chk_depth_block` and the build report's lowest point of
   `standing_block` both check it. Any replacement block must keep `block_height` at or under 140 mm.
+
+### Sling seat, wrist and guard rounds (2026-11-24)
+- **Larsen sling seat.** The hand stop's sling slot is replaced by a seat under the stop: as wide as the sling's end tab
+  (`sling_tab_w`), curved along its length to the tab's radius (`sling_tab_r`), with one heat-set insert at
+  `sling_hole_x` for the screw through the tab's eyelet. The stop is `sling_tab_w + 8 mm` wide. All three are
+  placeholders until the sling is measured.
+- **Wrist.** `wrist_under_y` is derived so the rear joint socket keeps `min_wall` below it (an earlier round let the socket
+  break through the underside). A facet (`wrist_facet_w`, `wrist_facet_h`) narrows the underside to the grip width, and
+  `grip_offset` is 0. The grip bottom now sits exactly on the 140 mm line (`chk_depth_grip` = 0).
+- **Rounds.** The guard is rounded as its own body and then joined, and the forestock hull is rounded before the hand
+  stop is joined. The build reports no skipped rounds.
 
 ## 11. Action cradle (2026-11-24)
 Darren's requirement: the stock must take a real barrelled action on its mounting screws, and a different action must
