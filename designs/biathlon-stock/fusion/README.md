@@ -382,6 +382,26 @@ The butt, main body and forestock are separate prints, but they should read as o
 - **One colour.** All rigid printed parts share one appearance; TPU parts and the two small ASA parts differ.
 Fixed features did not move: the action cradle, bolt positions, magazine well, trigger pocket, joints and marking surface.
 
+### Parameter tolerance (checked 2026-11-24)
+Ten driving measurements (AA, AC, AD, AE, AF, E, P, AG, J, M) were scaled together and one at a time.
+Standing height (A) drives nothing by itself; the stock follows the rifle-fit measurements.
+
+| Scale (shooter height) | Rebuild from the script | Layout checks that go negative |
+|---|---|---|
+| 115 % (2.05 m) | builds, all bodies valid, no skipped rounds | none new |
+| 100 % (1.78 m) | builds | none new |
+| 90 % (1.60 m) | builds | `chk_handstop_min`, `chk_pad_pocket` |
+| 80 % (1.42 m) | builds | those two and `chk_slots_handstop` |
+| 67 % (1.20 m) | fails: the forestock is too short for the row of four slots | |
+
+- **Rebuild, do not live-edit.** Changing a measurement in Change Parameters breaks recorded rounds from about 5 %,
+  because a recorded fillet cannot re-pick its edges. Re-running `fusion_build_demo.py` picks them afresh.
+- **Fixed by this check.** `comb_length`, `grip_depth`, `grip_width` and `forend_tip` were fixed numbers, so a 10 % smaller
+  shooter broke the outline. They are now derived from the measurements.
+- **The real limit is the front joint.** The hand stop and prone pad must sit ahead of the joint's head pocket
+  (`chk_handstop_min`), which needs AG of about 347 mm or more with J = 80. Smaller shooters need the front joint or the
+  spare-mag row laid out differently; the butt and grip already scale.
+
 ## 11. Action cradle (2026-11-24)
 Darren's requirement: the stock must take a real barrelled action on its mounting screws, and a different action must
 not mean redoing the design. Everything that depends on the action now lives in one component, `action_cradle`.
