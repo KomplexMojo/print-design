@@ -148,7 +148,9 @@ DEMO_PARAMS = [
     ("sling_hole_x", "mm", "sling_tip_x - sling_hole_inset", "[demo] derived: sling screw insert"),
     ("hs_width", "mm", "sling_tab_w + 8 mm", "[demo] derived: hand-stop width, 4 mm of shoulder each side of the sling seat"),
     ("chk_hs_width", "mm", "body_width - hs_width", "[demo] the hand stop is no wider than the forend"),
-    ("hs_round", "mm", "4 mm", "[demo]"),
+    ("hs_round", "mm", "4 mm", "[demo] edge round on the hand stop"),
+    ("hs_rear_r", "mm", "16 mm", "[demo] the hand stop's rear face is rounded to this radius, seen from below: the web between thumb and forefinger rests against it in prone"),
+    ("chk_hs_rear", "mm", "hs_width / 2 - hs_rear_r - 2 mm", "[demo] the rear rounding leaves a flat for the sling tab to leave through"),
     ("tip_sweep_x", "mm", "handstop_position + handstop_length + hs_rake + 14 mm", "[demo] derived: where the forend underside turns up to the nose"),
     # ---- spare-mag slots
     ("mag_slot_len", "mm", "36 mm", "[demo] spare-mag holder slot length along the forestock (Darren, measured 2026-11-24)"),
@@ -500,7 +502,7 @@ class Builder:
             return a.x, a.y
         return None
 
-    def fillet(self, comp, sets, name):
+    def fillet(self, comp, sets, name, chain=False):
         """sets: list of (edges, radius_expr). A failure is reported, not raised, so one bad
         round does not hide the rest of the model."""
         fil = comp.features.filletFeatures
@@ -513,9 +515,9 @@ class Builder:
             n += col.count
             if col.count:
                 try:
-                    inp.edgeSetInputs.addConstantRadiusEdgeSet(col, self.vi(r), False)
+                    inp.edgeSetInputs.addConstantRadiusEdgeSet(col, self.vi(r), chain)
                 except AttributeError:
-                    inp.addConstantRadiusEdgeSet(col, self.vi(r), False)
+                    inp.addConstantRadiusEdgeSet(col, self.vi(r), chain)
         if not n:
             self.problems.append(f"{name}: no edges found")
             return None
@@ -613,6 +615,21 @@ class Builder:
                 if abs(a.x - b.x) < 1e-4 and abs(a.z - b.z) < 1e-4 and abs(a.y - b.y) > 0.05:
                     picked[e.tempId] = e
         return self.fillet(occ.component, [(list(picked.values()), r)], name)
+
+    def round_rear_face(self, occ, x_expr, half_expr, r, name, body=None):
+        """Round a part's rear face as seen from above or below: fillet its two vertical edges at x, +/- half."""
+        b = body or occ.component.bRepBodies.item(0)
+        x, half = self.ev(x_expr), self.ev(half_expr)
+        picked = []
+        for e in b.edges:
+            g = e.geometry
+            if g.curveType != adsk.core.Curve3DTypes.Line3DCurveType:
+                continue
+            a, c = g.startPoint, g.endPoint
+            if (abs(a.x - c.x) < 1e-4 and abs(a.z - c.z) < 1e-4 and abs(a.y - c.y) > 0.05
+                    and abs(a.x - x) < 0.01 and abs(abs(a.z) - half) < 0.01 and self.sharp(e)):
+                picked.append(e)
+        return self.fillet(occ.component, [(picked, r)], name)
 
     def fillet_z_edges(self, occ, feature, r, name):
         """Round the corners (edges along Z) that a cut feature made: geometric windows with soft corners."""
@@ -802,7 +819,10 @@ class Builder:
         self.done(sk)
         self.extrude(fore, sk.profiles.item(0), JOIN, sym="hs_width", name="hand_stop")
 
-        self.round_faces(fore, "hs_width / 2", "hs_round", "hand_stop_round", skip_y=(hs_top, hs_bot))
+        self.round_rear_face(fore, hp, "hs_width / 2", "hs_rear_r", "hand_stop_rear")
+        y_hull = self.ev(ffd)       # leave the junction with the forend's belly square; round the free edges below it
+        self.round_faces(fore, "hs_width / 2", "hs_round", "hand_stop_round", skip_y=(hs_top, hs_bot),
+                         skip=lambda e: max(e.startVertex.geometry.y, e.endVertex.geometry.y) > y_hull + 0.01)
 
         # ---- trigger guard and standing block: ONE component (Darren 2026-11-24), like the 1827 F Comfort. The
         # guard's bottom rail is the top of the block; the trigger opening is compact with rounded corners and
@@ -998,8 +1018,13 @@ class Builder:
         self.poly(sk, [(hp, hs_bot), (f"{hp} + handstop_length", hs_bot), (xf, cb), (hp, cb)])
         self.done(sk)
         self.extrude(clamp, sk.profiles.item(0), NEW, sym="hs_width", name="sling_clamp")
-        self.corners(clamp, [(xf, cb, "clamp_t - 1 mm"), (hp, cb, "clamp_t - 1 mm")], "sling_clamp")
-        self.round_faces(clamp, "hs_width / 2", "hs_round", "sling_clamp_round", skip_y=(hs_bot,))
+        self.corners(clamp, [(xf, cb, "clamp_t - 1 mm")], "sling_clamp")
+        self.round_rear_face(clamp, hp, "hs_width / 2", "hs_rear_r", "sling_clamp_rear")
+        # the whole underside edge of the plate, followed round the rear curve
+        cx_, cy_ = self.ev(hp), self.ev(cb)
+        seed = [e for e in body("clamp").edges if self.z_edge(e)
+                and abs(self.z_edge(e)[0] - cx_) < 0.03 and abs(self.z_edge(e)[1] - cy_) < 0.03]
+        self.fillet(clamp.component, [(seed, "hs_round")], "sling_clamp_underside", chain=True)
         sk = self.sketch("sling_nut_slot")
         self.rect(sk, "sling_hole_x - m5_nut_af / 2 - fit_snug", "sling_hole_x + m5_nut_af / 2 + fit_snug",
                   "sling_nut_y", "sling_nut_y + m5_nut_m + 2 * fit_snug")

@@ -349,6 +349,10 @@ through the plate and the tab's eyelet into a captive hex nut that slides into a
 
 Both joints' counterbores are `joint_cbore_d` (13.5 mm) wide, room for an M6 nut or head and a thin-wall socket.
 
+**Hand stop rear.** The rear face of the hand stop and of the clamp plate is rounded in plan (`hs_rear_r`), because the
+web between thumb and forefinger rests against it in prone. A flat remains in the middle for the sling tab to leave
+through (`chk_hs_rear`).
+
 **Joint nut slots.** They are open right up through the receiver bed (rear) and the barrel channel wall (front), so a
 nut drops straight in; the action and barrel then cover them. Each slot is `nut_slot_af` (10.3 mm) across the flats, so the nut cannot turn, and `nut_slot_len`
 (5.5 mm) along the bolt, a slide fit so an M6 nut (10 mm across flats, 5 mm thick) drops down it edge-on.
