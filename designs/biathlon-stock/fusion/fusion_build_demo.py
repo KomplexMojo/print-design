@@ -11,6 +11,10 @@ Layout (see README.md §5 and §10):
   root      = skeleton: user parameters, the side-outline sketch with the two split lines
   rear_stock / main_body / forestock = rigid components (PAHT-CF); each extrudes its own
               region of the shared outline and adds its own features
+  action_cradle = the only part that touches the barrelled action: receiver bed, bedding-screw pillars,
+              trigger slot and magazine well. Its dimensions are the act_* parameters, which the loader
+              fills from the preset for the fit record's action type (stock_params.ACTIONS). It drops into
+              a pocket of fixed section in the main body and is fused to it for printing (FUSE_ACTION).
   tpu_grip / tpu_prone_pad = soft parts (TPU) carried on rigid cores; grip_cap locks the sleeve
   hardware_M6 = bolts and nuts, for reading the joints only
 
@@ -27,11 +31,14 @@ no front harness mount, grip and pad surfaces are smooth (no finger grooves or t
 """
 
 import math
+import os
+import sys
 
 import adsk.core
 import adsk.fusion
 
 DATUM = 1000.0  # mm
+FUSE_ACTION = False  # True joins the action cradle into the main body (the printed part); False keeps it apart for review
 
 # r2 values (PR 3) that differ from the r1 registry defaults: written as [manual] so the
 # loader leaves them alone on the next run. New demo-only shape parameters are [demo].
@@ -168,6 +175,12 @@ DEMO_PARAMS = [
     ("tpu_wall", "mm", "4 mm", "[demo] thinnest TPU over the rigid grip core"),
     ("cap_t", "mm", "5 mm", "[demo] rigid cap under the grip that locks the TPU sleeve"),
     ("cap_screw_d", "mm", "5.5 mm", "[demo] M5 clearance hole in the cap"),
+    ("cradle_w", "mm", "action_width + 2 * cradle_wall", "[demo] derived: width of the action cradle and of its pocket in the main body"),
+    ("cradle_y", "mm", "-(bore_above_inlet_floor + cradle_floor)", "[demo] derived: underside of the action cradle"),
+    ("act_bed_r", "mm", "act_receiver_d / 2 + fit_loose", "[demo] derived: bed radius, with room for bedding compound"),
+    ("chk_cradle_side", "mm", "(body_width - cradle_w) / 2 - 3 mm", "[demo] main-body wall beside the cradle"),
+    ("chk_pillar_mag", "mm", "act_screw_front_x - act_pillar_d / 2 - (mag_well_x1 + fit_slide) - 4 mm", "[demo] front pillar clear of the magazine well"),
+    ("chk_pillar_front", "mm", "action_front - (act_screw_front_x + act_pillar_d / 2)", "[demo] front pillar inside the cradle"),
     ("pad_t", "mm", "3 mm", "[demo] prone hand pad thickness"),
     ("pad_wrap", "mm", "14 mm", "[demo] the pad wraps this far up each side of the forend"),
     ("pad_x0", "mm", "handstop_position - prone_hand_length", "[demo] derived: the pad covers the prone hand (J) behind the hand stop"),
@@ -522,6 +535,16 @@ class Builder:
     # ---------------------------------------------------------------- build
     def params(self):
         up = self.d.userParameters
+        # action parameters normally come from the loader; add any that an older load did not create
+        here = os.path.dirname(os.path.abspath(__file__))
+        if here not in sys.path:
+            sys.path.insert(0, here)
+        import importlib
+        import stock_params
+        stock_params = importlib.reload(stock_params)   # Fusion keeps modules loaded between runs
+        for row in stock_params.REGISTRY:
+            if row.group == "action" and up.itemByName(row.name) is None:
+                up.add(row.name, self.vi(row.default), row.unit, f"[fit] {row.note} (placeholder)")
         for name, unit, expr, comment in DEMO_PARAMS:
             p = up.itemByName(name)
             if p is None:
@@ -549,7 +572,7 @@ class Builder:
 
         occs = {}
         for key, label in (("rear", "rear_stock"), ("main", "main_body"), ("fore", "forestock"),
-                           ("grip", "tpu_grip"), ("pad", "tpu_prone_pad"), ("cap", "grip_cap")):
+                           ("action", "action_cradle"), ("grip", "tpu_grip"), ("pad", "tpu_prone_pad"), ("cap", "grip_cap")):
             occ = root.occurrences.addNewComponent(adsk.core.Matrix3D.create())
             occ.component.name = label
             occs[key] = occ
@@ -651,22 +674,63 @@ class Builder:
         f = self.extrude(main, sk.profiles.item(0), CUT, sym="2 * body_width", name="block_window")
         self.fillet_z_edges(main, f, "win_round + guard_round", "block_window_round")
 
-        # ---- main body: action inlet, mag well, bolt notch (hardware side), barrel channel
-        sk = self.sketch("action_inlet")
-        self.rect(sk, "action_rear", "action_front", "-bore_above_inlet_floor", "sight_line_above_bore")
+        # ---- action cradle: everything that depends on the action type lives in this one component.
+        # The main body only has a pocket of fixed section (cradle_w wide, down to cradle_y).
+        act = occs["action"]
+        both = (main, act)
+        sk = self.sketch("cradle_pocket")
+        self.rect(sk, "action_rear", "action_front", "cradle_y", "sight_line_above_bore")
         self.done(sk)
-        self.extrude(main, sk.profiles.item(0), CUT, sym="action_width + 2 * fit_loose", name="action_inlet")
+        self.extrude(main, sk.profiles.item(0), CUT, sym="cradle_w", name="cradle_pocket")
+        sk = self.sketch("cradle_block")
+        self.rect(sk, "action_rear", "action_front", "cradle_y", "0 mm")
+        self.done(sk)
+        self.extrude(act, sk.profiles.item(0), NEW, sym="cradle_w", name="cradle_block")
 
-        sk = self.sketch("mag_well")
-        self.rect(sk, "mag_well_x0 - fit_slide", "mag_well_x1 + fit_slide", f"{fd} - 1 mm", "-bore_above_inlet_floor")
+        sk = self.yz_sketch("receiver_bed", "action_rear")      # half-round bed with straight walls above the bore
+        self.poly(sk, [("-act_bed_r", "5 mm"), ("-act_bed_r", "0 mm"), ("act_bed_r", "0 mm"), ("act_bed_r", "5 mm")],
+                  arcs={1: "act_bed_r"})
         self.done(sk)
-        self.extrude(main, sk.profiles.item(0), CUT, sym="mag_well_width + 2 * fit_slide", name="mag_well")
+        self.extrude(act, sk.profiles.item(0), CUT, dist="action_front - action_rear", name="receiver_bed")
 
-        sk = self.sketch("bolt_notch")
-        self.rect(sk, "bolt_notch_x - bolt_notch_length / 2", "bolt_notch_x + bolt_notch_length / 2",
-                  "-bolt_notch_depth", "sight_line_above_bore")
-        self.done(sk)
-        self.extrude(main, sk.profiles.item(0), CUT, dist="bolt_dir * body_width", name="bolt_notch")
+        def through(name, x0, x1, y0, y1, width, dist=None):
+            sk = self.sketch(name)
+            self.rect(sk, x0, x1, y0, y1)
+            self.done(sk)
+            for occ in both:
+                if dist:
+                    self.extrude(occ, sk.profiles.item(0), CUT, dist=dist, name=name)
+                else:
+                    self.extrude(occ, sk.profiles.item(0), CUT, sym=width, name=name)
+
+        through("trigger_slot", "trigger_slot_x0", "trigger_slot_x1", "finger_hole_y1 - 1 mm", "0 mm", "trigger_slot_width")
+        through("mag_well", "mag_well_x0 - fit_slide", "mag_well_x1 + fit_slide", f"{fd} - 1 mm", "0 mm",
+                "mag_well_width + 2 * fit_slide")
+        through("bolt_notch", "bolt_notch_x - bolt_notch_length / 2", "bolt_notch_x + bolt_notch_length / 2",
+                "-bolt_notch_depth", "sight_line_above_bore", None, dist="bolt_dir * body_width")
+
+        # bedding screws: vertical pillar bores from the bed to the underside, counterbored for the heads
+        def xz_sketch(name, y_expr):
+            y = self.ev(y_expr)
+            pl = self.offset_plane(f"{name}_plane", y_expr, root.xZConstructionPlane)
+            if abs(pl.geometry.origin.y - y) > 0.01:
+                pl.deleteMe()
+                pl = self.offset_plane(f"{name}_plane", f"-({y_expr})", root.xZConstructionPlane)
+            sk = self.sketch(name, pl)
+            q = sk.modelToSketchSpace(adsk.core.Point3D.create(1, y, 1))
+            down = -1 if sk.xDirection.crossProduct(sk.yDirection).y > 0 else 1
+            return sk, (lambda x: x if q.x > 0 else f"-({x})"), down
+
+        def drill(name, y_expr, x_expr, d_expr, depth, comps):
+            sk, fx, down = xz_sketch(name, y_expr)
+            self.circle(sk, fx(x_expr), "0 mm", d_expr)
+            self.done(sk)
+            for occ in comps:
+                self.extrude(occ, sk.profiles.item(0), CUT, dist=depth if down > 0 else f"-({depth})", name=name)
+
+        for nm, x, under in (("front", "act_screw_front_x", fd), ("rear", "act_screw_rear_x", "wrist_under_y")):
+            drill(f"{nm}_pillar_bore", "0 mm", x, "act_pillar_d", "ibu_depth_max", both)
+            drill(f"{nm}_screw_counterbore", f"{under} + act_cbore", x, "act_head_d + 3 mm", "act_cbore + 2 mm", (main,))
 
         sk = self.sketch("barrel_channel")
         self.rect(sk, "action_front", "forend_tip + tip_round", "-(barrel_d / 2 + barrel_float)", "sight_line_above_bore")
@@ -688,7 +752,7 @@ class Builder:
             self.done(sk)
             self.extrude(main, sk.profiles.item(0), CUT, sym=f"{w} + 2 * fit_snug", name=f"{label}_socket")
 
-        def nut_slots(label, x0, y, zs, top):
+        def nut_slots(label, x0, y, zs, top, comps=None):
             """Hex pocket matched to the nut (flats vertical, so it cannot turn), opening up to `top`."""
             sk = self.yz_sketch(f"{label}_nut_slots", x0)
             h, c2 = "nut_slot_af / 2", "nut_slot_af / 2 / (2 * cos(30 deg))"
@@ -697,7 +761,8 @@ class Builder:
                        (f"{z} - {h}", top), (f"{z} - {h}", f"{y} - {c2}")]
                 self.poly(sk, [(f"-({zz})", yy) for zz, yy in pts])
             self.done(sk)
-            self.extrude(main, self.profiles(sk), CUT, dist="nut_slot_len", name=f"{label}_nut_slots")
+            for occ in comps or (main,):
+                self.extrude(occ, self.profiles(sk), CUT, dist="nut_slot_len", name=f"{label}_nut_slots")
 
         def bolt_holes(label, x0, length, y, zs, comps):
             sk = self.yz_sketch(f"{label}_bolts", x0)
@@ -712,7 +777,7 @@ class Builder:
                       "rear_tongue_height", "rear_tongue_width",
                       "rear_split - fit_loose", "rear_split + rear_tongue_length + fit_snug", "rear")
         rz = ("rj_bolt_z", "-rj_bolt_z")
-        nut_slots("rear", "rj_nut_x0", "rear_tongue_y", rz, "-bore_above_inlet_floor + 1 mm")
+        nut_slots("rear", "rj_nut_x0", "rear_tongue_y", rz, "-act_bed_r + 3 mm", both)
         bolt_holes("rear", "rs_win_front_x - 1 mm", "rj_bolt_len + 1 mm", "rear_tongue_y", rz, (rear, main))
 
         # front: forestock tongue into the main body; heads in a pocket under the forestock,
@@ -866,16 +931,7 @@ class Builder:
         grip_solid(grip, "grip_outer", gtop, gb2)
         grip_solid(cap, "grip_cap", gb2, gbot)
 
-        # thumb rest: a tapered hexagonal shelf on the face side, part of the TPU
-        ty = "-thumb_rest_height"
-        tcx = f"({gf(ty)} - grip_depth / 2)"
-        thumb = self.offset_plane("thumb_plane", "grip_z0 + face_side * (grip_width - 8 mm)")
-        sk = self.sketch("thumb_rest", thumb)
-        self.poly(sk, [(f"{tcx} - 16 mm", ty), (f"{tcx} - 10 mm", f"{ty} + 6 mm"), (f"{tcx} + 10 mm", f"{ty} + 6 mm"),
-                       (f"{tcx} + 16 mm", ty), (f"{tcx} + 10 mm", f"{ty} - 6 mm"), (f"{tcx} - 10 mm", f"{ty} - 6 mm")])
-        self.done(sk)
-        self.extrude(grip, sk.profiles.item(0), JOIN, dist="face_side * (thumb_rest_depth + 8 mm)",
-                     name="thumb_rest", taper="-8 deg")
+        # no thumb shelf: Darren chose a clean grip (2026-11-24)
 
         # rigid core and front spine, trimmed to the grip's outer shape and joined to the main body
         sk = self.sketch("grip_core")
@@ -922,6 +978,8 @@ class Builder:
         self.extrude(cap, prs[-1], CUT, sym="2 * cap_t + 2 mm", name="cap_screw_hole")
         self.extrude(main, prs, CUT, sym="2 * (cap_t + insert_depth)", name="cap_insert_hole")
 
+        if FUSE_ACTION:
+            self.combine((main, body("main")), [(act, body("action"))], JOIN, "action_cradle_fused", keep=False)
         self.colour(occs)
         return occs
 
@@ -929,7 +987,7 @@ class Builder:
         app = adsk.core.Application.get()
         lib = app.materialLibraries.itemByName("Fusion Appearance Library")
         names = {"rear": "Plastic - Matte (White)", "main": "Plastic - Matte (Gray)", "fore": "Plastic - Matte (White)",
-                 "grip": "Plastic - Matte (Yellow)", "pad": "Plastic - Matte (Yellow)", "cap": "Plastic - Matte (Black)"}
+                 "action": "Plastic - Matte (Blue)", "grip": "Plastic - Matte (Yellow)", "pad": "Plastic - Matte (Yellow)", "cap": "Plastic - Matte (Black)"}
         for key, name in names.items():
             a = lib.appearances.itemByName(name) if lib else None
             if a:
@@ -950,6 +1008,8 @@ def report(design, occs, problems=(), log=print):
                 f"vol_cm3={b.volume:.0f} faces={b.faces.count}")
     for key in ("rear", "main", "fore", "pad", "grip", "cap"):
         occ = occs[key]
+        if not occ.component.bRepBodies.count:
+            continue
         low = -min(b.boundingBox.minPoint.y for b in occ.component.bRepBodies) * 10
         log(f"{occ.component.name}: lowest point {low:.1f} mm below the bore")
     log(f"(MC 3.1.6.4 a: forestock depth incl. shelf, mag and guard <= {up.itemByName('ibu_depth_max').value * 10:.0f} mm; "
@@ -957,7 +1017,8 @@ def report(design, occs, problems=(), log=print):
     bad = [up.item(i).name for i in range(up.count)
            if up.item(i).name.startswith("chk_") and up.item(i).value < -1e-7]
     log("chk_* below zero: " + (", ".join(bad) if bad else "none"))
-    for n in ("rj_bolt_len", "fj_bolt_len", "block_length", "block_position", "grip_round"):
+    for n in ("action_type", "act_receiver_d", "act_screw_front_x", "act_screw_rear_x", "cradle_w",
+              "rj_bolt_len", "fj_bolt_len", "block_length", "block_position", "grip_round"):
         log(f"{n} = {up.itemByName(n).value * 10:.1f} mm")
     tl = design.timeline
     errs = [f"{tl.item(i).name}: {tl.item(i).errorOrWarningMessage}" for i in range(tl.count)

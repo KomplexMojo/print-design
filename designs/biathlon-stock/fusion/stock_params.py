@@ -66,6 +66,43 @@ def _p(*a, **k):
     return P(*a, **k)
 
 
+# ---------------------------------------------------------------------------- actions
+# One preset per action type. The fit record's rifle.action_type (or make_model) picks the preset, and
+# its values become the act_* parameters and override the listed hardware parameters. The stock only
+# meets the action through the `action_cradle` component (fusion_build_demo.py), so supporting another
+# action means adding a preset here (and a cradle builder only if its shape family is new).
+# "family" selects the cradle builder: 1 = round receiver in a half-round bed, two vertical screws from below.
+# EVERY number below is a placeholder until the action is measured out of its stock (brief, "Fixed by hardware").
+ACTIONS = {
+    "anschutz_1827f": {
+        "label": "Anschütz 1827 F / 1825 Fortner", "code": 1, "family": 1,
+        "match": ("1827", "1825", "fortner"),
+        "values": {"act_receiver_d": "30 mm", "act_screw_front_x": "112 mm", "act_screw_rear_x": "-30 mm",
+                   "act_screw_d": "6 mm", "act_head_d": "10 mm",
+                   "action_rear": "-105 mm", "action_front": "125 mm", "action_width": "32 mm",
+                   "mag_well_x0": "50 mm", "mag_well_x1": "100 mm", "mag_well_width": "22 mm"},
+    },
+    "izhmash_7_4": {
+        "label": "Izhmash BI-7-4", "code": 2, "family": 1,
+        "match": ("izhmash", "bi-7", "7-4", "7-3"),
+        "values": {"act_receiver_d": "28 mm", "act_screw_front_x": "105 mm", "act_screw_rear_x": "-30 mm",
+                   "act_screw_d": "6 mm", "act_head_d": "10 mm",
+                   "action_rear": "-100 mm", "action_front": "115 mm", "action_width": "30 mm",
+                   "mag_well_x0": "45 mm", "mag_well_x1": "95 mm", "mag_well_width": "22 mm"},
+    },
+}
+DEFAULT_ACTION = "anschutz_1827f"
+
+
+def pick_action(rifle: dict) -> tuple[str, bool]:
+    """(preset key, matched) from rifle.action_type, action_type_other or make_model."""
+    text = " ".join(str(rifle.get(k) or "") for k in ("action_type", "action_type_other", "make_model")).lower()
+    for key, a in ACTIONS.items():
+        if key in text or any(m in text for m in a["match"]):
+            return key, True
+    return DEFAULT_ACTION, False
+
+
 REGISTRY: list[P] = [
     # ---- handedness and hardware sides (numeric switches; Fusion has no text parameters
     #      that features can consume, so a sign is used and the text goes in the comment)
@@ -165,6 +202,19 @@ REGISTRY: list[P] = [
     _p("bolt_notch_x", "mm", "-62 mm", "hardware", "bolt-handle notch centre; side from bolt_dir"),
     _p("bolt_notch_length", "mm", "26 mm", "hardware", ""),
     _p("bolt_notch_depth", "mm", "12 mm", "hardware", ""),
+
+    # ---- action cradle (values come from the ACTIONS preset; placeholders until measured)
+    _p("action_type", "", "1", "action", "action preset code: 1 = Anschütz 1827 F / 1825 Fortner, 2 = Izhmash BI-7-4", sources=("rifle.action_type",)),
+    _p("action_family", "", "1", "action", "cradle builder: 1 = round receiver, half-round bed, two vertical screws"),
+    _p("act_receiver_d", "mm", "30 mm", "action", "receiver diameter in the bed"),
+    _p("act_screw_front_x", "mm", "112 mm", "action", "trigger to the front action screw"),
+    _p("act_screw_rear_x", "mm", "-30 mm", "action", "trigger to the rear action screw"),
+    _p("act_screw_d", "mm", "6 mm", "action", "action screw thread"),
+    _p("act_head_d", "mm", "10 mm", "action", "action screw head"),
+    _p("act_pillar_d", "mm", "12 mm", "action", "aluminium bedding pillar outside diameter"),
+    _p("act_cbore", "mm", "8 mm", "action", "screw-head counterbore depth from the stock underside"),
+    _p("cradle_wall", "mm", "5 mm", "action", "cradle wall each side of the receiver"),
+    _p("cradle_floor", "mm", "3 mm", "action", "cradle material under the inlet floor"),
 
     # ---- spare magazine holder (away side)
     _p("mag_holder_count", "", "4", "holder", "", expr="r_spare_mag_count", sources=("rifle.spare_mag_count",)),
@@ -361,7 +411,16 @@ def resolve(doc: dict, fits: dict | None = None) -> Result:
 
     # 4. registry rows
     fits = fits or {}
+    akey, matched = pick_action(rifle)
+    action = ACTIONS[akey]
+    if not matched:
+        res.warnings.append(f"action type not recognised in the fit record, using {action['label']}")
+    preset = {**action["values"], "action_type": str(action["code"]), "action_family": str(action["family"])}
     for p in REGISTRY:
+        if p.name in preset and not p.expr:
+            v = evaluate(preset[p.name], {})
+            add(p.name, p.unit, preset[p.name], v, f"{p.note} [{action['label']}, placeholder]", "action")
+            continue
         if p.name in switch:
             v, text = switch[p.name]
             if v is None:

@@ -286,6 +286,7 @@ now builds it, still entirely from User Parameters. Review images come from `fus
 - **Webs.** `min_wall` (6 mm) is now held above the mag slots (`chk_slot_channel`), below them (`chk_fj_pocket_slots`,
   was 3.7 mm) and under the front tongue (`chk_fj_tongue_floor`).
 - **TPU inserts.** Surfaces shaped only by the athlete's body are separate TPU parts on rigid cores:
+  Rule (Darren, 2026-11-24): every TPU part mounts on a rigid feature of the structural part.
   - `tpu_grip`: a sleeve over a rounded rigid core. It slides on from below, is keyed by the core and by a rigid front
     strip above the guard bar (`spine_d`), and is locked by `grip_cap` with one M5 screw into a heat-set insert. Its girth
     comes from the measurement: `grip_round` is solved so the section's girth equals `grip_circumference` (PI * M).
@@ -297,6 +298,25 @@ now builds it, still entirely from User Parameters. Review images come from `fus
 - **Open points.** The joint fasteners cannot be inserted as bolts (the butt window and the head pocket are shorter than
   the bolts), so the plan is M6 studs threaded into the captive nuts with nuts on the outer ends. `chk_holder_joint`,
   `chk_holder_hand` and `chk_rail_handstop` still use r1's upright-holder rules. Some trigger-guard edges are left square.
+
+## 11. Action cradle (2026-11-24)
+Darren's requirement: the stock must take a real barrelled action on its mounting screws, and a different action must
+not mean redoing the design. Everything that depends on the action now lives in one component, `action_cradle`.
+
+- **Selection.** `stock_params.ACTIONS` holds one preset per action type. `pick_action()` reads `rifle.action_type`,
+  `action_type_other` or `make_model` from the fit record, and the preset fills the `act_*` parameters and the action's
+  hardware parameters (`action_rear`, `action_front`, `action_width`, `mag_well_*`). `action_type` is the preset's code
+  (1 = Anschütz 1827 F / 1825 Fortner, 2 = Izhmash BI-7-4).
+- **Interface.** The main body has a pocket of fixed section, `cradle_w` wide and down to `cradle_y`, from `action_rear`
+  to `action_front`. The cradle fills it exactly and is fused to the main body for printing (`FUSE_ACTION = True` in
+  `fusion_build_demo.py`; the default keeps it apart so it can be reviewed).
+- **Family 1 cradle** (round receiver): a half-round bed of radius `act_bed_r` with straight walls, a trigger slot, the
+  magazine well, the bolt notch, and two vertical pillar bores (`act_pillar_d`) at `act_screw_front_x` and
+  `act_screw_rear_x`, counterbored from the underside for the screw heads. The rear screw is reached inside the trigger guard.
+- **Adding an action.** Add a preset. Write a new cradle builder only if the receiver is not a round one on two vertical screws.
+- **Placeholders.** No dimensioned drawing of the 1827 F action is published, so every preset value is a placeholder.
+  Needed from the action out of its stock: receiver diameter and length, both screw positions from the trigger, thread and
+  head size, recoil lug, magazine well and trigger housing outline.
 
 ## Files
 | File | Purpose |
