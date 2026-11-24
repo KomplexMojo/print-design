@@ -38,7 +38,7 @@ import adsk.core
 import adsk.fusion
 
 DATUM = 1000.0  # mm
-OBSOLETE_PARAMS = ("chk_pillar_mag", "chk_pillar_front", "act_receiver_d", "sling_tab_r", "rel_len", "guard_div",
+OBSOLETE_PARAMS = ("chk_pillar_mag", "act_receiver_d", "sling_tab_r", "rel_len", "guard_div",
                    "block_top_len", "grip_toe", "rs_rib_x", "saddle_h", "block_bolt_x", "block_insert_depth",
                    "chk_slot_pillar", "chk_key_slot", "act_slot_x0", "act_slot_x1", "act_slot_w",
                    "wrist_facet_w", "wrist_facet_h", "chk_belly_step", "chk_rel_travel", "chk_bolts_centred")
