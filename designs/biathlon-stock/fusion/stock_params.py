@@ -77,10 +77,11 @@ ACTIONS = {
     "anschutz_1827f": {
         "label": "Anschütz 1827 F / 1825 Fortner", "code": 1, "family": 1,
         "match": ("1827", "1825", "fortner"),
-        "values": {"act_receiver_d": "30 mm", "act_screw_front_x": "112 mm", "act_screw_rear_x": "-30 mm",
+        "values": {"act_receiver_d": "30 mm", "act_screw_front_x": "143 mm", "act_screw_rear_x": "-30 mm",
                    "act_screw_d": "6 mm", "act_head_d": "10 mm",
-                   "action_rear": "-105 mm", "action_front": "125 mm", "action_width": "32 mm",
-                   "mag_well_x0": "50 mm", "mag_well_x1": "100 mm", "mag_well_width": "22 mm"},
+                   # trigger guard, then the magazine-release window, then the magazine well (1827 F Comfort layout)
+                   "action_rear": "-105 mm", "action_front": "156 mm", "action_width": "32 mm",
+                   "mag_well_x0": "82 mm", "mag_well_x1": "132 mm", "mag_well_width": "22 mm"},
     },
     "izhmash_7_4": {
         "label": "Izhmash BI-7-4", "code": 2, "family": 1,

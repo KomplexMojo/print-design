@@ -86,17 +86,22 @@ DEMO_PARAMS = [
     ("chk_depth_grip", "mm", "ibu_depth_max + grip_top_y - grip_length",
      "[demo] MC 3.1.6.4 a read strictly: grip bottom within 140 mm of the bore"),
     # ---- trigger guard and standing block (Darren 2026-11-24: the block is an extension of the guard base)
-    ("guard_front_x", "mm", "45 mm", "[demo] front of the trigger-guard loop, behind the mag well"),
+    ("guard_front_x", "mm", "78 mm", "[demo] front of the guard's front leg, behind the mag well"),
     ("guard_bar", "mm", "8 mm", "[demo] trigger-guard bar thickness"),
     ("guard_rake", "mm", "10 mm", "[demo] guard front leg thickness over the bar"),
     ("guard_width", "mm", "18 mm", "[demo] trigger-guard width"),
     ("guard_round", "mm", "3 mm", "[demo] edge round on the guard"),
-    ("finger_hole_x1", "mm", "guard_front_x - guard_rake - guard_bar", "[manual] guard opening front"),
+    ("rel_len", "mm", "22 mm", "[demo] magazine-release window length (second loop, ahead of the trigger guard)"),
+    ("guard_div", "mm", "8 mm", "[demo] divider between the trigger opening and the release window"),
+    ("rel_front_x", "mm", "guard_front_x - guard_rake - guard_bar", "[demo] derived: front of the release window"),
+    ("finger_hole_x1", "mm", "rel_front_x - rel_len - guard_div", "[manual] trigger opening front"),
     ("finger_hole_y0", "mm", "-guard_bottom + guard_bar", "[manual] guard opening bottom"),
-    ("finger_clear", "mm", "28 mm", "[demo] room for the gloved fingers between the grip front and the block"),
+    ("finger_clear", "mm", "12 mm", "[demo] grip front to the block's rear top edge (1827 F Comfort layout: the block starts under the grip front)"),
     ("blk_rear_x", "mm", "grip_front_x - grip_lean * (grip_top_y + guard_bottom) + finger_clear",
      "[demo] derived: rear face of the standing block"),
-    ("blk_rake", "mm", "8 mm", "[demo] block front and rear faces lean in by this much"),
+    ("blk_rake", "mm", "10 mm", "[demo] block rear face is undercut by this much, for the fingers"),
+    ("blk_front_rake", "mm", "2 mm", "[demo] block and front-leg face lean (near vertical)"),
+    ("block_slot_r", "mm", "10 mm", "[demo] end radius of the oblong slot through the block"),
     ("block_width", "mm", "40 mm", "[demo] standing block width"),
     ("block_round", "mm", "8 mm", "[demo] edge round on the block"),
     ("block_corner_r", "mm", "14 mm", "[demo] round of the block's bottom corners"),
@@ -220,7 +225,7 @@ def gb(y):
 
 def lf(y):
     """Front face of the guard leg and standing block at height y (one straight line)."""
-    return f"guard_front_x - blk_rake * (-forend_depth - ({y})) / (block_height - forend_depth)"
+    return f"guard_front_x - blk_front_rake * (-forend_depth - ({y})) / (block_height - forend_depth)"
 
 
 class Builder:
@@ -545,6 +550,14 @@ class Builder:
         for row in stock_params.REGISTRY:
             if row.group == "action" and up.itemByName(row.name) is None:
                 up.add(row.name, self.vi(row.default), row.unit, f"[fit] {row.note} (placeholder)")
+        # apply the preset of the selected action, so a preset edit shows without re-running the loader
+        code = round(up.itemByName("action_type").value)
+        for a in stock_params.ACTIONS.values():
+            if a["code"] == code:
+                for name, expr in a["values"].items():
+                    q = up.itemByName(name)
+                    if q is not None and not q.comment.startswith("[manual]"):
+                        q.expression = expr
         for name, unit, expr, comment in DEMO_PARAMS:
             p = up.itemByName(name)
             if p is None:
@@ -595,8 +608,8 @@ class Builder:
             ("tip_sweep_x", ffd),                                                 # 7 underside turns up
             ("belly_x1", ffd),                                                    # 8 drop-belly ramp, front
             ("belly_x0", fd),                                                     # 9 drop-belly ramp, rear
-            ("finger_hole_x1", fd),                                               # 10 step behind the mag well
-            ("finger_hole_x1", "finger_hole_y1"),                                 # 11 guard opening, top front
+            ("rel_front_x", fd),                                                  # 10 step behind the mag well
+            ("rel_front_x", "finger_hole_y1"),                                    # 11 release window, top front
             (f"{gb('wrist_under_y')} - wrist_ramp", "wrist_under_y"),             # 12 behind the grip
             ("wrist_heel_x", "wrist_heel_y"),                                     # 13
             ("-lop + hook_thickness", "hook_tip_y - tip_round"),                  # 14
@@ -652,27 +665,33 @@ class Builder:
         # ---- main body: trigger guard, and the standing block as an extension of the guard base
         sk = self.sketch("trigger_guard")
         gbm, fh0 = "-guard_bottom", "finger_hole_y0"
-        self.poly(sk, [("finger_hole_x1", f"{fd} + 3 mm"), ("guard_front_x", f"{fd} + 3 mm"), (lf(gbm), gbm),
-                       (f"{gf(gbm)} - 3 mm", gbm), (f"{gf(fh0)} - 3 mm", fh0), ("finger_hole_x1", fh0)])
+        self.poly(sk, [("rel_front_x", f"{fd} + 3 mm"), ("guard_front_x", f"{fd} + 3 mm"), (lf(gbm), gbm),
+                       (f"{gf(gbm)} - 3 mm", gbm), (f"{gf(fh0)} - 3 mm", fh0), ("rel_front_x", fh0)])
         self.done(sk)
         self.extrude(main, sk.profiles.item(0), JOIN, sym="guard_width", name="trigger_guard")
-        self.corners(main, [("finger_hole_x1", fh0, "guard_bar")], "guard")
+        # two closed loops on one bottom rail (1827 F Comfort layout): the trigger guard, and ahead of it
+        # the window the magazine release hangs in
+        sk = self.sketch("guard_divider")
+        self.rect(sk, "finger_hole_x1", "finger_hole_x1 + guard_div", f"{fh0} - 1 mm", "finger_hole_y1 + 3 mm")
+        self.done(sk)
+        self.extrude(main, sk.profiles.item(0), JOIN, sym="guard_width", name="guard_divider")
+        self.corners(main, [("rel_front_x", fh0, "guard_round + guard_round")], "guard")
         self.round_faces(main, "guard_width / 2", "guard_round", "guard_round", skip_y=(fd,))
 
         sk = self.sketch("standing_block")
         bh = "-block_height"
-        self.poly(sk, [("blk_rear_x", fh0), (lf(fh0), fh0), ("guard_front_x - blk_rake", bh), ("blk_rear_x + blk_rake", bh)])
+        self.poly(sk, [("blk_rear_x", fh0), (lf(fh0), fh0), ("guard_front_x - blk_front_rake", bh), ("blk_rear_x + blk_rake", bh)])
         self.done(sk)
         self.extrude(main, sk.profiles.item(0), JOIN, sym="block_width", name="standing_block")
-        self.corners(main, [("guard_front_x - blk_rake", bh, "block_corner_r"), ("blk_rear_x + blk_rake", bh, "block_corner_r")], "block")
+        self.corners(main, [("guard_front_x - blk_front_rake", bh, "block_corner_r"), ("blk_rear_x + blk_rake", bh, "block_corner_r")], "block")
         self.round_faces(main, "block_width / 2", "block_round", "block_round")
 
         sk = self.sketch("block_window")
-        self.rect(sk, "blk_rear_x + blk_rake + blk_win_web", "guard_front_x - blk_rake - blk_win_web",
+        self.rect(sk, "blk_rear_x + blk_rake + blk_win_web", "guard_front_x - blk_front_rake - blk_win_web",
                   f"{bh} + blk_win_web", f"{gbm} - blk_win_web")
         self.done(sk)
         f = self.extrude(main, sk.profiles.item(0), CUT, sym="2 * body_width", name="block_window")
-        self.fillet_z_edges(main, f, "win_round + guard_round", "block_window_round")
+        self.fillet_z_edges(main, f, "block_slot_r", "block_window_round")
 
         # ---- action cradle: everything that depends on the action type lives in this one component.
         # The main body only has a pocket of fixed section (cradle_w wide, down to cradle_y).

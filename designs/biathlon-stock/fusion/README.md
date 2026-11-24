@@ -299,6 +299,13 @@ now builds it, still entirely from User Parameters. Review images come from `fus
   the bolts), so the plan is M6 studs threaded into the captive nuts with nuts on the outer ends. `chk_holder_joint`,
   `chk_holder_hand` and `chk_rail_handstop` still use r1's upright-holder rules. Some trigger-guard edges are left square.
 
+### Standing block after the 1827 F Comfort (Darren, 2026-11-24)
+The guard is now two closed loops on one bottom rail: the trigger guard, then the window the magazine release hangs in
+(`rel_len`, split off by `guard_div`), with the magazine well ahead of the front leg. The block is a slab under the whole
+rail, from `finger_clear` ahead of the grip front to `guard_front_x`, with a near-vertical front (`blk_front_rake`), an
+undercut rear (`blk_rake`) and an oblong slot (`block_slot_r`). The 1827 F preset moves the magazine well to 82–132 mm and
+the front screw to 143 mm to make room for the release window; all still placeholders.
+
 ## 11. Action cradle (2026-11-24)
 Darren's requirement: the stock must take a real barrelled action on its mounting screws, and a different action must
 not mean redoing the design. Everything that depends on the action now lives in one component, `action_cradle`.
