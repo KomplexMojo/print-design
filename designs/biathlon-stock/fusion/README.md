@@ -329,9 +329,15 @@ Nothing on the stock may catch clothing, so every fastener head is recessed and 
 | Rear joint (2) | counterbores `joint_cbore` deep in the butt window's front wall | `chk_head_rear_joint` |
 | Front joint (2) | inside the head pocket under the forestock | `chk_head_front_joint` |
 | Grip cap screw | low-head M5 in a `cap_cbore` counterbore; the cap is 7 mm thick to take it | `chk_head_cap` |
-| Sling screw | low-head M5; the seat is as deep as the tab plus the head (`sling_seat_d`) | `chk_head_sling` |
+| Sling bolt | low-head M5 in a `clamp_cbore` counterbore in the sling clamp plate | `chk_head_sling` |
 
-A wing or thumb screw on the sling would stand proud, so the model assumes a low-head screw. `sling_tab_t` is a placeholder.
+**Sling clamp (Darren, 2026-11-24).** `sling_clamp` is a separate plate, `clamp_t` thick, under the hand stop. The tab
+(3.5 mm thick, measured) lies in a seat exactly its thickness deep, and the plate closes flat on it. One M5 bolt goes up
+through the plate and the tab's eyelet into a captive hex nut that slides into a slot in the side of the hand stop
+(`sling_nut_y`, `m5_nut_af`, `m5_nut_m`). The plate carries the hand stop's shape on down, with rounded corners and edges.
+
+**Joint nut slots.** Each slot is `nut_slot_af` (10.3 mm) across the flats, so the nut cannot turn, and `nut_slot_len`
+(5.5 mm) along the bolt, a slide fit so an M6 nut (10 mm across flats, 5 mm thick) drops down it edge-on.
 
 ## 11. Action cradle (2026-11-24)
 Darren's requirement: the stock must take a real barrelled action on its mounting screws, and a different action must

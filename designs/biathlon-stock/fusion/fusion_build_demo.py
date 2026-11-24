@@ -41,7 +41,7 @@ DATUM = 1000.0  # mm
 OBSOLETE_PARAMS = ("chk_pillar_mag", "act_receiver_d", "sling_tab_r", "rel_len", "guard_div",
                    "block_top_len", "grip_toe", "rs_rib_x", "saddle_h", "block_bolt_x", "block_insert_depth",
                    "chk_slot_pillar", "chk_key_slot", "act_slot_x0", "act_slot_x1", "act_slot_w",
-                   "wrist_facet_w", "wrist_facet_h", "chk_belly_step", "chk_rel_travel", "chk_bolts_centred")
+                   "wrist_facet_w", "wrist_facet_h", "chk_belly_step", "chk_rel_travel", "chk_bolts_centred", "sling_head_h")
 FUSE_BLOCK = False   # True joins the standing block into the main body (the printed part)
 FUSE_ACTION = False  # True joins the action cradle into the main body (the printed part); False keeps it apart for review
 
@@ -122,7 +122,7 @@ DEMO_PARAMS = [
     ("sling_tab_w", "mm", "40 mm", "[demo] Biatar sling end tab width (Darren, measured 2026-11-24)"),
     ("sling_hole_d", "mm", "5.5 mm", "[demo] Biatar sling eyelet (Darren, measured): M5 thumb screw"),
     ("sling_hole_inset", "mm", "17 mm", "[demo] Biatar sling: tab tip to eyelet centre (Darren, confirmed 2026-11-24)"),
-    ("sling_seat_d", "mm", "5.5 mm", "[demo] depth of the sling seat: tab thickness plus the screw head, so the head is recessed"),
+    ("sling_seat_d", "mm", "sling_tab_t", "[demo] derived: the sling seat is as deep as the tab, so the clamp plate closes flat on it"),
     ("sling_seat_r", "mm", "(sling_tab_w + 1 mm) / 2", "[demo] derived: the seat's semicircular end, matching the tab's round tip"),
     ("sling_tip_x", "mm", "handstop_position + handstop_length - tip_round - 2 mm", "[demo] derived: where the tab's tip sits"),
     ("sling_hole_x", "mm", "sling_tip_x - sling_hole_inset", "[demo] derived: sling screw insert"),
@@ -165,7 +165,7 @@ DEMO_PARAMS = [
     ("nut_af", "mm", "10 mm", "[demo] M6 nut across flats"),
     ("nut_m", "mm", "5 mm", "[demo] M6 nut thickness"),
     ("nut_slot_af", "mm", "nut_af + 2 * fit_snug", "[demo] slot across flats: snug, so the nut cannot turn"),
-    ("nut_slot_len", "mm", "nut_m + 2 * fit_snug", "[demo] slot length along the bolt"),
+    ("nut_slot_len", "mm", "nut_m + 2 * fit_slide", "[demo] slot length along the bolt: slide fit, so the nut drops down the slot (the flats stay snug so it cannot turn)"),
     ("bolt_tail", "mm", "8 mm", "[demo] bolt end past the nut slot"),
     ("rear_tongue_height", "mm", "24 mm", "[manual] bolted joint"),
     ("rear_tongue_width", "mm", "34 mm", "[manual] bolted joint: both bolts inside the tongue"),
@@ -187,9 +187,15 @@ DEMO_PARAMS = [
     ("cap_head_h", "mm", "3.5 mm", "[demo] M5 low-head cap screw: head height"),
     ("cap_cbore", "mm", "4 mm", "[demo] counterbore depth for the grip cap screw"),
     ("chk_head_cap", "mm", "cap_cbore - cap_head_h", "[demo] no-snag: grip cap screw head below the cap"),
-    ("sling_tab_t", "mm", "2 mm", "[demo] PLACEHOLDER: thickness of the sling's end tab"),
-    ("sling_head_h", "mm", "3.5 mm", "[demo] sling screw: low-head M5 (a wing screw would stand proud)"),
-    ("chk_head_sling", "mm", "sling_seat_d - sling_tab_t - sling_head_h", "[demo] no-snag: sling screw head below the hand stop's underside"),
+    ("sling_tab_t", "mm", "3.5 mm", "[demo] Biatar sling: thickness of the tab where it meets the rifle (Darren, measured 2026-11-24)"),
+    ("clamp_t", "mm", "7 mm", "[demo] sling clamp plate thickness (the extension under the hand stop that sandwiches the tab)"),
+    ("clamp_cbore", "mm", "4 mm", "[demo] counterbore in the clamp plate for the M5 bolt head"),
+    ("m5_nut_af", "mm", "8 mm", "[demo] M5 hex nut across flats"),
+    ("m5_nut_m", "mm", "4 mm", "[demo] M5 hex nut thickness"),
+    ("sling_nut_y", "mm", "-forend_fore_depth - handstop_height + sling_tab_t + 6 mm", "[demo] derived: underside of the captive nut slot in the hand stop"),
+    ("chk_head_sling", "mm", "clamp_cbore - cap_head_h", "[demo] no-snag: sling bolt head inside the clamp plate"),
+    ("chk_clamp_floor", "mm", "clamp_t - clamp_cbore - 2.5 mm", "[demo] clamp plate material under the bolt head"),
+    ("chk_depth_clamp", "mm", "ibu_depth_max - (forend_fore_depth + handstop_height + clamp_t)", "[demo] MC 3.1.6.4 a: hand stop with the clamp plate"),
     ("front_tongue_height", "mm", "20 mm", "[manual] restyle: bolted joint"),
     ("front_tongue_y", "mm", "-46 mm", "[manual] restyle: head pocket leaves min_wall under the mag slots"),
     ("fj_bolt_z", "mm", "8 mm", "[demo] front bolts at +/- this"),
@@ -661,7 +667,7 @@ class Builder:
 
         occs = {}
         for key, label in (("rear", "rear_stock"), ("main", "main_body"), ("fore", "forestock"),
-                           ("action", "action_cradle"), ("block", "standing_block"), ("grip", "tpu_grip"), ("pad", "tpu_prone_pad"), ("cap", "grip_cap")):
+                           ("action", "action_cradle"), ("block", "standing_block"), ("clamp", "sling_clamp"), ("grip", "tpu_grip"), ("pad", "tpu_prone_pad"), ("cap", "grip_cap")):
             occ = root.occurrences.addNewComponent(adsk.core.Matrix3D.create())
             occ.component.name = label
             occs[key] = occ
@@ -732,9 +738,8 @@ class Builder:
                        (f"{hp} + handstop_length", hs_bot), (hp, hs_bot)])
         self.done(sk)
         self.extrude(fore, sk.profiles.item(0), JOIN, sym="hs_width", name="hand_stop")
-        self.corners(fore, [(f"{hp} + handstop_length", hs_bot, "tip_round"), (hp, hs_bot, "hook_round")], "hand_stop")
 
-        self.round_faces(fore, "hs_width / 2", "hs_round", "hand_stop_round", skip_y=(hs_top,))
+        self.round_faces(fore, "hs_width / 2", "hs_round", "hand_stop_round", skip_y=(hs_top, hs_bot))
 
         # ---- main body: trigger guard, and the standing block as an extension of the guard base
         sk = self.sketch("trigger_guard")
@@ -875,7 +880,27 @@ class Builder:
         self.poly(sk, ring, arcs={1: r})
         self.done(sk)
         self.extrude(fore, sk.profiles.item(0), CUT, dist="-(sling_seat_d)" if down > 0 else "sling_seat_d", name="sling_seat")
-        drill("sling_insert", f"{hs_bot} + insert_depth + sling_seat_d", "sling_hole_x", "insert_hole_d", "insert_depth + sling_seat_d + 1 mm", (fore,))
+        # sling clamp (Darren 2026-11-24): a separate plate under the hand stop sandwiches the tab in its seat.
+        # One M5 bolt goes up through the plate and the tab's eyelet into a captive hex nut that slides into a
+        # slot in the hand stop; the bolt head is recessed in the plate, so nothing stands proud.
+        clamp = occs["clamp"]
+        cb = f"{hs_bot} - clamp_t"
+        xf = f"{hp} + handstop_length - hs_rake * clamp_t / handstop_height"     # the front face carries on down
+        sk = self.sketch("sling_clamp")
+        self.poly(sk, [(hp, hs_bot), (f"{hp} + handstop_length", hs_bot), (xf, cb), (hp, cb)])
+        self.done(sk)
+        self.extrude(clamp, sk.profiles.item(0), NEW, sym="hs_width", name="sling_clamp")
+        self.corners(clamp, [(xf, cb, "clamp_t - 1 mm"), (hp, cb, "clamp_t - 1 mm")], "sling_clamp")
+        self.round_faces(clamp, "hs_width / 2", "hs_round", "sling_clamp_round", skip_y=(hs_bot,))
+        sk = self.sketch("sling_nut_slot")
+        self.rect(sk, "sling_hole_x - m5_nut_af / 2 - fit_snug", "sling_hole_x + m5_nut_af / 2 + fit_snug",
+                  "sling_nut_y", "sling_nut_y + m5_nut_m + 2 * fit_snug")
+        self.done(sk)
+        self.extrude(fore, sk.profiles.item(0), CUT, start="face_side * (m5_nut_af / 2 + 1 mm)", dist="-face_side * body_width",
+                     name="sling_nut_slot")
+        drill("sling_bolt_hole", "sling_nut_y + m5_nut_m + 4 mm", "sling_hole_x", "cap_screw_d", "m5_nut_m + 4 mm + 6 mm + sling_tab_t + clamp_t + 1 mm",
+              (fore, clamp))
+        drill("sling_bolt_counterbore", f"{cb} + clamp_cbore", "sling_hole_x", "cap_head_d + 1 mm", "clamp_cbore + 1 mm", (clamp,))
 
         sk = self.yz_sketch("barrel_channel", "action_front")   # half-round, like the receiver bed
         self.poly(sk, [("-barrel_r", "5 mm"), ("-barrel_r", "0 mm"), ("barrel_r", "0 mm"), ("barrel_r", "5 mm")],
@@ -1141,7 +1166,7 @@ class Builder:
         app = adsk.core.Application.get()
         lib = app.materialLibraries.itemByName("Fusion Appearance Library")
         names = {"rear": "Plastic - Matte (White)", "main": "Plastic - Matte (Gray)", "fore": "Plastic - Matte (White)",
-                 "action": "Plastic - Matte (Blue)", "block": "Plastic - Matte (Black)", "grip": "Plastic - Matte (Yellow)", "pad": "Plastic - Matte (Yellow)", "cap": "Plastic - Matte (Black)"}
+                 "action": "Plastic - Matte (Blue)", "block": "Plastic - Matte (Black)", "clamp": "Plastic - Matte (Black)", "grip": "Plastic - Matte (Yellow)", "pad": "Plastic - Matte (Yellow)", "cap": "Plastic - Matte (Black)"}
         for key, name in names.items():
             a = lib.appearances.itemByName(name) if lib else None
             if a:
@@ -1160,7 +1185,7 @@ def report(design, occs, problems=(), log=print):
             size = [round((getattr(bb.maxPoint, a) - getattr(bb.minPoint, a)) * 10, 1) for a in "xyz"]
             log(f"{occ.component.name}: {b.name} valid={b.isValid} lumps={b.lumps.count} size_mm={size} "
                 f"vol_cm3={b.volume:.0f} faces={b.faces.count}")
-    for key in ("rear", "main", "fore", "block", "pad", "grip", "cap"):
+    for key in ("rear", "main", "fore", "block", "clamp", "pad", "grip", "cap"):
         occ = occs[key]
         if not occ.component.bRepBodies.count:
             continue
