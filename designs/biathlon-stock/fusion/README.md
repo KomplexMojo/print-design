@@ -420,7 +420,17 @@ them with `[manual]` rows at the top of `DEMO_PARAMS`. The TPU covers remain the
 - The rear joint studs are longer for it (150 mm, see PARTS.md), because their heads sit in the butt's front window.
 - Rear sight above the cheek rest: 47.2 mm measured, so P = 47 mm. With the current comb 20 mm above the bore (AB),
   `sight_line_above_bore` becomes 67 mm and the comb stays where it was. Pending: bore centre to aperture centre.
-- Known defect: with the narrower butt windows one corner round (`butt_windows_round`) fails; those corners are sharp.
+
+### Organic butt (Darren, 2026-11-24)
+- **Outline in curves.** The comb falls to the heel over `heel_sweep` with a large round (`heel_sweep_r`), the heel
+  itself is rounded, the comb turns down to the bolt flat in an S-curve (`comb_front_r`), and the underside sweeps
+  into the wrist (`wrist_heel_r`) and into the hook (`hook_sweep_r`).
+- **Two windows, one rib.** The rear window's back edge follows the butt plate's curve (`rs_post_top_x`,
+  `rs_post_low_x`), so the plate post is one even band `plate_thickness` deep. The front window is a triangle. Each
+  corner is a large round (`win_round`; sharp-angled corners get less).
+- **Rounded struts.** The slim frame and its coved pockets are gone: the butt is one thickness (`comb_width`), and
+  both window rims are rounded (`strut_round`), so the rib, lower strut and plate post are rounded bars that run
+  into the plate without a step. `frame_width` and `slim_cove` no longer drive geometry. About 45 cm³ heavier.
 
 ### Parameter tolerance (checked 2026-11-24)
 Ten driving measurements (AA, AC, AD, AE, AF, E, P, AG, J, M) were scaled together and one at a time.

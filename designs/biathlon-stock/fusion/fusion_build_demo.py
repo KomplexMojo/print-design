@@ -93,9 +93,13 @@ DEMO_PARAMS = [
     ("comb_rise", "mm", "18 mm", "[demo] length of the ramp from the bolt flat up to the comb"),
     ("wrist_step", "mm", "10 mm", "[demo] length of the ramp from the bolt flat up to the stock top beside the action; it starts at the action's rear"),
     ("comb_length", "mm", "lop + bolt_clear_x - comb_rise", "[manual] derived: the comb starts behind the bolt's travel and the thumb, whatever the length of pull"),
-    ("chk_comb_flat", "mm", "comb_length - comb_nose - 90 mm", "[demo] USER-FITTED RANGE: at least 90 mm of comb left for the cheek"),
     ("chk_wrist_socket", "mm", "wrist_top - (rear_tongue_y + rear_tongue_height / 2) - 5 mm", "[demo] 5 mm of wall between the bolt flat and the rear joint socket"),
-    ("comb_front_r", "mm", "14 mm", "[demo] round where the comb turns down to the wrist"),
+    ("comb_front_r", "mm", "24 mm", "[demo] the comb turns down to the bolt flat in an S-curve of two of these rounds"),
+    ("heel_sweep", "mm", "35 mm", "[demo] the comb falls to the heel of the butt plate over this length"),
+    ("chk_comb_flat", "mm", "comb_length - heel_sweep - 80 mm", "[demo] USER-FITTED RANGE: at least 80 mm of level comb left for the cheek"),
+    ("heel_sweep_r", "mm", "60 mm", "[demo] round where the comb starts to fall toward the heel"),
+    ("hook_sweep_r", "mm", "20 mm", "[demo] round where the butt underside turns into the hook"),
+    ("strut_round", "mm", "5 mm", "[demo] edge round of the butt's window rims, so the rib, strut and plate post are rounded bars"),
     ("hook_thickness", "mm", "30 mm", "[demo] butt face to the hook's underside corner"),
     ("hook_round", "mm", "6 mm", "[demo]"),
     ("butt_bot_y", "mm", "-buttplate_drop - buttplate_length / 2", "[demo] derived: bore to butt-plate toe"),
@@ -104,7 +108,7 @@ DEMO_PARAMS = [
     ("wrist_ramp", "mm", "7 mm", "[demo]"),
     ("wrist_heel_x", "mm", "-130 mm", "[demo]"),
     ("wrist_heel_y", "mm", "-52 mm", "[demo]"),
-    ("wrist_heel_r", "mm", "40 mm", "[demo] sweep from the wrist into the butt underside"),
+    ("wrist_heel_r", "mm", "60 mm", "[demo] sweep from the wrist into the butt underside (its tangent must stay behind the rear joint)"),
     ("grip_top_y", "mm", "-55 mm", "[demo] derived: the grip hangs from the wrist underside"),
     ("grip_lean", "", "tan(90 deg - grip_angle_deg)", "[demo] grip lean per mm of height"),
     ("grip_front_x", "mm", "-trigger_reach + grip_depth / 2", "[demo] derived: grip front at its top"),
@@ -196,11 +200,11 @@ DEMO_PARAMS = [
     ("plate_thickness", "mm", "14 mm", "[demo] butt-plate post, measured from the deepest point of the concave face"),
     ("comb_beam_h", "mm", "comb_top - mag_holder_top", "[demo] derived: the butt windows start on the same line as the top of the spare-mag slots, one line through the whole stock"),
     ("frame_web", "mm", "12 mm", "[demo] lower strut and window margins"),
-    ("frame_rib", "mm", "10 mm", "[demo] rib width between the windows (measured along X)"),
+    ("frame_rib", "mm", "12 mm", "[demo] width of the rib between the two butt windows (measured along X)"),
     ("frame_width", "mm", "24 mm", "[demo] thickness of the slim frame between the comb beam and the plate post"),
     ("rib_lean", "", "0.5", "[demo] ribs lean back by this much per mm of height (near square to the lower strut)"),
-    ("win_round", "mm", "5 mm", "[demo] corner round of the geometric windows"),
-    ("slim_cove", "mm", "5 mm", "[demo] cove where the slim frame meets the comb beam"),
+    ("win_round", "mm", "12 mm", "[demo] corner round of the butt windows; sharp-angled corners get half of it"),
+    ("slim_cove", "mm", "7 mm", "[demo] cove where the slim frame meets the comb beam and the plate post"),
     ("butt_sagitta", "mm", "buttplate_curve_radius - sqrt(buttplate_curve_radius * buttplate_curve_radius - buttplate_length * buttplate_length / 4)",
      "[demo] derived: depth of the concave butt face"),
     ("rs_low_slope", "", "(wrist_heel_y - (hook_tip_y - tip_round)) / (wrist_heel_x - (-lop + hook_thickness))",
@@ -210,10 +214,14 @@ DEMO_PARAMS = [
     ("rs_win_top", "mm", "comb_top - comb_beam_h", "[demo] derived: top of the windows"),
     ("rs_win_rear_x", "mm", "-lop + butt_sagitta + plate_thickness", "[demo] derived: front face of the plate post"),
     ("rs_win_front_x", "mm", "-lop + comb_length - frame_web", "[demo] derived: front of the front window"),
-    ("chk_butt_windows", "mm", "(rs_win_front_x - rs_win_rear_x) - 2 * frame_rib - 3 * 16 mm", "[demo] room for the three truss windows in the butt"),
+    ("chk_butt_windows", "mm", "(rs_win_front_x - rs_win_rear_x) - frame_rib - 2 * 30 mm", "[demo] room for the two windows in the butt"),
     ("rs_rib1_x", "mm", "rs_win_rear_x + 0.26 * (rs_win_front_x - rs_win_rear_x)", "[demo] derived: rear rib centre at the window top"),
-    ("rs_rib2_x", "mm", "rs_win_rear_x + 0.58 * (rs_win_front_x - rs_win_rear_x)", "[demo] derived: front rib centre at the window top"),
+    ("rs_rib2_x", "mm", "rs_win_rear_x + 0.5 * (rs_win_front_x - rs_win_rear_x)", "[demo] derived: centre of the single rib at the window top"),
     ("rs_win_low_y", "mm", "butt_bot_y + frame_web", "[demo] derived: lowest window edge, above the toe"),
+    ("rs_post_top_x", "mm", "-lop + plate_thickness + sqrt(buttplate_curve_radius * buttplate_curve_radius - (rs_win_top + buttplate_drop) * (rs_win_top + buttplate_drop)) - sqrt(buttplate_curve_radius * buttplate_curve_radius - buttplate_length * buttplate_length / 4)",
+     "[demo] derived: the rear window follows the butt plate's curve, plate_thickness ahead of it (top end)"),
+    ("rs_post_low_x", "mm", "-lop + plate_thickness + sqrt(buttplate_curve_radius * buttplate_curve_radius - (rs_win_low_y + buttplate_drop) * (rs_win_low_y + buttplate_drop)) - sqrt(buttplate_curve_radius * buttplate_curve_radius - buttplate_length * buttplate_length / 4)",
+     "[demo] derived: same, bottom end"),
     ("rs_win_low_x", "mm", "wrist_heel_x + (rs_win_low_y - wrist_heel_y - rs_web_v) / rs_low_slope",
      "[demo] derived: where the window bottom meets the strut"),
     # ---- bolted tongue joints (Darren 2026-11-23): two fasteners per joint along X, hex nuts in the main body
@@ -794,7 +802,7 @@ class Builder:
         sk = self.sketch("skeleton_outline")
         P = [
             ("-lop", "-buttplate_drop + buttplate_length / 2"),                  # 0 heel
-            ("-lop + comb_nose", "comb_top"),                                     # 1
+            ("-lop + heel_sweep", "comb_top"),                                    # 1 comb starts to fall to the heel
             ("-lop + comb_length", "comb_top"),                                   # 2 comb front
             ("bolt_clear_x", "wrist_top"),                                        # 3 rear end of the bolt flat
             ("action_rear", "wrist_top"),                                         # 4 bolt flat runs to the action's rear
@@ -837,8 +845,8 @@ class Builder:
         self.extrude(fore, fore_pr, NEW, sym="body_width", name="fore_blank")
 
         # ---- flowing profile: each outline corner gets its own radius (convex ones >= body_round)
-        self.corners(rear, [(*P[1], "comb_nose"), (*P[2], "comb_front_r"), (*P[3], "comb_front_r"),
-                            (*P[14], "wrist_heel_r"), (*P[15], "hook_round + body_round"), (*P[18], "hook_round")], "rear")
+        self.corners(rear, [(*P[0], "tip_round"), (*P[1], "heel_sweep_r"), (*P[2], "comb_front_r"), (*P[3], "comb_front_r"),
+                            (*P[14], "wrist_heel_r"), (*P[15], "hook_sweep_r"), (*P[18], "hook_round")], "rear")
         self.corners(fore, [(*P[6], "tip_round"), (*P[7], "tip_round + body_round"),
                             (*P[9], "belly_sweep_r"), (*P[10], "belly_sweep_r")], "fore")
 
@@ -1218,32 +1226,40 @@ class Builder:
         self.extrude(fore, sk.profiles.item(0), CUT, sym="2 * (fj_bolt_z + joint_cbore_d / 2 + joint_head_clear)",
                      name="front_head_pocket")
 
-        # ---- rear stock: comb beam and plate post stay at full width; the frame between them is
-        # slimmed with coved pockets and opened by three straight-edged truss windows
-        top = "rs_win_top"
+        # ---- rear stock: one thickness throughout (the slim frame and its coved pockets are gone), opened by
+        # two windows. The rear window follows the butt plate's curve, so the plate
+        # post is one even band; every window corner is a large round and every strut edge is rounded.
+        top, low = "rs_win_top", "rs_win_low_y"
         far = "-ibu_depth_max - 60 mm"
-        sk = self.sketch("butt_slim")
-        self.poly(sk, [("rs_win_rear_x", top), ("rs_rib2_x", top),
-                       (f"rs_rib2_x + rib_lean * ({top} - ({far}))", far), ("rs_win_rear_x", far)])
-        self.done(sk)
-        side = "(comb_width - frame_width) / 2"
-        for nm, start in (("face", "cast_z + frame_width / 2"), ("away", "cast_z - comb_width / 2")):
-            f = self.extrude(rear, sk.profiles.item(0), CUT, start=start, dist=side, name=f"butt_slim_{nm}")
-            ids = {fc.tempId for fc in f.faces}
-            cove = [e for fc in f.faces for e in fc.edges
-                    if self.sharp(e) and all(e.faces.item(i).tempId in ids for i in range(2))]
-            self.fillet(rear.component, [(list({e.tempId: e for e in cove}.values()), "slim_cove")], f"butt_cove_{nm}")
-
-        sk = self.sketch("butt_windows")
-        r1a, r1b = "rs_rib1_x - frame_rib / 2", "rs_rib1_x + frame_rib / 2"
         r2a, r2b = "rs_rib2_x - frame_rib / 2", "rs_rib2_x + frame_rib / 2"
-        self.poly(sk, [("rs_win_rear_x", top), (r1a, top), rib_hit(r1a),
-                       ("rs_win_low_x", "rs_win_low_y"), ("rs_win_rear_x", "rs_win_low_y")])
-        self.poly(sk, [(r1b, top), (r2a, top), rib_hit(r2a), rib_hit(r1b)])
-        self.poly(sk, [(r2b, top), ("rs_win_front_x", top), ("rs_win_front_x", strut_y("rs_win_front_x")), rib_hit(r2b)])
+        plate_r = "buttplate_curve_radius"
+        sk = self.sketch("butt_windows")
+        w1 = [("rs_post_top_x", top), (r2a, top), rib_hit(r2a), ("rs_win_low_x", low), ("rs_post_low_x", low)]
+        w2 = [(r2b, top), ("rs_win_front_x", top), rib_hit(r2b)]
+        self.poly(sk, w1, arcs={4: plate_r})
+        self.poly(sk, w2)
         self.done(sk)
-        f = self.extrude(rear, self.profiles(sk), CUT, sym="2 * comb_width", name="butt_windows")
-        self.fillet_z_edges(rear, f, "win_round", "butt_windows_round")
+        self.extrude(rear, self.profiles(sk), CUT, sym="2 * comb_width", name="butt_windows")
+        full, half_r = "win_round", "win_round / 2"
+        for i, (pt, r) in enumerate(((w1[0], full), (w1[1], full), (w1[2], full), (w1[3], half_r), (w1[4], full),
+                                     (w2[0], "win_round * 2 / 3"), (w2[1], "win_round * 2 / 3"), (w2[2], half_r))):
+            for rr_ in (r, f"({r}) / 2", f"({r}) / 4"):      # a corner that will not take its round gets a smaller one
+                k = len(self.problems)
+                cx, cy = self.ev(pt[0]), self.ev(pt[1])
+                edges = [e for e in body("rear").edges
+                         if self.z_edge(e) and abs(self.z_edge(e)[0] - cx) < 0.03 and abs(self.z_edge(e)[1] - cy) < 0.03]
+                if self.fillet(rear.component, [(edges, rr_)], f"butt_window_corner_{i}") is not None:
+                    break
+                if rr_ != f"({r}) / 4":
+                    del self.problems[k:]
+        # strut edges: the rim of both windows, on both sides, so the rib, strut and plate post read as rounded bars
+        x_hi, y_hi, y_lo = self.ev("rs_win_front_x") + 0.05, self.ev(top) + 0.005, self.ev(low) - 0.005
+
+        def not_window(e):
+            m = self.mid(e)
+            return not (m.x < x_hi and y_lo < m.y < y_hi)
+
+        self.round_faces(rear, "comb_width / 2", "strut_round", "strut_round", zc="cast_z", skip=not_window)
 
         # ---- forestock: flush horizontal spare-mag slots on the away side, patterned by count
         away = self.offset_plane("mag_side_plane", "mag_side * body_width / 2")
