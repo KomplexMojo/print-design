@@ -39,7 +39,8 @@ import adsk.fusion
 
 DATUM = 1000.0  # mm
 OBSOLETE_PARAMS = ("chk_pillar_mag", "chk_pillar_front", "act_receiver_d", "sling_tab_r", "rel_len", "guard_div",
-                   "block_top_len", "grip_toe", "rs_rib_x")
+                   "block_top_len", "grip_toe", "rs_rib_x", "saddle_h", "block_bolt_x", "block_insert_depth")
+FUSE_BLOCK = False   # True joins the standing block into the main body (the printed part)
 FUSE_ACTION = False  # True joins the action cradle into the main body (the printed part); False keeps it apart for review
 
 # r2 values (PR 3) that differ from the r1 registry defaults: written as [manual] so the
@@ -92,7 +93,7 @@ DEMO_PARAMS = [
     # ---- trigger guard and standing block (Darren 2026-11-24: the block is an extension of the guard base)
     ("guard_bottom", "mm", "83 mm", "[manual] rework: guard raised tight under the body so the hand wraps the grip; IBU MC 3.1.6.4 a"),
     ("guard_front_x", "mm", "34 mm", "[demo] front of the guard's front leg, behind the mag well"),
-    ("guard_bar", "mm", "10 mm", "[demo] trigger-guard rail thickness (carries the block mount insert)"),
+    ("guard_bar", "mm", "10 mm", "[demo] trigger-guard rail thickness (the standing block hangs from it)"),
     ("guard_rake", "mm", "10 mm", "[demo] guard front leg thickness over the bar"),
     ("guard_width", "mm", "18 mm", "[demo] trigger-guard width"),
     ("guard_round", "mm", "3 mm", "[demo] edge round on the guard"),
@@ -112,9 +113,6 @@ DEMO_PARAMS = [
      "[manual] restyle: derived, the block spans from the finger clearance to the guard front"),
     ("block_position", "mm", "(guard_front_x + blk_rear_x) / 2",
      "[manual] restyle: derived, the block sits under the trigger guard (m_AJ is kept for reference only)"),
-    ("saddle_h", "mm", "4 mm", "[demo] the block's saddle wraps this far up the guard rail (locates it and stops it turning)"),
-    ("block_bolt_x", "mm", "block_position", "[demo] derived: the single M5 block bolt, into a heat-set insert in the rail"),
-    ("block_insert_depth", "mm", "guard_bar - 2 mm", "[demo] derived: insert hole depth in the rail"),
     ("chk_block_mag", "mm", "mag_well_x0 - fit_slide - guard_front_x - 2 mm",
      "[demo] the block and guard stay behind the magazine well, so the magazine drops free"),
     # ---- hand stop
@@ -691,18 +689,17 @@ class Builder:
         self.round_faces(main, "guard_width / 2", "guard_round", "guard_round", body=body("main", 1))
         self.combine((main, body("main")), [(main, body("main", 1))], JOIN, "trigger_guard_join", keep=False)
 
-        # ---- standing block: the stock only carries a mount point (the flat underside of the guard rail
-        # with one M5 heat-set insert). The block is a separate printed part the athlete can swap: its
-        # saddle straddles the rail, so it cannot turn or slide sideways, and one bolt holds it.
+        # ---- standing block: its own component, so the block design can be changed or swapped in CAD without
+        # touching the main body. It sits under the guard rail and is joined to the main body before printing
+        # (FUSE_BLOCK), as one print. No fasteners (Darren 2026-11-24).
         blk = occs["block"]
-        bh, btop = "-block_height", f"{gbm} + saddle_h"
+        bh, btop = "-block_height", gbm
         sk = self.sketch("standing_block")
         self.poly(sk, [("blk_rear_x", btop), (lf(btop), btop), ("guard_front_x - blk_front_rake", bh), ("blk_rear_x + blk_rake", bh)])
         self.done(sk)
         self.extrude(blk, sk.profiles.item(0), NEW, sym="block_width", name="standing_block")
         self.corners(blk, [("guard_front_x - blk_front_rake", bh, "block_corner_r"), ("blk_rear_x + blk_rake", bh, "block_corner_r")], "block")
         self.round_faces(blk, "block_width / 2", "block_round", "block_round")
-        self.combine((blk, body("block")), [(main, body("main"))], CUT, "block_saddle")
         sk = self.sketch("block_window")
         self.rect(sk, "blk_rear_x + blk_rake + blk_win_web", "guard_front_x - blk_front_rake - blk_win_web",
                   f"{bh} + blk_win_web", f"{gbm} - blk_win_web")
@@ -790,10 +787,6 @@ class Builder:
         self.done(sk)
         self.extrude(fore, sk.profiles.item(0), CUT, dist="-(sling_seat_d)" if down > 0 else "sling_seat_d", name="sling_seat")
         drill("sling_insert", f"{hs_bot} + insert_depth + sling_seat_d", "sling_hole_x", "insert_hole_d", "insert_depth + sling_seat_d + 1 mm", (fore,))
-
-        # block bolt: the head sits inside the block's slot and is tightened through the hole in the slot floor
-        drill("block_bolt_hole", gbm, "block_bolt_x", "cap_screw_d", "block_height", (blk,))
-        drill("block_mount_insert", f"{gbm} + block_insert_depth", "block_bolt_x", "insert_hole_d", "block_insert_depth + 1 mm", (main,))
 
         sk = self.yz_sketch("barrel_channel", "action_front")   # half-round, like the receiver bed
         self.poly(sk, [("-barrel_r", "5 mm"), ("-barrel_r", "0 mm"), ("barrel_r", "0 mm"), ("barrel_r", "5 mm")],
@@ -1042,6 +1035,8 @@ class Builder:
         self.extrude(cap, prs[-1], CUT, sym="2 * cap_t + 2 mm", name="cap_screw_hole")
         self.extrude(main, prs, CUT, sym="2 * (cap_t + insert_depth)", name="cap_insert_hole")
 
+        if FUSE_BLOCK:
+            self.combine((main, body("main")), [(blk, body("block"))], JOIN, "standing_block_fused", keep=False)
         if FUSE_ACTION:
             self.combine((main, body("main")), [(act, body("action"))], JOIN, "action_cradle_fused", keep=False)
         self.colour(occs)

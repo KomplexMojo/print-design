@@ -303,11 +303,10 @@ now builds it, still entirely from User Parameters. Review images come from `fus
 - **Guard.** One closed loop sized like a real guard: the opening runs from the grip front to `rel_front_x` (about 62 mm)
   and is 28 mm high. `guard_bottom` is 83 mm, so the rail sits tight under the body and the hand wraps the grip below it.
   There is no divider bar and no separate release window.
-- **Mount point.** The stock carries only the flat underside of the guard rail with one M5 heat-set insert
-  (`block_bolt_x`, `block_insert_depth`).
-- **Block.** `standing_block` is its own component and print, so an athlete can swap designs. Its saddle wraps `saddle_h`
-  up the rail, which locates it and stops it turning; one M5 bolt holds it. The bolt head sits inside the block's slot and
-  is tightened through the hole in the slot floor. The default block spans `finger_clear` ahead of the grip to the guard front.
+- **Block.** `standing_block` is its own component, so its design can be changed without touching the main body. It
+  sits under the guard rail and is joined to the main body before printing, as one print (`FUSE_BLOCK = True`). There
+  are no fasteners or attachment features (Darren, 2026-11-24). The default block spans `finger_clear` ahead of the
+  grip to the guard front.
 - **IBU.** The assembled block counts toward MC 3.1.6.4 a: `chk_depth_block` and the build report's lowest point of
   `standing_block` both check it. Any replacement block must keep `block_height` at or under 140 mm.
 
