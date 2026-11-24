@@ -269,12 +269,42 @@ parity check tolerates that only for parts that are fit-tested in Fusion first, 
   - Demo shortcuts: no chamfers or grip rounding, no tie rods, no harness inserts, no mag window or
     finger scallops, and no teardrop holes.
 
+## 10. Hybrid restyle (2026-11-24)
+Darren picked the "Hybrid" style: flowing rigid surfaces with straight-edged geometric windows. `fusion_build_demo.py`
+now builds it, still entirely from User Parameters. Review images come from `fusion_render_views.py`.
+
+- **Flowing surfaces.** Each outline corner is rounded by its own radius parameter (`comb_front_r`, `wrist_heel_r`,
+  `tip_round`, `belly_sweep_r`). The forend has a faceted belly (`belly_w`, `belly_h`) and every side edge is rounded
+  (`body_round`). Rounds that Fusion cannot build are reported under "skipped rounds", never hidden.
+- **Drop belly.** The underside is `forend_depth` (62 mm) under the action and the front joint, then rises to
+  `forend_fore_depth` (50 mm) along the joint's head pocket, so the hand's forend is slimmer.
+- **Geometric windows.** The butt has three truss windows between ribs that lean by `rib_lean`, near square to the lower
+  strut. The slim frame meets the comb beam in a cove (`slim_cove`).
+- **Standing block.** It is now an extension of the trigger-guard base: it hangs under the guard bar, from `finger_clear`
+  ahead of the grip to `guard_front_x`, which is behind the magazine well (`chk_block_mag`), so the magazine drops free.
+  `block_position` and `block_length` are derived; `m_AJ` is reference only. `block_height` stays the IBU-limited input.
+- **Webs.** `min_wall` (6 mm) is now held above the mag slots (`chk_slot_channel`), below them (`chk_fj_pocket_slots`,
+  was 3.7 mm) and under the front tongue (`chk_fj_tongue_floor`).
+- **TPU inserts.** Surfaces shaped only by the athlete's body are separate TPU parts on rigid cores:
+  - `tpu_grip`: a sleeve over a rounded rigid core. It slides on from below, is keyed by the core and by a rigid front
+    strip above the guard bar (`spine_d`), and is locked by `grip_cap` with one M5 screw into a heat-set insert. Its girth
+    comes from the measurement: `grip_round` is solved so the section's girth equals `grip_circumference` (PI * M).
+  - `tpu_prone_pad`: a `pad_t` skin over the belly from `pad_x0` (hand-stop position minus J) to the hand stop. It sits in
+    a recess, wraps `pad_wrap` up each side and snaps in with a dovetail keel.
+- **IBU flags.** `block_height`, `guard_bottom`, `forend_depth` and `handstop_height` are limited by MC 3.1.6.4 a (140 mm);
+  `chk_depth_grip` applies the same limit to the grip bottom in case a controller reads the rule strictly. `body_round`
+  and `belly_h` reduce the flat marking surface (`chk_mark_round`). The block no longer sits in the marking zone.
+- **Open points.** The joint fasteners cannot be inserted as bolts (the butt window and the head pocket are shorter than
+  the bolts), so the plan is M6 studs threaded into the captive nuts with nuts on the outer ends. `chk_holder_joint`,
+  `chk_holder_hand` and `chk_rail_handstop` still use r1's upright-holder rules. Some trigger-guard edges are left square.
+
 ## Files
 | File | Purpose |
 |---|---|
 | `stock_params.py` | Registry and resolver (stdlib only), the parameter source for both models. CLI preview, `--csv` for ParameterIO, `params_from_fit()` for part.py |
 | `fusion_load_params.py` | Fusion script: create or update User Parameters from a fit record |
-| `fusion_build_demo.py` | Fusion script: skeleton plus the three components, fully parameter-driven (demo geometry) |
+| `fusion_build_demo.py` | Fusion script: skeleton, the three rigid components and the TPU inserts, fully parameter-driven |
+| `fusion_render_views.py` | Fusion script: saves the review images (sides, top, bottom, isos, exploded) |
 | `make_param_table.py` | Regenerates `PARAMETERS.md` |
 | `PARAMETERS.md` | JSON field → Fusion name, unit, expression |
 | `test_stock_params.py` | Tests (no Fusion needed) |
