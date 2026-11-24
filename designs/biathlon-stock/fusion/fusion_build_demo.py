@@ -119,7 +119,7 @@ DEMO_PARAMS = [
     ("hs_rake", "mm", "14 mm", "[demo] hand-stop front face leans by this much"),
     ("sling_tab_w", "mm", "40 mm", "[demo] Biatar sling end tab width (Darren, measured 2026-11-24)"),
     ("sling_hole_d", "mm", "5.5 mm", "[demo] Biatar sling eyelet (Darren, measured): M5 thumb screw"),
-    ("sling_hole_inset", "mm", "17 mm", "[demo] PLACEHOLDER (estimated from a photo): tab tip to eyelet centre"),
+    ("sling_hole_inset", "mm", "17 mm", "[demo] Biatar sling: tab tip to eyelet centre (Darren, confirmed 2026-11-24)"),
     ("sling_seat_d", "mm", "2 mm", "[demo] depth of the sling seat"),
     ("sling_seat_r", "mm", "(sling_tab_w + 1 mm) / 2", "[demo] derived: the seat's semicircular end, matching the tab's round tip"),
     ("sling_tip_x", "mm", "handstop_position + handstop_length - tip_round - 2 mm", "[demo] derived: where the tab's tip sits"),

@@ -315,7 +315,7 @@ now builds it, still entirely from User Parameters. Review images come from `fus
 - **Sling seat.** The hand stop's sling slot is replaced by a flat pocket under the stop for the sling's end tab
   (Darren's Biatar sling: 40 mm wide, 5.5 mm eyelet, flat, round tip). The pocket is `sling_tab_w + 1 mm` wide and
   `sling_seat_d` deep, ends in a semicircle (`sling_seat_r`) for the tip, and is open to the rear. A heat-set insert at
-  `sling_hole_x` takes an M5 thumb screw through the eyelet. `sling_hole_inset` (tip to eyelet, 17 mm) is an estimate.
+  `sling_hole_x` takes an M5 thumb screw through the eyelet. `sling_hole_inset` (tip to eyelet) is 17 mm, confirmed by Darren.
 - **Wrist.** `wrist_under_y` is derived so the rear joint socket keeps `min_wall` below it (an earlier round let the socket
   break through the underside). A facet (`wrist_facet_w`, `wrist_facet_h`) narrows the underside to the grip width, and
   `grip_offset` is 0. The grip bottom now sits exactly on the 140 mm line (`chk_depth_grip` = 0).
