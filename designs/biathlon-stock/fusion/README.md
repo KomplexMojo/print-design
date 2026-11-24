@@ -299,16 +299,18 @@ now builds it, still entirely from User Parameters. Review images come from `fus
   the bolts), so the plan is M6 studs threaded into the captive nuts with nuts on the outer ends. `chk_holder_joint`,
   `chk_holder_hand` and `chk_rail_handstop` still use r1's upright-holder rules.
 
-### Trigger guard and bolt-on standing block (Darren, 2026-11-24)
-- **Guard.** One closed loop sized like a real guard: the opening runs from the grip front to `rel_front_x` (about 62 mm)
-  and is 28 mm high. `guard_bottom` is 83 mm, so the rail sits tight under the body and the hand wraps the grip below it.
-  There is no divider bar and no separate release window.
-- **Block.** After the 1827 F Comfort: a long slab under the guard rail with an oblong slot. It starts `finger_clear`
-  ahead of the grip front and runs forward under the release lever to `blk_front_x`, which stops 2 mm short of the
-  magazine (`act_rel_zone` is the lever's share of the well, pending measurement), so the magazine drops free
-  (`chk_block_mag`). `standing_block` is the rigid core, its own component, joined to the main body before printing
-  (`FUSE_BLOCK = True`). A hole through it gives a key access to the rear mounting bolt.
-- **Block cover.** `tpu_block_cover` is a removable TPU boot, `cover_t` thick, that slips over the core from below and
+### Trigger guard and standing block: one component (Darren, 2026-11-24)
+- **One form.** `guard_block` holds the trigger guard and the standing block core as a single body; the guard's bottom
+  rail is the top of the block. It is its own component and is joined to the main body before printing
+  (`FUSE_BLOCK = True`). No fasteners.
+- **Guard.** 30 mm wide (`guard_width`), close to the block's 36 mm (`block_width`, over its cover). The opening is
+  24 mm high (`guard_open_h`) with rounded corners (`guard_corner_r`) and a large radius where the rail flows into the
+  grip front (`guard_rear_r`). Its length (about 62 mm) cannot go below the measured 60 mm trigger opening above it.
+- **Block.** A slab with an oblong slot. Its rear starts `blk_tuck` behind the front of the trigger opening, with a
+  finger scoop (`blk_scoop_r`), so the hand wraps the grip freely. It runs forward under the release lever to
+  `blk_front_x`, 2 mm short of the magazine (`act_rel_zone` pending measurement), so the magazine drops free
+  (`chk_block_mag`). A hole through it gives a key access to the rear mounting bolt.
+- **Block cover.** `tpu_block_cover` is a removable TPU boot, `cover_t` thick, that slips over the block from below and
   wraps its bottom, sides and ends. A dovetail keel under the core holds it on (the TPU rule). Its outer shape is the
   athlete-specific hold surface: `block_width`, `block_height`, `block_corner_r`, `block_round`.
 - **IBU.** The assembled block counts toward MC 3.1.6.4 a: `chk_depth_block` and the build report's lowest point of
