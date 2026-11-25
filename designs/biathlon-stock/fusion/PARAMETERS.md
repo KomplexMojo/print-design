@@ -77,7 +77,7 @@ One parameter per numeric value in the JSON. S and T (sides) are not parameters;
 | `hook_radius` | `hook_radius` | mm | `40 mm` | 40 | estimate |  | armpit curve (design input; X positions it) Sources: X. |
 | `grip_angle_deg` |  | deg | `85 deg` | 85 | fixed |  | grip axis to bore (design input) |
 | `grip_circumference` | `grip_circumference` | mm | `PI * m_M` | 122.522 | derived |  | target grip girth; drives the grip section Sources: M. |
-| `grip_length` | `grip_length` | mm | `85 mm` | 85 | estimate |  | grip top to bottom (design input from F, G, J) Sources: F, G, J. |
+| `grip_length` | `grip_length` | mm | `m_J` | 85 | measured |  | grip top to bottom = hand breadth J (IBU depth caps it) Sources: J. |
 | `grip_depth` |  | mm | `48 mm` | 48 | fixed |  | front to back |
 | `grip_width` |  | mm | `40 mm` | 40 | fixed |  | side to side |
 | `grip_chamfer` |  | mm | `14 mm` | 14 | fixed |  | rounds the grip section |
@@ -124,30 +124,30 @@ One parameter per numeric value in the JSON. S and T (sides) are not parameters;
 
 | Fusion name | JSON `cad_parameters` key | Unit | Expression | Sample | Status | IBU | Note |
 |---|---|---|---|---|---|---|---|
-| `action_rear` |  | mm | `-105 mm` | -105 | fixed |  |  |
-| `action_front` |  | mm | `125 mm` | 125 | fixed |  |  |
-| `action_width` |  | mm | `32 mm` | 32 | fixed |  |  |
+| `action_rear` |  | mm | `-105 mm` | -105 | action |  |  |
+| `action_front` |  | mm | `164 mm` | 164 | action |  |  |
+| `action_width` |  | mm | `32 mm` | 32 | action |  |  |
 | `bore_above_inlet_floor` |  | mm | `20 mm` | 20 | fixed |  |  |
 | `sight_line_above_bore` |  | mm | `37 mm` | 37 | fixed |  | diopter + front globe |
 | `barrel_d` | `barrel_d` | mm | `r_barrel_d_action` | 22 | measured |  | barrel at the action Sources: rifle.barrel_diameter_action_mm. |
 | `barrel_float` |  | mm | `2 mm` | 2 | fixed |  | free-float clearance |
 | `guard_bottom` |  | mm | `90 mm` | 90 | fixed | MC 3.1.6.4 a | bore to bottom of the trigger guard |
-| `trigger_slot_x0` |  | mm | `-8 mm` | -8 | fixed |  |  |
-| `trigger_slot_x1` |  | mm | `28 mm` | 28 | fixed |  |  |
-| `trigger_slot_width` |  | mm | `12 mm` | 12 | fixed |  |  |
+| `trigger_slot_x0` |  | mm | `-46 mm` | -46 | action |  |  |
+| `trigger_slot_x1` |  | mm | `14 mm` | 14 | action |  |  |
+| `trigger_slot_width` |  | mm | `20 mm` | 20 | action |  |  |
 | `finger_hole_x0` |  | mm | `-42 mm` | -42 | fixed |  |  |
 | `finger_hole_x1` |  | mm | `38 mm` | 38 | fixed |  |  |
 | `finger_hole_y0` |  | mm | `-82 mm` | -82 | fixed |  |  |
 | `finger_hole_y1` |  | mm | `-45 mm` | -45 | fixed |  |  |
-| `mag_well_x0` |  | mm | `50 mm` | 50 | fixed |  |  |
-| `mag_well_x1` |  | mm | `100 mm` | 100 | fixed |  |  |
-| `mag_well_width` |  | mm | `22 mm` | 22 | fixed |  |  |
+| `mag_well_x0` |  | mm | `74 mm` | 74 | action |  |  |
+| `mag_well_x1` |  | mm | `134 mm` | 134 | action |  |  |
+| `mag_well_width` |  | mm | `15 mm` | 15 | action |  |  |
 | `spare_mag_t` |  | mm | `14 mm` | 14 | fixed |  | spare mag thickness (along X) |
 | `spare_mag_l` |  | mm | `32 mm` | 32 | fixed |  | spare mag length (lateral) |
 | `spare_mag_h` |  | mm | `50 mm` | 50 | fixed |  | spare mag height |
-| `bolt_notch_x` |  | mm | `-62 mm` | -62 | fixed |  | bolt-handle notch centre; side from bolt_dir |
-| `bolt_notch_length` |  | mm | `26 mm` | 26 | fixed |  |  |
-| `bolt_notch_depth` |  | mm | `12 mm` | 12 | fixed |  |  |
+| `bolt_notch_x` |  | mm | `-50 mm` | -50 | action |  | bolt-handle notch centre; side from bolt_dir |
+| `bolt_notch_length` |  | mm | `70 mm` | 70 | action |  |  |
+| `bolt_notch_depth` |  | mm | `14 mm` | 14 | action |  |  |
 
 ## 7. Spare-magazine holder
 

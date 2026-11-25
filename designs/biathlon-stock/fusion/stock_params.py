@@ -66,6 +66,61 @@ def _p(*a, **k):
     return P(*a, **k)
 
 
+# ---------------------------------------------------------------------------- actions
+# One preset per action type. The fit record's rifle.action_type (or make_model) picks the preset, and
+# its values become the act_* parameters and override the listed hardware parameters. The stock only
+# meets the action through the `action_cradle` component (fusion_build_demo.py), so supporting another
+# action means adding a preset here (and a cradle builder only if its shape family is new).
+# "family" selects the cradle builder: 1 = round receiver in a half-round bed, two vertical screws from below.
+# EVERY number below is a placeholder until the action is measured out of its stock (brief, "Fixed by hardware").
+ACTIONS = {
+    "anschutz_1827f": {
+        "label": "Anschütz 1827 F / 1825 Fortner", "code": 1, "family": 1,
+        "match": ("1827", "1825", "fortner"),
+        # Layout read from Darren's own 1827 F stock (2026-11-24), muzzle to butt: round barrel channel, step,
+        # receiver bed, FRONT mounting bolt, locating pin, magazine well, steel cross key, REAR mounting bolt,
+        # trigger pocket. The two bolts straddle the magazine well, centred on it, heads recessed from below
+        # (Darren, 2026-11-24). MEASURED: act_bed_w, magazine well 60 x 15, act_screw_hole_d, act_trig_w, trigger opening 20 x 60, stock top to pocket floor 43, bed bottom to pocket floor 31. Every
+        # position, length and depth is still a placeholder.
+        "values": {"act_bed_w": "30.19 mm", "act_screw_hole_d": "6.84 mm", "act_trig_w": "26.2 mm",
+                   # magazine well, seen from the underside: one slot 60 x 15 mm that takes the magazine and, in its
+                   # rear part, the release lever (Darren, measured 2026-11-24; an earlier top reading gave 16.00 wide)
+                   "mag_well_width": "15 mm", "mag_well_x0": "74 mm", "mag_well_x1": "134 mm",
+                   "action_rear": "-105 mm", "action_front": "164 mm", "action_width": "32 mm",
+                   "act_screw_front_x": "156 mm", "act_pin_x": "143 mm",
+                   "act_key_x": "62 mm", "act_screw_rear_x": "52 mm",
+                   # trigger opening: 20 x 60 mm (Darren, measured), ending at the rear of the guard opening by the grip
+                   # outer pocket: its front step is 12.5 mm ahead of the opening (Darren's third depth photo, as read)
+                   "act_trig_x0": "-48 mm", "act_trig_x1": "26.5 mm", "act_wall_h": "12 mm", "act_trig_drop": "31 mm",
+                   "trigger_slot_x0": "-46 mm", "trigger_slot_x1": "14 mm", "trigger_slot_width": "20 mm",
+                   "act_screw_d": "6 mm", "act_head_d": "10 mm", "act_pillar_d": "10 mm",
+                   # Fortner straight-pull handle: long notch in the bolt-side wall, deeper step for the lever (placeholders)
+                   "bolt_notch_x": "-50 mm", "bolt_notch_length": "70 mm", "bolt_notch_depth": "14 mm",
+                   "act_bolt_step_len": "25 mm", "act_bolt_step_depth": "18 mm",
+                   "act_bolt_travel": "45 mm",      # Fortner bolt, rearward travel past the action's rear (43.16 measured, Darren 2026-11-24)
+                   "act_rel_len": "0 mm"},     # no separate release scoop: the lever sits inside the 60 mm well
+    },
+    "izhmash_7_4": {
+        "label": "Izhmash BI-7-4", "code": 2, "family": 1,
+        "match": ("izhmash", "bi-7", "7-4", "7-3"),
+        "values": {"act_bed_w": "28 mm", "act_screw_front_x": "130 mm", "act_screw_rear_x": "50 mm",
+                   "act_screw_d": "6 mm", "act_head_d": "10 mm",
+                   "action_rear": "-100 mm", "action_front": "140 mm", "action_width": "30 mm",
+                   "mag_well_x0": "70 mm", "mag_well_x1": "110 mm", "mag_well_width": "22 mm"},
+    },
+}
+DEFAULT_ACTION = "anschutz_1827f"
+
+
+def pick_action(rifle: dict) -> tuple[str, bool]:
+    """(preset key, matched) from rifle.action_type, action_type_other or make_model."""
+    text = " ".join(str(rifle.get(k) or "") for k in ("action_type", "action_type_other", "make_model")).lower()
+    for key, a in ACTIONS.items():
+        if key in text or any(m in text for m in a["match"]):
+            return key, True
+    return DEFAULT_ACTION, False
+
+
 REGISTRY: list[P] = [
     # ---- handedness and hardware sides (numeric switches; Fusion has no text parameters
     #      that features can consume, so a sign is used and the text goes in the comment)
@@ -103,7 +158,7 @@ REGISTRY: list[P] = [
     _p("hook_radius", "mm", "40 mm", "fit", "armpit curve (design input; X positions it)", sources=("X",)),
     _p("grip_angle_deg", "deg", "85 deg", "fit", "grip axis to bore (design input)"),
     _p("grip_circumference", "mm", "143 mm", "fit", "target grip girth; drives the grip section", expr="PI * m_M", sources=("M",)),
-    _p("grip_length", "mm", "85 mm", "fit", "grip top to bottom (design input from F, G, J)", sources=("F", "G", "J")),
+    _p("grip_length", "mm", "85 mm", "fit", "grip top to bottom = hand breadth J (IBU depth caps it)", expr="m_J", sources=("J",)),
     _p("grip_depth", "mm", "48 mm", "fit", "front to back"),
     _p("grip_width", "mm", "40 mm", "fit", "side to side"),
     _p("grip_chamfer", "mm", "14 mm", "fit", "rounds the grip section"),
@@ -165,6 +220,39 @@ REGISTRY: list[P] = [
     _p("bolt_notch_x", "mm", "-62 mm", "hardware", "bolt-handle notch centre; side from bolt_dir"),
     _p("bolt_notch_length", "mm", "26 mm", "hardware", ""),
     _p("bolt_notch_depth", "mm", "12 mm", "hardware", ""),
+
+    # ---- action cradle (values come from the ACTIONS preset; placeholders until measured)
+    _p("action_type", "", "1", "action", "action preset code: 1 = Anschütz 1827 F / 1825 Fortner, 2 = Izhmash BI-7-4", sources=("rifle.action_type",)),
+    _p("action_family", "", "1", "action", "cradle builder: 1 = round receiver, half-round bed, two vertical screws"),
+    _p("act_bed_w", "mm", "30.19 mm", "action", "width across the half-round receiver bed"),
+    _p("act_screw_front_x", "mm", "156 mm", "action", "PENDING MEASUREMENT: trigger to the front mounting bolt. Must match the action's threaded hole exactly; never derived"),
+    _p("act_screw_rear_x", "mm", "52 mm", "action", "PENDING MEASUREMENT: trigger to the rear mounting bolt. Must match the action's threaded hole exactly; never derived"),
+    _p("act_pin_x", "mm", "122 mm", "action", "trigger to the locating pin behind the receiver's front step"),
+    _p("act_pin_d", "mm", "4 mm", "action", "locating pin hole"),
+    _p("act_key_x", "mm", "62 mm", "action", "trigger to the rear face of the steel cross key (recoil bearing)"),
+    _p("act_key_w", "mm", "8 mm", "action", "cross key size along the bore"),
+    _p("act_key_d", "mm", "6 mm", "action", "cross key depth below the bed"),
+    _p("act_key_len", "mm", "34 mm", "action", "cross key length across the stock"),
+    _p("act_screw_hole_d", "mm", "6.84 mm", "action", "clearance hole for each of the two action mounting bolts (bore of the bedding pillar)"),
+    _p("act_trig_x0", "mm", "-42 mm", "action", "trigger to the rear of the trigger pocket"),
+    _p("act_trig_x1", "mm", "22 mm", "action", "trigger to the front of the trigger pocket"),
+    _p("act_trig_w", "mm", "26.2 mm", "action", "trigger pocket width"),
+    _p("act_bolt_travel", "mm", "45 mm", "action", "how far the bolt travels back past the rear of the action; the stock stays below it"),
+    _p("act_bolt_step_len", "mm", "0 mm", "action", "length of the deeper step at the rear of the bolt-handle notch (0 = none)"),
+    _p("act_bolt_step_depth", "mm", "18 mm", "action", "bore to the floor of that step"),
+    _p("act_rel_len", "mm", "0 mm", "action", "length of the magazine-release scoop behind the magazine well (0 = none)"),
+    _p("act_rel_depth", "mm", "6 mm", "action", "depth of the scoop into the underside"),
+    _p("act_rel_zone", "mm", "14 mm", "action", "PENDING MEASUREMENT: length of the rear part of the magazine well that holds the release lever; the magazine sits ahead of it"),
+    _p("act_rel_travel", "mm", "8 mm", "action", "fore-aft travel of the magazine-release lever (it moves back to front)"),
+    _p("act_rel_lever", "mm", "4 mm", "action", "size of the release lever along the bore"),
+    _p("act_wall_h", "mm", "12 mm", "action", "stock top edge down to the bottom of the receiver bed"),
+    _p("act_trig_drop", "mm", "31 mm", "action", "bottom of the receiver bed down to the trigger pocket floor"),
+    _p("act_screw_d", "mm", "6 mm", "action", "action screw thread"),
+    _p("act_head_d", "mm", "10 mm", "action", "action screw head"),
+    _p("act_pillar_d", "mm", "10 mm", "action", "aluminium bedding pillar outside diameter (10 x 1.5 mm tube)"),
+    _p("act_cbore", "mm", "8 mm", "action", "screw-head counterbore depth from the stock underside"),
+    _p("cradle_wall", "mm", "5 mm", "action", "cradle wall each side of the receiver"),
+    _p("cradle_floor", "mm", "3 mm", "action", "cradle material under the inlet floor"),
 
     # ---- spare magazine holder (away side)
     _p("mag_holder_count", "", "4", "holder", "", expr="r_spare_mag_count", sources=("rifle.spare_mag_count",)),
@@ -361,7 +449,16 @@ def resolve(doc: dict, fits: dict | None = None) -> Result:
 
     # 4. registry rows
     fits = fits or {}
+    akey, matched = pick_action(rifle)
+    action = ACTIONS[akey]
+    if not matched:
+        res.warnings.append(f"action type not recognised in the fit record, using {action['label']}")
+    preset = {**action["values"], "action_type": str(action["code"]), "action_family": str(action["family"])}
     for p in REGISTRY:
+        if p.name in preset and not p.expr:
+            v = evaluate(preset[p.name], {})
+            add(p.name, p.unit, preset[p.name], v, f"{p.note} [{action['label']}, placeholder]", "action")
+            continue
         if p.name in switch:
             v, text = switch[p.name]
             if v is None:
