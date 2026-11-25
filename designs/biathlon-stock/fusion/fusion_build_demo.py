@@ -288,6 +288,12 @@ DEMO_PARAMS = [
     ("chk_rj_head_window", "mm", "(rs_win_top - (rear_tongue_y + joint_head_d / 2)) ", "[demo] rear heads fit under the window top"),
     # ---- TPU inserts (Darren 2026-11-24): surfaces shaped purely by the athlete's body are separate TPU parts
     ("tpu_wall", "mm", "4 mm", "[demo] TPU at the grip's front, between the core and the fingers"),
+    # sleeve edges held down (Darren 2026-11-25, options A + B): the top edge tucks into the stock, and the front
+    # edges, where the sleeve meets the rigid front strip, tuck under a rigid lip
+    ("sleeve_tuck", "mm", "3 mm", "[demo] the grip sleeve's top edge runs this far up into a pocket in the stock (option A)"),
+    ("chk_sleeve_tuck_wall", "mm", "(rear_tongue_y - rear_tongue_height / 2) - (grip_top_y + sleeve_tuck) - 4 mm", "[demo] at least 4 mm of stock between the sleeve pocket and the rear joint socket above it"),
+    ("lip_t", "mm", "1.5 mm", "[demo] thickness of the rigid lip that covers the sleeve's front edges (option B)"),
+    ("lip_len", "mm", "3 mm", "[demo] how far the rigid lip overlaps the sleeve's front edges"),
     ("grip_core_depth", "mm", "28 mm", "[demo] FIXED rigid grip core: front to back (the TPU sleeve takes the hand size)"),
     ("grip_core_width", "mm", "26 mm", "[demo] FIXED rigid grip core: side to side"),
     ("grip_core_round", "mm", "9 mm", "[demo] FIXED rigid grip core: corner round"),
@@ -1427,7 +1433,7 @@ class Builder:
                             long_edges[e.tempId] = e
             self.fillet(occ.component, [(list(long_edges.values()), "grip_round")], f"{name}_girth")
 
-        grip_solid(grip, "grip_outer", gtop, gb2)
+        grip_solid(grip, "grip_outer", f"{gtop} + sleeve_tuck", gb2)          # top edge tucked into the stock (A)
         grip_solid(cap, "grip_cap", gb2, gbot)
 
         # no thumb shelf: Darren chose a clean grip (2026-11-24)
@@ -1437,7 +1443,7 @@ class Builder:
             return blk.component.bRepBodies.item(blk.component.bRepBodies.count - 1)
 
         sk = self.sketch("grip_core")
-        ov = f"{gtop} + 3 mm"
+        ov = f"{gtop} + sleeve_tuck + 3 mm"
         # FIXED core section (Darren 2026-11-25): the hand size goes into the TPU only
         cb = "(tpu_wall + grip_core_depth)"
         self.poly(sk, [(f"{gf(ov)} - tpu_wall", ov), (f"{gf(gb2)} - tpu_wall", gb2),
@@ -1458,6 +1464,35 @@ class Builder:
         self.done(sk)
         self.extrude(blk, sk.profiles.item(0), JOIN, start="grip_z0", dist="face_side * grip_width",
                      name="grip_spine", bodies=[last()])
+        spine_body = last()
+        # rigid lip (B): a lip_t skin that runs lip_len behind the front strip and lip_len below it, so the sleeve's
+        # front edges sit in a rebate under rigid material instead of meeting it in a butt joint
+        sk = self.sketch("grip_lip")
+        yl = f"{gbm} - lip_len"
+        self.poly(sk, [(f"{gf(ov)} - spine_d", ov), (f"{gf(ov)} - spine_d - lip_len", ov),
+                       (f"{gf(yl)} - spine_d - lip_len", yl), (f"{gf(yl)} + 1 mm", yl),
+                       (f"{gf(gbm)} + 1 mm", gbm), (f"{gf(gbm)} - spine_d", gbm)])
+        self.done(sk)
+        self.extrude(blk, sk.profiles.item(0), NEW, start="grip_z0", dist="face_side * grip_width", name="grip_lip")
+        lip = last()
+        sk = self.sketch("grip_lip_inner")
+        ya, yb = f"{ov} + 2 mm", f"{yl} - 2 mm"
+        self.poly(sk, [(f"{gf(ya)} - lip_t", ya), (f"{gf(yb)} - lip_t", yb),
+                       (f"{gb(yb)} + lip_t", yb), (f"{gb(ya)} + lip_t", ya)])
+        self.done(sk)
+        self.extrude(blk, sk.profiles.item(0), NEW, start="grip_z0 + face_side * lip_t",
+                     dist="face_side * (grip_width - 2 * lip_t)", name="grip_lip_inner")
+        inner = last()
+        long_edges = {}
+        for f in inner.faces:
+            g = f.geometry
+            if g.surfaceType == adsk.core.SurfaceTypes.PlaneSurfaceType and abs(g.normal.z) > 0.99:
+                for e in f.edges:
+                    if abs(e.startVertex.geometry.y - e.endVertex.geometry.y) > 0.1:
+                        long_edges[e.tempId] = e
+        self.fillet(blk.component, [(list(long_edges.values()), "grip_round - lip_t")], "grip_lip_inner_girth")
+        self.combine((blk, lip), [(blk, inner)], CUT, "grip_lip_hollow", keep=False)
+        self.combine((blk, spine_body), [(blk, lip)], JOIN, "grip_lip_join", keep=False)
         self.combine((blk, last()), [(grip, body("grip"))], INTERSECT, "grip_core_trim")
         extra = [(blk, blk.component.bRepBodies.item(i)) for i in range(1, blk.component.bRepBodies.count)]
         self.combine((blk, body("block")), extra, JOIN, "grip_core_join", keep=False)
@@ -1478,6 +1513,7 @@ class Builder:
         self.combine((grip, body("grip")), [(blk, body("block"))], CUT, "grip_sleeve")
         # the stock gets a pocket that matches everything the lower unit pushes up into it (plate, guard leg, grip top)
         self.combine((main, body("main")), [(blk, body("block"))], CUT, "lower_pocket")
+        self.combine((main, body("main")), [(grip, body("grip"))], CUT, "sleeve_tuck_pocket")    # (A)
 
         # cap screw: M5 through the cap into a heat-set insert in the core
         ybot = self.ev(gbot)

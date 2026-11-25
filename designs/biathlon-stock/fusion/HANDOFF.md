@@ -31,6 +31,8 @@ Read this before touching `fusion_build_demo.py`. The longer history is in `READ
   length J, palm swell G; plus thumb room N) follow the athlete. Everything
   else is a fixed dimension, above all whatever meets the action and barrel.
 - Standing block: rigid heel plus a plain rectangular tongue; the TPU is a sock over front, top, bottom and sides.
+- Grip sleeve edges (r35): top edge tucked into a pocket in the stock (`sleeve_tuck`), front edges under a rigid lip
+  (`lip_t`, `lip_len`). Do not go back to plain butt joints between the sleeve and rigid parts.
 - Guard-to-block sweep (r33): the guard's front leg flows into the block top on a rigid concave sweep (`sweep_len`)
   that ends at the heel front, where the sock starts. Not an L-shape. The sock keeps its full front, top, bottom and
   sides on the tongue ahead of the sweep; never cut it back under a rigid top skin.

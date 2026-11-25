@@ -415,6 +415,14 @@ so the trigger reach stay put, and the sleeve grows toward the palm and to both 
 result matches the earlier locked grip (126 mm girth, 40 x 36 mm, 80 mm long). Trigger reach (H) stays fixed. The core's
 length follows the grip length, so the lower unit is reprinted with it.
 
+**Sleeve edges held down (Darren, 2026-11-25, r35, options A + B).** The sleeve was held only by the cap at the bottom,
+so its top and front edges were butt joints that could peel. (A) The sleeve's top runs `sleeve_tuck` (3 mm) up into a
+matching pocket in the main body, so the stock traps the top edge all round (`chk_sleeve_tuck_wall` keeps 4 mm of stock
+under the rear joint socket). (B) Where the sleeve meets the rigid front strip above the guard bar, a rigid lip
+(`lip_t` 1.5 mm thick) runs `lip_len` (3 mm) back over the sleeve's side edges and down over its front edge below the
+bar; the sleeve has the matching rebate, so every front edge sits under rigid material. The sleeve still slides on from
+below. Interlocking ribs (C) are the next step if a print still lifts; bonding (D) was rejected.
+
 Everything else is locked: the butt plate, hook, guard, standing block frame, forestock length, magazine slots,
 joints and the whole action cradle. The loader would drive some of these from body measurements; the build script pins
 them with `[manual]` rows at the top of `DEMO_PARAMS`. The TPU covers remain the place for per-athlete shape.
