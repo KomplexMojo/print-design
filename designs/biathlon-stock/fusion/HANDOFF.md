@@ -27,7 +27,8 @@ Read this before touching `fusion_build_demo.py`. The longer history is in `READ
 - Rebuilds cost credits. Batch changes, one rebuild per request where possible.
 
 ## Decided. Do not revert
-- Only stock length, cheek height, hand stop, harness positions and spare-mag side follow the athlete. Everything
+- Only stock length, cheek height, hand stop, harness positions, spare-mag side and the grip (TPU sleeve only: girth M,
+  length J, palm swell G; plus thumb room N) follow the athlete. Everything
   else is a fixed dimension, above all whatever meets the action and barrel.
 - Standing block: rigid heel plus a plain rectangular tongue; the TPU is a sock over front, top, bottom and sides.
 - Guard-to-block sweep (r33): the guard's front leg flows into the block top on a rigid concave sweep (`sweep_len`)

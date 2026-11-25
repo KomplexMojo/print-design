@@ -158,7 +158,7 @@ REGISTRY: list[P] = [
     _p("hook_radius", "mm", "40 mm", "fit", "armpit curve (design input; X positions it)", sources=("X",)),
     _p("grip_angle_deg", "deg", "85 deg", "fit", "grip axis to bore (design input)"),
     _p("grip_circumference", "mm", "143 mm", "fit", "target grip girth; drives the grip section", expr="PI * m_M", sources=("M",)),
-    _p("grip_length", "mm", "85 mm", "fit", "grip top to bottom (design input from F, G, J)", sources=("F", "G", "J")),
+    _p("grip_length", "mm", "85 mm", "fit", "grip top to bottom = hand breadth J (IBU depth caps it)", expr="m_J", sources=("J",)),
     _p("grip_depth", "mm", "48 mm", "fit", "front to back"),
     _p("grip_width", "mm", "40 mm", "fit", "side to side"),
     _p("grip_chamfer", "mm", "14 mm", "fit", "rounds the grip section"),

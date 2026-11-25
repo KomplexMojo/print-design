@@ -404,8 +404,18 @@ So only these follow the fit record (`USER_FITTED` in `fusion_build_demo.py`):
 | Front harness connector | `harness_front_position` | AH | 237 to 429 mm | `chk_harness_front_lo`, `chk_harness_front_hi` |
 | Rear harness connector | `harness_rear_position` | AI | from 35 mm ahead of the butt plate to the butt's flare | `chk_harness_rear_lo`, `chk_harness_rear_hi` |
 | Spare-mag side | `mag_side` (default: away from the face) | T | left or right; same place along the forestock | |
+| Grip girth (TPU sleeve) | `grip_circumference` = PI x M; `grip_depth`, `grip_width` scale with it | M | M from about 34 mm up | `chk_grip_tpu_side`, `chk_grip_tpu_back`, `chk_grip_round` |
+| Grip length (TPU sleeve) | `grip_length` = J | J | up to about 85 mm | `chk_depth_grip` (IBU 140 mm) |
+| Palm swell (TPU sleeve) | `grip_swell` = G / 20, sets `grip_back_r` | G | starting rule, tune after printing | |
+| Thumb room behind the bolt | `bolt_thumb_room` = 0.37 x N | N | moves the comb start | `chk_comb_flat` |
 
-Everything else is locked: the butt plate, hook, grip, guard, standing block frame, forestock length, magazine slots,
+**Grip (Darren, 2026-11-25).** The grip is sized to the hand, but only through the TPU sleeve. The rigid core has a fixed
+section (`grip_core_depth` 28 mm, `grip_core_width` 26 mm, `grip_core_round` 9 mm), the grip front (`grip_front_x`) and
+so the trigger reach stay put, and the sleeve grows toward the palm and to both sides. With M = 40, J = 80, G = 100 the
+result matches the earlier locked grip (126 mm girth, 40 x 36 mm, 80 mm long). Trigger reach (H) stays fixed. The core's
+length follows the grip length, so the lower unit is reprinted with it.
+
+Everything else is locked: the butt plate, hook, guard, standing block frame, forestock length, magazine slots,
 joints and the whole action cradle. The loader would drive some of these from body measurements; the build script pins
 them with `[manual]` rows at the top of `DEMO_PARAMS`. The TPU covers remain the place for per-athlete shape.
 

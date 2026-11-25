@@ -77,7 +77,7 @@ One parameter per numeric value in the JSON. S and T (sides) are not parameters;
 | `hook_radius` | `hook_radius` | mm | `40 mm` | 40 | estimate |  | armpit curve (design input; X positions it) Sources: X. |
 | `grip_angle_deg` |  | deg | `85 deg` | 85 | fixed |  | grip axis to bore (design input) |
 | `grip_circumference` | `grip_circumference` | mm | `PI * m_M` | 122.522 | derived |  | target grip girth; drives the grip section Sources: M. |
-| `grip_length` | `grip_length` | mm | `85 mm` | 85 | estimate |  | grip top to bottom (design input from F, G, J) Sources: F, G, J. |
+| `grip_length` | `grip_length` | mm | `m_J` | 85 | measured |  | grip top to bottom = hand breadth J (IBU depth caps it) Sources: J. |
 | `grip_depth` |  | mm | `48 mm` | 48 | fixed |  | front to back |
 | `grip_width` |  | mm | `40 mm` | 40 | fixed |  | side to side |
 | `grip_chamfer` |  | mm | `14 mm` | 14 | fixed |  | rounds the grip section |

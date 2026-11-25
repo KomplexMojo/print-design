@@ -45,7 +45,7 @@ Notes:
 | `forestock` | PAHT-CF | |
 | `sling_clamp` | ASA | |
 | `grip_cap` | ASA | |
-| `tpu_grip` | TPU | sleeve over the grip core |
+| `tpu_grip` | TPU | sleeve over the fixed grip core, sized to the hand (M, J, G) |
 | `tpu_block_cover` | TPU | sleeve over the standing block tongue, customised per athlete |
 | `tpu_prone_pad` | TPU | |
 

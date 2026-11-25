@@ -57,7 +57,8 @@ DEMO_PARAMS = [
     ("buttplate_curve_radius", "mm", "150 mm", "[manual] locked: curve of the butt plate"),
     ("hook_drop", "mm", "15 mm", "[manual] locked: butt-plate bottom to hook contact"),
     ("hook_reach", "mm", "20 mm", "[manual] locked: hook tip behind the butt plate"),
-    ("grip_circumference", "mm", "125.7 mm", "[manual] locked: grip girth (the TPU sleeve is the athlete-specific part)"),
+    # ---- grip sized to the hand (Darren 2026-11-25): only the TPU sleeve follows these; the rigid core is fixed
+    ("grip_circumference", "mm", "PI * m_M", "[manual] fitted: grip girth = PI x M (largest dowel the fingertips just meet the palm around)"),
     ("prone_hand_length", "mm", "80 mm", "[manual] locked: no longer drives geometry"),
     ("mag_holder_count", "", "4", "[manual] locked: four spare magazines"),
     ("barrel_d", "mm", "22 mm", "[manual] locked: set by the action, not by the athlete"),
@@ -68,9 +69,10 @@ DEMO_PARAMS = [
     ("sight_line_above_bore", "mm", "67 mm", "[manual] PENDING MEASUREMENT: derived as current comb height (AB, 20 mm) + the measured rear sight above the cheek rest (47.2 mm, Darren 2026-11-24). Confirm with bore centre to sight aperture centre"),
     ("forend_tip", "mm", "455 mm", "[manual] locked: forestock length; the hand stop moves along it"),
     ("forend_depth", "mm", "62 mm", "[manual] restyle: 6 mm webs above and below the mag slots; IBU MC 3.1.6.4 a"),
-    ("grip_depth", "mm", "40 mm", "[manual] locked"),
-    ("grip_width", "mm", "36 mm", "[manual] locked"),
-    ("grip_length", "mm", "80 mm", "[manual] Darren 2026-11-24: 5 mm of margin to the 140 mm line (chk_depth_grip)"),
+    ("grip_depth", "mm", "40 mm * grip_circumference / 125.7 mm", "[manual] fitted: front to back, scales with the girth (40 mm at 125.7 mm); grows toward the palm, the front stays put"),
+    ("grip_width", "mm", "36 mm * grip_circumference / 125.7 mm", "[manual] fitted: side to side, scales with the girth (36 mm at 125.7 mm)"),
+    ("grip_length", "mm", "m_J", "[manual] fitted: grip length = hand breadth J; IBU 140 mm depth caps it (chk_depth_grip)"),
+    ("grip_swell", "mm", "m_G / 20", "[manual] fitted: palm swell depth on the grip's back = palm length G / 20 (starting rule, tune after the first print)"),
     ("grip_angle_deg", "deg", "78 deg", "[manual] restyle: raked like current biathlon grips"),
     ("mag_holder_start", "mm", "222 mm", "[manual] r2 flush slots"),
     ("mag_holder_wall", "mm", "8 mm", "[manual] web between the spare-mag slots, re-spaced for the 36 mm slots"),
@@ -87,7 +89,7 @@ DEMO_PARAMS = [
     ("tip_rake", "mm", "6 mm", "[demo] forend nose leans back by this much"),
     ("tip_depth", "mm", "38 mm", "[demo] bore to the bottom of the forend nose"),
     ("comb_nose", "mm", "12 mm", "[demo] heel to comb, and comb to wrist ramps"),
-    ("bolt_thumb_room", "mm", "22 mm", "[demo] PLACEHOLDER: room for the thumb behind the bolt at the end of its travel (Darren 2026-11-24)"),
+    ("bolt_thumb_room", "mm", "0.37 * m_N", "[manual] fitted: room for the thumb behind the bolt at the end of its travel = 0.37 x thumb length N (22 mm at N = 60, the earlier placeholder)"),
     ("bolt_clear_x", "mm", "action_rear - act_bolt_travel - bolt_thumb_room", "[demo] derived: the stock stays below the bolt from the action's rear back to here"),
     ("wrist_top", "mm", "-(act_bed_w / 2 + 2 mm)", "[demo] derived: the flat behind the action sits 2 mm below the receiver's underside, so the bolt and the thumb pass over it"),
     ("comb_rise", "mm", "18 mm", "[demo] length of the ramp from the bolt flat up to the comb"),
@@ -111,7 +113,7 @@ DEMO_PARAMS = [
     ("wrist_heel_r", "mm", "60 mm", "[demo] sweep from the wrist into the butt underside (its tangent must stay behind the rear joint)"),
     ("grip_top_y", "mm", "-55 mm", "[demo] derived: the grip hangs from the wrist underside"),
     ("grip_lean", "", "tan(90 deg - grip_angle_deg)", "[demo] grip lean per mm of height"),
-    ("grip_front_x", "mm", "-trigger_reach + grip_depth / 2", "[demo] derived: grip front at its top"),
+    ("grip_front_x", "mm", "-trigger_reach + 20 mm", "[demo] derived: grip front at its top; fixed, so the trigger reach and the rigid front strip never move with the hand"),
     ("grip_offset", "mm", "0 mm", "[demo] grip centre offset toward the away (palm) side"),
     ("butt_flare_len", "mm", "45 mm", "[demo] the butt is as wide as the main body at the rear joint and narrows to comb_width over this length, so there is no step at the joint"),
     ("butt_flare_x", "mm", "rear_split - butt_flare_len", "[demo] derived: where the butt reaches comb_width"),
@@ -122,7 +124,7 @@ DEMO_PARAMS = [
     ("grip_z0", "mm", "-face_side * (grip_offset + grip_width / 2)", "[demo] derived: away-side skin of the grip"),
     ("grip_round", "mm", "(2 * (grip_depth + grip_width) - grip_circumference) / (8 - 2 * PI)",
      "[demo] derived: corner round that makes the grip girth equal grip_circumference (PI * M)"),
-    ("grip_back_r", "mm", "160 mm", "[demo] palm swell: arc of the grip's back"),
+    ("grip_back_r", "mm", "grip_length * grip_length / (8 * grip_swell) + grip_swell / 2", "[demo] derived: arc of the grip's back that bulges grip_swell"),
     ("chk_grip_round", "mm", "grip_width / 2 - grip_round - 1 mm", "[demo] the girth round fits the grip width"),
     ("chk_depth_grip", "mm", "ibu_depth_max + grip_top_y - grip_length",
      "[demo] MC 3.1.6.4 a read strictly: grip bottom within 140 mm of the bore"),
@@ -285,7 +287,12 @@ DEMO_PARAMS = [
     ("chk_fj_pocket_hand", "mm", "handstop_position - (fj_head_x + fj_pocket_len)", "[demo] head pocket behind the hand stop"),
     ("chk_rj_head_window", "mm", "(rs_win_top - (rear_tongue_y + joint_head_d / 2)) ", "[demo] rear heads fit under the window top"),
     # ---- TPU inserts (Darren 2026-11-24): surfaces shaped purely by the athlete's body are separate TPU parts
-    ("tpu_wall", "mm", "4 mm", "[demo] thinnest TPU over the rigid grip core"),
+    ("tpu_wall", "mm", "4 mm", "[demo] TPU at the grip's front, between the core and the fingers"),
+    ("grip_core_depth", "mm", "28 mm", "[demo] FIXED rigid grip core: front to back (the TPU sleeve takes the hand size)"),
+    ("grip_core_width", "mm", "26 mm", "[demo] FIXED rigid grip core: side to side"),
+    ("grip_core_round", "mm", "9 mm", "[demo] FIXED rigid grip core: corner round"),
+    ("chk_grip_tpu_side", "mm", "(grip_width - grip_core_width) / 2 - 2 mm", "[demo] USER-FITTED RANGE: at least 2 mm of TPU on each side of the core (M >= about 33.5 mm)"),
+    ("chk_grip_tpu_back", "mm", "grip_depth - tpu_wall - grip_core_depth - 2 mm", "[demo] USER-FITTED RANGE: at least 2 mm of TPU behind the core (M >= about 34 mm)"),
     ("cap_t", "mm", "7 mm", "[demo] rigid cap under the grip that locks the TPU sleeve; thick enough to counterbore the screw head"),
     ("cap_screw_d", "mm", "5.5 mm", "[demo] M5 clearance hole in the cap"),
     ("stock_top_y", "mm", "-(act_bed_r - act_wall_h)", "[demo] derived: top edge of the stock beside the action, from the measured bed depth"),
@@ -1431,11 +1438,13 @@ class Builder:
 
         sk = self.sketch("grip_core")
         ov = f"{gtop} + 3 mm"
+        # FIXED core section (Darren 2026-11-25): the hand size goes into the TPU only
+        cb = "(tpu_wall + grip_core_depth)"
         self.poly(sk, [(f"{gf(ov)} - tpu_wall", ov), (f"{gf(gb2)} - tpu_wall", gb2),
-                       (f"{gb(gb2)} + tpu_wall", gb2), (f"{gb(ov)} + tpu_wall", ov)])
+                       (f"{gf(gb2)} - {cb}", gb2), (f"{gf(ov)} - {cb}", ov)])
         self.done(sk)
-        self.extrude(blk, sk.profiles.item(0), NEW, start="grip_z0 + face_side * tpu_wall",
-                     dist="face_side * (grip_width - 2 * tpu_wall)", name="grip_core")
+        self.extrude(blk, sk.profiles.item(0), NEW, start="grip_z0 + face_side * (grip_width - grip_core_width) / 2",
+                     dist="face_side * grip_core_width", name="grip_core")
         long_edges = {}
         for f in last().faces:
             g = f.geometry
@@ -1443,7 +1452,7 @@ class Builder:
                 for e in f.edges:
                     if abs(e.startVertex.geometry.y - e.endVertex.geometry.y) > 0.1:
                         long_edges[e.tempId] = e
-        self.fillet(blk.component, [(list(long_edges.values()), "grip_round - tpu_wall")], "grip_core_girth")
+        self.fillet(blk.component, [(list(long_edges.values()), "grip_core_round")], "grip_core_girth")
         sk = self.sketch("grip_spine")
         self.poly(sk, [(gf(ov), ov), (gf(gbm), gbm), (f"{gf(gbm)} - spine_d", gbm), (f"{gf(ov)} - spine_d", ov)])
         self.done(sk)
@@ -1478,7 +1487,7 @@ class Builder:
             pl = self.offset_plane("cap_plane", f"-({gbot})", root.xZConstructionPlane)
         sk = self.sketch("cap_screw", pl)
         q = sk.modelToSketchSpace(adsk.core.Point3D.create(1, ybot, 1))
-        cx = f"({gf(gbot)} - grip_depth / 2)"
+        cx = f"({gf(gbot)} - tpu_wall - grip_core_depth / 2)"           # centre of the fixed core
         cz = "(-face_side * grip_offset)"
         ex = cx if q.x > 0 else f"-{cx}"
         ez = cz if q.y > 0 else f"-{cz}"
