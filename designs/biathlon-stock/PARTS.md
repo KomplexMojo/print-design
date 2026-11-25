@@ -41,7 +41,7 @@ Notes:
 | `rear_stock` | PAHT-CF | butt, comb, hook |
 | `main_body` | PAHT-CF | joined with `action_cradle` and `lower_unit` before printing |
 | `action_cradle` | PAHT-CF | action-specific inlet |
-| `lower_unit` | PAHT-CF | grip core, trigger guard, standing block tongue |
+| `lower_unit` | PAHT-CF | grip core, trigger guard sweeping into the block heel, standing block tongue |
 | `forestock` | PAHT-CF | |
 | `sling_clamp` | ASA | |
 | `grip_cap` | ASA | |

@@ -41,7 +41,7 @@ DATUM = 1000.0  # mm
 OBSOLETE_PARAMS = ("chk_pillar_mag", "act_receiver_d", "sling_tab_r", "rel_len", "guard_div",
                    "block_top_len", "grip_toe", "rs_rib_x", "saddle_h", "block_bolt_x", "block_insert_depth",
                    "chk_slot_pillar", "chk_key_slot", "act_slot_x0", "act_slot_x1", "act_slot_w",
-                   "wrist_facet_w", "wrist_facet_h", "chk_belly_step", "chk_rel_travel", "chk_bolts_centred", "sling_head_h", "finger_clear", "blk_scoop_d", "chk_comb_length", "chk_pad_pocket", "guard_gusset_r", "collar_h", "nose_cap", "core_neck", "chk_gusset_bolt", "rail_w", "rail_h", "rail_y", "chk_rail_barrel", "chk_rail_web", "rail_x0", "rail_len", "rail_screw_inset", "rail_nut_depth", "chk_rail_nose", "anchor_y", "anchor_sleeve_d", "anchor_head_d", "anchor_head_h", "anchor_washer_d", "anchor_washer_t", "blk_win_web", "block_slot_r", "chk_block_top_flat", "collar_round", "rear_cap", "wrist_round")
+                   "wrist_facet_w", "wrist_facet_h", "chk_belly_step", "chk_rel_travel", "chk_bolts_centred", "sling_head_h", "finger_clear", "blk_scoop_d", "chk_comb_length", "chk_pad_pocket", "guard_gusset_r", "collar_h", "nose_cap", "core_neck", "chk_gusset_bolt", "rail_w", "rail_h", "rail_y", "chk_rail_barrel", "chk_rail_web", "rail_x0", "rail_len", "rail_screw_inset", "rail_nut_depth", "chk_rail_nose", "anchor_y", "anchor_sleeve_d", "anchor_head_d", "anchor_head_h", "anchor_washer_d", "anchor_washer_t", "blk_win_web", "block_slot_r", "chk_block_top_flat", "collar_round", "rear_cap", "wrist_round", "heel_len")
 FUSE_BLOCK = False   # True joins the standing block into the main body (the printed part)
 FUSE_ACTION = False  # True joins the action cradle into the main body (the printed part); False keeps it apart for review
 
@@ -142,8 +142,8 @@ DEMO_PARAMS = [
     ("plug_h", "mm", "5 mm", "[demo] lower unit: height of the plate that plugs into the stock underside"),
     ("plug_w", "mm", "30 mm", "[demo] lower unit: width of that plate (inside the flat of the underside)"),
     ("plug_x0", "mm", "rear_split + rear_tongue_length + 2 mm", "[demo] derived: the plate starts ahead of the rear joint socket"),
-    ("heel_len", "mm", "14 mm", "[demo] rigid heel at the rear of the standing block (carries the finger scoop and the tongue; the cover slides up to it)"),
-    ("blk_heel_x", "mm", "blk_rear_x + heel_len", "[demo] derived: front face of the heel, where the TPU cover stops"),
+    ("sweep_len", "mm", "16 mm", "[demo] DECIDED: the guard's front leg sweeps down into the block top over this length (rigid, concave, tangent to the sock top)"),
+    ("blk_heel_x", "mm", "guard_front_x + sweep_len", "[demo] derived: front face of the rigid heel and end of the sweep, where the TPU sock starts"),
     ("detent_w", "mm", "4 mm", "[demo] cross groove under the block tongue; a rib inside the cover snaps into it"),
     ("detent_d", "mm", "1.5 mm", "[demo] depth of that groove"),
     ("rail_taper_len", "mm", "18 mm", "[demo] the guard rail narrows over this length before it meets the grip"),
@@ -165,6 +165,8 @@ DEMO_PARAMS = [
      "[manual] restyle: derived, the block sits under the trigger guard (m_AJ is kept for reference only)"),
     ("chk_block_mag", "mm", "mag_well_x0 + act_rel_zone - blk_front_x - 2 mm",
      "[demo] the block and guard stay behind the magazine well, so the magazine drops free"),
+    ("chk_sweep_bolt", "mm", "act_screw_rear_x - (act_head_d + 3 mm) / 2 - blk_heel_x - 2 mm",
+     "[demo] the rigid sweep ends ahead of the rear bolt's key hole, which stays under the TPU sock"),
     # ---- hand stop
     ("hs_rake", "mm", "14 mm", "[demo] hand-stop front face leans by this much"),
     ("sling_tab_w", "mm", "40 mm", "[demo] Biatar sling end tab width (Darren, measured 2026-11-24)"),
@@ -900,23 +902,37 @@ class Builder:
         # DECIDED (Darren 2026-11-25, do not revert): the standing block's rigid part is a plain rectangular tongue
         # and the TPU is a sock that slides over it from the front and covers front, top, bottom and sides. So the
         # guard's outline stops at the block's top line: nothing rigid runs along the top of the block.
+        # DECIDED (Darren 2026-11-25, do not revert): the front leg does not meet the block in an L. A rigid concave
+        # sweep runs from the leg's front face down into the block top, tangent to both, and ends at the heel front
+        # (blk_heel_x), where the sock's top carries on level. The sock is never cut back under rigid skin.
+        k = self.ev("blk_front_rake") / self.ev("block_height - forend_depth")      # leg face lean (dx per dy)
+        half_a = (math.pi / 2 - math.atan(k)) / 2                                      # half the corner angle
+        dt = f"(blk_heel_x - ({lf(gbm)}))"                                             # tangent length from the corner
+        sweep_r = f"{dt} * {math.tan(half_a):.6f}"
+        y_t = f"{gbm} + {dt} * {1 / math.hypot(1, k):.6f}"                            # tangent point on the leg face
         self.poly(sk, [(f"{rf} - {rc}", top_e), ("guard_front_x", top_e),
-                       (lf(f"{gbm} + {rc}"), f"{gbm} + {rc}"), (f"{lf(gbm)} - {rc}", gbm),          # 2 -> 3: rounded front lower corner of the loop
+                       (lf(y_t), y_t), ("blk_heel_x", gbm),                                        # 2 -> 3: concave sweep into the block top
                        ("blk_rear_x + 6 mm", gbm), ("blk_rear_x + 6 mm", f"{gbm} - {rb}"),
                        ("blk_rear_x", f"{gbm} - {rb}"), (f"blk_rear_x - {rb}", gbm),               # 6 -> 7: rail rolls into the heel's rear face
                        (f"{gf(gbm)} - 6 mm", gbm), (f"{gf(f'{fh0} + {rr}')} - 6 mm", f"{fh0} + {rr}"),
                        (gf(f"{fh0} + {rr}"), f"{fh0} + {rr}"), (f"{gf(fh0)} + {rr}", fh0),          # 10 -> 11: rail into grip
                        (f"{rf} - {rc}", fh0), (rf, f"{fh0} + {rc}"),                               # 12 -> 13: opening, front lower corner
                        (rf, f"{y1} - {rc}"), (f"{rf} - {rc}", y1)],                                # 14 -> 15: opening, front upper corner
-                  arcs={2: (rc, -1), 6: rb, 10: rr, 12: rc, 14: rc})
+                  arcs={2: sweep_r, 6: rb, 10: rr, 12: rc, 14: rc})
         self.done(sk)
         self.extrude(blk, sk.profiles.item(0), NEW, sym="guard_width", name="trigger_guard")
         x_heel, x_rear, y_top = self.ev("blk_heel_x"), self.ev("blk_rear_x"), self.ev(gbm)
 
-        def in_heel(e):         # edges buried in the heel: leave them, the join removes them
+        x_open = self.ev(rf)
+
+        def in_heel(e):         # edges buried in the heel, and the leg-front/sweep edges (rounded after the join)
             a_, b_ = e.startVertex.geometry, e.endVertex.geometry
-            return (abs(a_.z - b_.z) < 1e-4 and min(a_.x, b_.x) > x_rear - 0.01 and max(a_.x, b_.x) < x_heel + 0.01
-                    and max(a_.y, b_.y) < y_top - 0.01)
+            if abs(a_.z - b_.z) > 1e-4:
+                return False
+            if min(a_.x, b_.x) > x_open + 0.05:
+                return True
+            return (min(a_.x, b_.x) > x_rear - 0.01 and max(a_.x, b_.x) < x_heel + 0.01
+                    and max(a_.y, b_.y) < y_top + 0.01)
 
         self.round_faces(blk, "guard_width / 2", "guard_round", "guard_round", skip_y=(top_e,), skip=in_heel)
 
@@ -927,7 +943,7 @@ class Builder:
                       arcs={3: "blk_scoop_r"})                                                     # finger scoop at the rear
             self.done(sk)
 
-        def block_solid(occ, name, inset, width, corner_r, edge_r, top_corner=True):
+        def block_solid(occ, name, inset, width, corner_r, edge_r, top_corner=True, skip=None):
             lo = f"{bh} + {inset}"
             sk = self.sketch(name)
             block_profile(sk, inset)
@@ -937,7 +953,7 @@ class Builder:
                                (f"blk_rear_x + blk_rake + {inset}", lo, corner_r)]
                          + ([(f"blk_front_x - {inset}", btop, "block_top_r")] if top_corner else []), name, body=b)
             if edge_r:
-                self.round_faces(occ, f"({width}) / 2", edge_r, f"{name}_round", body=b)     # top edges too
+                self.round_faces(occ, f"({width}) / 2", edge_r, f"{name}_round", body=b, skip=skip)   # top edges too
             return b
 
         # plate that plugs into the stock underside (the stock gets the matching pocket at the end)
@@ -957,7 +973,11 @@ class Builder:
             return self.extrude(occ, sk.profiles.item(0), CUT, sym="2 * body_width", name=name, bodies=bodies)
 
         # heel and sock are cut from the same rounded shape, so they are flush where they meet
-        heel = block_solid(blk, "block_heel", "0 mm", "block_width", "block_corner_r", "block_round")
+        def top_edge(e):        # the heel's top lies under the guard and sweep: square, so the join leaves no groove.
+            a_, b_ = e.startVertex.geometry, e.endVertex.geometry           # edges ahead of the heel are cut away
+            return (abs(a_.y - y_top) < 1e-3 and abs(b_.y - y_top) < 1e-3) or min(a_.x, b_.x) > x_heel - 0.01
+
+        heel = block_solid(blk, "block_heel", "0 mm", "block_width", "block_corner_r", "block_round", skip=top_edge)
         cut_box(blk, "block_heel_front", "blk_heel_x", "blk_front_x + 10 mm", f"{bh} - 5 mm", f"{btop} + 5 mm", [heel])
         sk = self.yz_sketch("block_tongue", "blk_heel_x")
         tw, t_hi, t_lo = f"(block_width / 2 - {ct})", f"{btop} - {ct}", f"{bh} + {ct}"
@@ -968,6 +988,19 @@ class Builder:
         cut_box(blk, "block_detent", "blk_heel_x + 8 mm", "blk_heel_x + 8 mm + detent_w", f"{t_lo} - 1 mm", f"{t_lo} + detent_d", [tongue])
         extra = [(blk, blk.component.bRepBodies.item(i)) for i in range(1, blk.component.bRepBodies.count)]
         self.combine((blk, body("block")), extra, JOIN, "lower_unit_join", keep=False)
+        # round the leg front and the sweep as one tangent chain on the joined part; it ends square on the heel front,
+        # where the sock's own edge round of the same radius carries on
+        half_w, y_lid = self.ev("guard_width / 2"), self.ev(top_e)
+        chain = []
+        for e in body("block").edges:
+            a_, b_ = e.startVertex.geometry, e.endVertex.geometry
+            if not (abs(abs(a_.z) - half_w) < 1e-3 and abs(a_.z - b_.z) < 1e-4 and self.sharp(e)):
+                continue
+            xs, ys = (a_.x, b_.x), (a_.y, b_.y)
+            if (min(xs) > x_open + 0.05 and max(xs) < x_heel + 0.01 and min(ys) > y_top - 0.01
+                    and not all(abs(y - y_lid) < 1e-3 for y in ys) and not all(abs(x - x_heel) < 1e-3 for x in xs)):
+                chain.append(e)
+        self.fillet(blk.component, [(chain, "guard_round")], "guard_sweep_round")
 
         # TPU sock: its own part, customised and printed per athlete. It covers the front, top, bottom and both
         # sides of the block, and hides the hole for the rear mounting bolt.

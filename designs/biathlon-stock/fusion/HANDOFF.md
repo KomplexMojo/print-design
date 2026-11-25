@@ -30,6 +30,9 @@ Read this before touching `fusion_build_demo.py`. The longer history is in `READ
 - Only stock length, cheek height, hand stop, harness positions and spare-mag side follow the athlete. Everything
   else is a fixed dimension, above all whatever meets the action and barrel.
 - Standing block: rigid heel plus a plain rectangular tongue; the TPU is a sock over front, top, bottom and sides.
+- Guard-to-block sweep (r33): the guard's front leg flows into the block top on a rigid concave sweep (`sweep_len`)
+  that ends at the heel front, where the sock starts. Not an L-shape. The sock keeps its full front, top, bottom and
+  sides on the tongue ahead of the sweep; never cut it back under a rigid top skin.
 - Lower unit and action cradle are separate components, joined to the main body for printing. No fasteners.
 - Harness: a raised boss on the forestock side opposite the mags, with a T-slot, mouth toward the butt, stop toward
   the muzzle, at the measured position. No rail, no through-hole, no added part.

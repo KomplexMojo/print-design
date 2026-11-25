@@ -308,11 +308,18 @@ now builds it, still entirely from User Parameters. Review images come from `fus
   corners (`guard_corner_r`) and a large radius into the grip front (`guard_rear_r`); its length (about 62 mm) cannot go
   below the measured 60 mm trigger opening above it. Toward the grip the rail narrows (`rail_taper_len`,
   `rail_taper_w`), so it runs into the grip's rounded front without shoulders.
-- **Standing block: DECIDED, do not revert (Darren, 2026-11-25).** The rigid part is a heel at the rear
-  (`heel_len`) and a plain rectangular tongue that sticks forward from it, `cover_t` inside the block's outer shape
-  all round, with a cross groove underneath (`detent_w`, `detent_d`). The hole for the rear mounting bolt goes
-  through the tongue. Nothing rigid runs along the top, sides, bottom or front of the block. The guard's rail rolls
-  into the heel's rear face on a quarter-round (`guard_blend_r`).
+- **Standing block: DECIDED, do not revert (Darren, 2026-11-25).** The rigid part is a heel at the rear and a plain
+  rectangular tongue that sticks forward from it, `cover_t` inside the block's outer shape all round, with a cross
+  groove underneath (`detent_w`, `detent_d`). The hole for the rear mounting bolt goes through the tongue. Nothing
+  rigid runs along the top, sides, bottom or front of the sock. The guard's rail rolls into the heel's rear face on a
+  quarter-round (`guard_blend_r`).
+- **Guard-to-block sweep: DECIDED, do not revert (Darren, 2026-11-25, r33).** The guard's front leg no longer meets
+  the block in an L. A rigid concave sweep runs from the leg's front face down into the block top, tangent to both,
+  over `sweep_len` (16 mm, radius about 16 mm). It ends at the heel front (`blk_heel_x = guard_front_x + sweep_len`),
+  exactly where the sock starts, so the sock's top carries on level from the end of the curve. The leg and sweep side
+  edges are rounded as one chain after the join (`guard_sweep_round`, `guard_round`), the heel's top edges stay square
+  under the guard, so the seam leaves no groove. The sweep stays ahead of the rear bolt's key hole (`chk_sweep_bolt`),
+  which stays under the sock. Never cut the sock back under a rigid top skin to get this shape.
 - **TPU sock.** `tpu_block_cover` is the whole standing block: its own part, customised and printed per athlete.
   It slides over the tongue from the front until it meets the heel, and covers the front, top, bottom and both sides.
   A rib inside it snaps into the tongue's groove (the TPU rule), and it hides the bolt hole. Heel and sock are cut
