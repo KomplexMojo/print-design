@@ -314,9 +314,10 @@ DEMO_PARAMS = [
     ("chk_handstop_max", "mm", "forend_tip - tip_rake - 4 mm - tip_sweep_x", "[demo] USER-FITTED RANGE: furthest forward the hand stop can sit"),
     ("harness_pitch", "mm", "20 mm", "[demo] PLACEHOLDER: spacing of the two inserts of each harness connector"),
     ("harness_rear_y", "mm", "comb_top - 14 mm", "[demo] height of the rear harness connector, in the comb beam"),
-    # ---- harness module (Darren 2026-11-24): a mini-rail built into the forestock's side, opposite the spare mags.
-    # The harness's own sliding block drops in at the front, slides back under two lips to a hard stop at the
-    # measured position, and the harness's nut clamps it on the lips. Nothing passes through the stock.
+    # ---- harness module (Darren 2026-11-24): a raised boss on the forestock's side, opposite the spare mags, printed
+    # in one piece with the forestock, with a mini-rail (T-slot) in it. The mouth faces the butt and the stop faces
+    # the muzzle: carried muzzle up, the rifle's weight pulls the harness block against the stop, so the rifle
+    # cannot slide off even if the harness's nut comes loose.
     ("mini_block_w", "mm", "13 mm", "[demo] PENDING MEASUREMENT: width of the harness's sliding block"),
     ("mini_block_len", "mm", "18 mm", "[demo] PENDING MEASUREMENT: length of the sliding block"),
     ("mini_block_t", "mm", "4 mm", "[demo] PENDING MEASUREMENT: thickness of the sliding block's foot"),
@@ -326,8 +327,12 @@ DEMO_PARAMS = [
     ("mini_track_w", "mm", "mini_block_w + 2 * fit_slide", "[demo] derived: width of the track under the lips"),
     ("mini_track_h", "mm", "mini_block_t + 0.4 mm", "[demo] derived: height of the track under the lips"),
     ("mini_entry_len", "mm", "mini_block_len + 3 mm", "[demo] derived: the open mouth ahead of the lips, where the block drops in"),
-    ("chk_harness_front_lo", "mm", "harness_front_position - mini_block_len / 2 - 0.9 mm - (mag_holder_start + mag_holder_count * mag_slot_len + (mag_holder_count - 1) * mag_holder_wall)", "[demo] USER-FITTED RANGE: the harness module starts ahead of the spare-mag slots (it sits at their height, and the wall beside them is too thin for it)"),
-    ("chk_harness_front_hi", "mm", "forend_tip - tip_rake - 12 mm - (harness_front_position + mini_block_len / 2 + mini_entry_len)", "[demo] USER-FITTED RANGE: the module's mouth ends behind the forend's nose"),
+    ("mini_wall", "mm", "7 mm", "[demo] wall of the boss round the T-slot"),
+    ("mini_boss_h", "mm", "mini_lip_t + mini_track_h", "[demo] derived: the boss stands this far off the side of the forestock; the T-slot's floor is the side's own surface"),
+    ("mini_boss_round", "mm", "3 mm", "[demo] no-snag: round on the boss's outer edges"),
+    ("mini_boss_corner", "mm", "5 mm", "[demo] no-snag: round on the boss's four corners"),
+    ("chk_harness_front_lo", "mm", "harness_front_position - mini_block_len / 2 - mini_entry_len - mini_wall - handstop_position", "[demo] USER-FITTED RANGE: the harness boss sits ahead of the prone pad"),
+    ("chk_harness_front_hi", "mm", "forend_tip - tip_rake - tip_round - 2 mm - (harness_front_position + mini_block_len / 2 + 0.5 mm + mini_wall)", "[demo] USER-FITTED RANGE: the harness boss ends behind the forend's rounded nose"),
     ("chk_mini_lip", "mm", "(mini_track_w - mini_neck_w) / 2 - 1.5 mm", "[demo] each lip overhangs the block by at least 1.5 mm"),
     ("chk_harness_rear_lo", "mm", "harness_rear_position - harness_pitch / 2 - (-lop + 25 mm)", "[demo] USER-FITTED RANGE: rear harness connector ahead of the butt plate"),
     ("chk_harness_rear_hi", "mm", "(-lop + comb_length) - (harness_rear_position + harness_pitch / 2) - 5 mm", "[demo] USER-FITTED RANGE: rear harness connector behind the front of the comb"),
@@ -1313,25 +1318,38 @@ class Builder:
             fl = self.extrude(main, sk.profiles.item(0), CUT, start=start, dist="flute_d + 1 mm", name=f"body_flute_{nm}")
             self.fillet_z_edges(main, fl, "mag_slot_r", f"body_flute_corners_{nm}")
 
-        # harness module (Darren 2026-11-24): a mini-rail built into the forestock, not a through-hole and not an
-        # added part. The harness's sliding block drops into the open mouth, slides back under two lips until
-        # its post meets the end of the slot at harness_front_position, and the harness's nut clamps on the lips.
+        # harness module (Darren 2026-11-24): a raised boss on the forestock's side, one piece with it, with the
+        # T-slot in it. Mouth toward the butt, stop toward the muzzle: carried muzzle up, the rifle's weight pulls
+        # the harness block against the stop, so a loose nut cannot let the rifle slide off. The harness's block
+        # drops into the mouth, slides forward under the two lips until its neck meets the rounded end of the slot
+        # at harness_front_position, and the harness's nut clamps on the lips.
         hx, hy = "harness_front_position", "mini_y"
-        x_stop = f"{hx} - mini_block_len / 2 - 0.5 mm"
-        x_lips = f"{hx} + mini_block_len / 2 + 1 mm"            # lips end here; the mouth starts
-        x_end = f"{hx} + mini_block_len / 2 + mini_entry_len"
-        sk = self.sketch("harness_track", face)                 # the track under the lips, and the mouth's floor
-        self.rect(sk, x_stop, x_end, f"{hy} - mini_track_w / 2", f"{hy} + mini_track_w / 2")
+        x_stop = f"{hx} + mini_block_len / 2 + 0.5 mm"          # front end of the track
+        x_lips = f"{hx} - mini_block_len / 2 - 1 mm"            # lips end here; the mouth is behind
+        x_end = f"{hx} - mini_block_len / 2 - mini_entry_len"   # rear end of the mouth
+        half = "(mini_track_w / 2 + mini_wall)"
+        sk = self.sketch("harness_boss", face)
+        self.rect(sk, f"{x_end} - mini_wall", f"{x_stop} + mini_wall", f"{hy} - {half}", f"{hy} + {half}")
         self.done(sk)
-        f = self.extrude(fore, sk.profiles.item(0), CUT, start="mag_side * mini_lip_t", dist="mag_side * mini_track_h",
-                         name="harness_track")
-        sk = self.sketch("harness_neck_slot", face)             # the opening between the lips; its end is the hard stop
-        self.rect(sk, f"{hx} - mini_neck_w / 2", x_end, f"{hy} - mini_neck_w / 2 - fit_slide", f"{hy} + mini_neck_w / 2 + fit_slide")
+        boss = self.extrude(fore, sk.profiles.item(0), JOIN, dist="-mag_side * mini_boss_h", name="harness_boss")
+        self.fillet_z_edges(fore, boss, "mini_boss_corner", "harness_boss_corners")
+        z_top = abs(self.ev("body_width / 2 + mini_boss_h"))
+        rim = [e for e in body("fore").edges
+               if self.sharp(e) and abs(abs(e.startVertex.geometry.z) - z_top) < 1e-3 and abs(abs(e.endVertex.geometry.z) - z_top) < 1e-3]
+        self.fillet(fore.component, [(rim, "mini_boss_round")], "harness_boss_round")
+        top_pl = self.offset_plane("harness_boss_top", "-mag_side * (body_width / 2 + mini_boss_h)")
+        sk = self.sketch("harness_track", top_pl)               # the track under the lips, and the mouth's floor
+        self.rect(sk, x_end, x_stop, f"{hy} - mini_track_w / 2", f"{hy} + mini_track_w / 2")
+        self.done(sk)
+        self.extrude(fore, sk.profiles.item(0), CUT, start="mag_side * mini_lip_t", dist="mag_side * mini_track_h",
+                     name="harness_track")
+        sk = self.sketch("harness_neck_slot", top_pl)           # the opening between the lips; its front end is the stop
+        self.rect(sk, x_end, f"{hx} + mini_neck_w / 2", f"{hy} - mini_neck_w / 2 - fit_slide", f"{hy} + mini_neck_w / 2 + fit_slide")
         self.done(sk)
         f2 = self.extrude(fore, sk.profiles.item(0), CUT, dist="mag_side * (mini_lip_t + 0.1 mm)", name="harness_neck_slot")
         self.fillet_z_edges(fore, f2, "mini_neck_w / 2 - 0.5 mm", "harness_neck_slot_end")
-        sk = self.sketch("harness_mouth", face)                 # where the block drops in
-        self.rect(sk, x_lips, x_end, f"{hy} - mini_track_w / 2", f"{hy} + mini_track_w / 2")
+        sk = self.sketch("harness_mouth", top_pl)               # where the block drops in
+        self.rect(sk, x_end, x_lips, f"{hy} - mini_track_w / 2", f"{hy} + mini_track_w / 2")
         self.done(sk)
         self.extrude(fore, sk.profiles.item(0), CUT, dist="mag_side * (mini_lip_t + 0.1 mm)", name="harness_mouth")
 

@@ -433,22 +433,26 @@ them with `[manual]` rows at the top of `DEMO_PARAMS`. The TPU covers remain the
   both window rims are rounded (`strut_round`), so the rib, lower strut and plate post are rounded bars that run
   into the plate without a step. `frame_width` and `slim_cove` no longer drive geometry. About 45 cm³ heavier.
 
-### Harness module: a built-in mini-rail (Darren, 2026-11-24)
-- **Not a rail, not a through-hole, not an added part.** The full-length aluminium rail (r33) and the sleeve-nut
-  through-hole (r35) were both rejected. The connector is a short T-slot printed into the forestock's side, opposite
-  the spare mags, at `harness_front_position` from the fit record (measurement AH).
-- **Layout.** Lengthwise, centred top to bottom on the side of the forestock (`mini_y`). An upright slot open at
-  the top edge was tried in r38 and dropped.
-- **How it works.** The harness's own sliding block drops into an open mouth (`mini_entry_len`), slides back under
-  two lips (`mini_lip_t` thick, the track is `mini_track_w` x `mini_track_h`), and its neck meets the rounded end
-  of the slot exactly at the measured position. The harness's nut then clamps on the lips.
+### Harness module: a raised boss with a mini-rail (Darren, 2026-11-24)
+- **What it is.** A boss that rises `mini_boss_h` from the forestock's side, opposite the spare mags, printed in
+  one piece with the forestock, with a T-slot in it. Its floor is the side's own surface, so nothing is cut into
+  the forestock and the thin wall beside the spare-mag slots does not matter. Centred top to bottom (`mini_y`).
+- **Rejected on the way.** A full-length aluminium rail (r33), a through-hole with a sleeve nut (r35), a slot cut
+  into the side (r37, r39) and an upright slot open at the top edge (r38).
+- **Safe direction.** The mouth faces the butt and the stop faces the muzzle. Carried muzzle up, the rifle's
+  weight pulls the harness block against the stop, so the rifle cannot slide off if the harness's nut comes loose.
+- **How it works.** The harness's own sliding block drops into the mouth (`mini_entry_len`), slides forward under
+  two lips (`mini_lip_t` thick; the track is `mini_track_w` x `mini_track_h`) until its neck meets the rounded end
+  of the slot exactly at `harness_front_position` (measurement AH). The harness's nut then clamps on the lips.
 - **Sizes are PENDING MEASUREMENT** of the harness block: `mini_block_w`, `mini_block_len`, `mini_block_t`,
-  `mini_neck_w`. `chk_mini_lip` keeps at least 1.5 mm of lip over each side of the block.
-- **Strength.** The rifle hangs on the two printed lips. Print the forestock so the layers do not run parallel to
-  the lips' underside, and treat the lip thickness as the parameter to raise if the block's neck allows.
-- **Fitted range.** `chk_harness_front_lo` and `chk_harness_front_hi`: the module sits ahead of the prone pad and
-  its mouth ends behind the nose. Centred, it sits at the height of the spare-mag slots, so it must start ahead of
-  them: 400 to 407 mm ahead of the trigger. Darren's is 400.
+  `mini_neck_w`. `chk_mini_lip` keeps at least 1.5 mm of lip over each side of the block. The boss has `mini_wall`
+  round the slot and rounded edges and corners (`mini_boss_round`, `mini_boss_corner`, no-snag).
+- **Strength.** The rifle hangs on the two printed lips. Raise `mini_lip_t` as far as the block's neck allows; the
+  boss grows with it.
+- **Fitted range.** `chk_harness_front_lo`, `chk_harness_front_hi`: the boss sits ahead of the prone pad and behind
+  the rounded nose, 387 to 422 mm ahead of the trigger. Darren's is 400.
+- **Width.** The forestock is 57.9 mm wide at the boss. No IBU width limit for the forestock is in our rules file;
+  confirm against the current IBU material catalogue.
 - **Rear connector.** Still two heat-set inserts on the comb beam, pending how the rear of the harness attaches.
 
 ### Parameter tolerance (checked 2026-11-24)
